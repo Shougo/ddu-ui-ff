@@ -14,8 +14,8 @@ type DoActionParams = {
 };
 
 type Params = {
-  startFilter: boolean;
   split: "horizontal" | "vertical" | "no";
+  startFilter: boolean;
 };
 
 export class Ui extends BaseUi<Params> {
