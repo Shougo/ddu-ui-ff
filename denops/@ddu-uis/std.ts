@@ -5,7 +5,7 @@ import {
   DduOptions,
   UiOptions,
 } from "https://deno.land/x/ddu_vim@v0.1.0/types.ts";
-import { Denops, fn } from "https://deno.land/x/ddu_vim@v0.1.0/deps.ts";
+import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.1.0/deps.ts";
 import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.1.0/base/ui.ts";
 
 type DoActionParams = {
@@ -14,7 +14,7 @@ type DoActionParams = {
 };
 
 type Params = {
-  split: "horizontal" | "vertical" | "no";
+  split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
 };
 
@@ -47,17 +47,30 @@ export class Ui extends BaseUi<Params> {
 
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
-      switch (args.uiParams.split) {
-        default:
-        case "horizontal":
-          await args.denops.cmd(`silent keepalt sbuffer ${bufnr}`);
-          break;
-        case "vertical":
-          await args.denops.cmd(`silent keepalt vertical sbuffer ${bufnr}`);
-          break;
-        case "no":
-          await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
-          break;
+      if (args.uiParams.split == "horizontal") {
+        await args.denops.cmd(`silent keepalt sbuffer ${bufnr}`);
+      } else if (args.uiParams.split == "vertical") {
+        await args.denops.cmd(`silent keepalt vertical sbuffer ${bufnr}`);
+      } else if (args.uiParams.split == "floating") {
+        await args.denops.call("nvim_open_win", bufnr, true, {
+          "relative": "editor",
+          "row": Math.ceil(
+            (await args.denops.call("eval", "&lines") as number) / 2 - 10,
+          ),
+          "col": Math.ceil((await op.columns.getGlobal(args.denops)) / 4),
+          "width": Math.ceil((await op.columns.getGlobal(args.denops)) / 2),
+          "height": 20,
+        });
+      } else if (
+        args.uiParams.split == "no" && await fn.has(args.denops, "nvim")
+      ) {
+        await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
+      } else {
+        await args.denops.call(
+          "ddu#util#print_error",
+          `Invalid split param: ${args.uiParams.split}`,
+        );
+        return;
       }
     }
 
@@ -90,6 +103,7 @@ export class Ui extends BaseUi<Params> {
         args.options.name,
         args.options.input,
         this.filterBufnr,
+        args.uiParams,
       ) as number;
     }
 
@@ -158,12 +172,14 @@ export class Ui extends BaseUi<Params> {
     openFilterWindow: async (args: {
       denops: Denops;
       options: DduOptions;
+      uiParams: Params;
     }) => {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
         args.options.input,
         this.filterBufnr,
+        args.uiParams,
       ) as number;
 
       return Promise.resolve(ActionFlags.None);

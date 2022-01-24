@@ -83,6 +83,7 @@ split		(boolean)
 
 		"horizontal": horizontal split
 		"vertical": vertical split
+		"floating": use neovim floating window feature
 		"no": no split
 
 		Default: "horizontal"

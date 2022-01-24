@@ -1,15 +1,12 @@
 let g:ddu#ui#std#_filter_name = ''
 
-function! ddu#ui#std#filter#_open(name, input, bufnr) abort
+function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
   let ids = win_findbuf(a:bufnr)
   if !empty(ids)
     call win_gotoid(ids[0])
     call cursor(line('$'), 0)
   else
-    silent execute 'split' 'ddu-std-filter'
-    let g:ddu#ui#std#_filter_winid = win_getid()
-
-    call s:init_buffer()
+    call s:init_buffer(a:params)
 
     " Set the current input
     if getline('$') ==# ''
@@ -33,7 +30,10 @@ function! ddu#ui#std#filter#_open(name, input, bufnr) abort
   return bufnr('%')
 endfunction
 
-function! s:init_buffer() abort
+function! s:init_buffer(params) abort
+  silent execute 'split' 'ddu-std-filter'
+  let g:ddu#ui#std#_filter_winid = win_getid()
+
   setlocal bufhidden=hide
   setlocal buftype=nofile
   setlocal colorcolumn=
