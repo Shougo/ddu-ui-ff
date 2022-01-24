@@ -125,7 +125,11 @@ export class Ui extends BaseUi<Params> {
     }
 
     await fn.win_gotoid(args.denops, ids[0]);
-    await args.denops.cmd("close!");
+    if ((await fn.winnr(args.denops, "$")) == 1) {
+      await args.denops.cmd("enew");
+    } else {
+      await args.denops.cmd("close!");
+    }
   }
 
   actions: Record<

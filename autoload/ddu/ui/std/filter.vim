@@ -31,7 +31,27 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
 endfunction
 
 function! s:init_buffer(params) abort
-  silent execute 'split' 'ddu-std-filter'
+  if has('nvim') && a:params.split ==# 'floating'
+    let wincol = &columns / 4
+    let winrow = &lines / 2 - 10
+    let winwidth = &columns / 2
+    let row = win_screenpos(win_getid())[0] - 1
+    let bordered_row = row + winheight(0)
+
+    call nvim_open_win(bufnr('%'), v:true, {
+          \ 'relative': 'editor',
+          \ 'row': winrow == 1 ? 0 : bordered_row,
+          \ 'col': wincol,
+          \ 'width': winwidth,
+          \ 'height': 1,
+          \})
+  else
+    split
+  endif
+
+  let bufnr = bufadd('ddu-std-filter')
+  execute bufnr 'buffer'
+
   let g:ddu#ui#std#_filter_winid = win_getid()
 
   setlocal bufhidden=hide
