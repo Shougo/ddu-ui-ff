@@ -1,10 +1,11 @@
 import {
   ActionFlags,
   BaseUi,
+  Context,
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.1.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.2.2/types.ts";
 import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.1.0/deps.ts";
 import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.1.0/base/ui.ts";
 
@@ -23,6 +24,7 @@ export class Ui extends BaseUi<Params> {
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
+  private saveTitle: string = "";
 
   refreshItems(args: {
     items: DduItem[];
@@ -34,6 +36,7 @@ export class Ui extends BaseUi<Params> {
 
   async redraw(args: {
     denops: Denops;
+    context: Context;
     options: DduOptions;
     uiOptions: UiOptions;
     uiParams: Params;
@@ -45,13 +48,15 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
+    const floating = args.uiParams.split == "floating" &&
+      await fn.has(args.denops, "nvim");
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
       if (args.uiParams.split == "horizontal") {
         await args.denops.cmd(`silent keepalt sbuffer ${bufnr}`);
       } else if (args.uiParams.split == "vertical") {
         await args.denops.cmd(`silent keepalt vertical sbuffer ${bufnr}`);
-      } else if (args.uiParams.split == "floating") {
+      } else if (floating) {
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
           "row": Math.ceil(
@@ -61,9 +66,7 @@ export class Ui extends BaseUi<Params> {
           "width": Math.ceil((await op.columns.getGlobal(args.denops)) / 2),
           "height": 20,
         });
-      } else if (
-        args.uiParams.split == "no" && await fn.has(args.denops, "nvim")
-      ) {
+      } else if (args.uiParams.split == "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       } else {
         await args.denops.call(
@@ -77,6 +80,28 @@ export class Ui extends BaseUi<Params> {
     if (this.bufnr <= 0) {
       // Highlights must be initialized when not exists
       await this.initHighlights(args.denops, bufnr);
+    }
+
+    const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
+    if (floating) {
+      if (this.saveTitle == "") {
+        this.saveTitle = await args.denops.call("nvim_get_option", "titlestring") as string;
+      }
+
+      args.denops.call(
+        "nvim_set_option",
+        "titlestring",
+        `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}` +
+          " %{" + linenr + "}%*",
+      );
+    } else {
+      await fn.setwinvar(
+        args.denops,
+        await fn.bufwinnr(args.denops, this.bufnr),
+        "&statusline",
+        `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}` +
+          " %#LineNR#%{" + linenr + "}%*",
+      );
     }
 
     // Update main buffer
@@ -129,6 +154,17 @@ export class Ui extends BaseUi<Params> {
       await args.denops.cmd("enew");
     } else {
       await args.denops.cmd("close!");
+    }
+
+    // Restore options
+    if (this.saveTitle != "") {
+      args.denops.call(
+        "nvim_set_option",
+        "titlestring",
+        this.saveTitle,
+      );
+
+      this.saveTitle = "";
     }
   }
 
