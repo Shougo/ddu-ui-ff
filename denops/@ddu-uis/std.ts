@@ -5,9 +5,9 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.2.2/types.ts";
-import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.1.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.1.0/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.2.3/types.ts";
+import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.2.3/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.3/base/ui.ts";
 
 type DoActionParams = {
   name?: string;
@@ -25,6 +25,7 @@ export class Ui extends BaseUi<Params> {
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
   private saveTitle: string = "";
+  private saveCursor: number[] = [];
 
   refreshItems(args: {
     items: DduItem[];
@@ -116,6 +117,10 @@ export class Ui extends BaseUi<Params> {
       ),
     );
 
+    if (args.options.resume && this.saveCursor.length != 0) {
+      await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
+    }
+
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
     const filterIds = await fn.win_findbuf(
@@ -142,6 +147,9 @@ export class Ui extends BaseUi<Params> {
     if (this.bufnr <= 0) {
       return;
     }
+
+    // Save the cursor
+    this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
     const ids = await fn.win_findbuf(args.denops, this.bufnr) as number[];
     if (ids.length == 0) {
