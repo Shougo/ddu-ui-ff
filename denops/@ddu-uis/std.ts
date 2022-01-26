@@ -5,9 +5,9 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.2.3/types.ts";
-import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.2.3/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.3/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.2.4/types.ts";
+import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.4/base/ui.ts";
 
 type DoActionParams = {
   name?: string;
@@ -119,6 +119,7 @@ export class Ui extends BaseUi<Params> {
 
     if (args.options.resume && this.saveCursor.length != 0) {
       await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
+      this.saveCursor = [];
     }
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
@@ -131,7 +132,7 @@ export class Ui extends BaseUi<Params> {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
-        args.options.input,
+        args.context.input,
         this.filterBufnr,
         args.uiParams,
       ) as number;
@@ -225,7 +226,7 @@ export class Ui extends BaseUi<Params> {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
-        args.options.input,
+        args.context.input,
         this.filterBufnr,
         args.uiParams,
       ) as number;
