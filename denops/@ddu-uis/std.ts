@@ -255,6 +255,7 @@ export class Ui extends BaseUi<Params> {
   ): Promise<number> {
     const bufnr = await fn.bufadd(denops, bufferName);
     await fn.bufload(denops, bufnr);
+
     return Promise.resolve(bufnr);
   }
 
@@ -267,6 +268,8 @@ export class Ui extends BaseUi<Params> {
     // Set options
     await fn.setwinvar(denops, winid, "&conceallevel", 3);
     await fn.setwinvar(denops, winid, "&concealcursor", "inv");
+    await fn.setwinvar(denops, winid, "&list", 0);
+    await fn.setwinvar(denops, winid, "&colorcolumn", 0);
 
     // Highlights
     await denops.cmd(

@@ -78,7 +78,7 @@ quit
 PARAMS						*ddu-std-ui-params*
 
 				    		*ddu-std-ui-param-split*
-split		(boolean)
+split		(string)
 		Specify split mode. Following values are available:
 
 		"horizontal": horizontal split
