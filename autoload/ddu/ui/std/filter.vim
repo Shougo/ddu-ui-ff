@@ -90,5 +90,5 @@ function! s:update() abort
 
   let g:ddu#ui#std#_filter_prev_input = input
 
-  call ddu#narrow(g:ddu#ui#std#_filter_name, input)
+  call ddu#redraw(g:ddu#ui#std#_filter_name, { 'input': input })
 endfunction
