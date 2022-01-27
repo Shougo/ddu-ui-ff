@@ -31,12 +31,17 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
 endfunction
 
 function! s:init_buffer(params) abort
-  if has('nvim') && a:params.split ==# 'floating'
-    let wincol = &columns / 4
-    let winrow = &lines / 2 - 10
-    let winwidth = &columns / 2
+  if has('nvim') &&
+        \ (a:params.split ==# 'floating' ||
+        \  a:params.filterSplitDirection ==# 'floating')
+    let wincol = a:params.winCol
+    let winrow = a:params.winRow
+    let winwidth = a:params.winWidth
     let row = win_screenpos(win_getid())[0] - 1
     let bordered_row = row + winheight(0)
+    if a:params.filterSplitDirection ==# 'floating'
+      let wincol = win_screenpos(0)[1] - 1
+    endif
 
     call nvim_open_win(bufnr('%'), v:true, {
           \ 'relative': 'editor',

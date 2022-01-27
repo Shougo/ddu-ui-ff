@@ -15,8 +15,13 @@ type DoActionParams = {
 };
 
 type Params = {
+  filterSplitDirection: "botright" | "floating";
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
+  winCol: number;
+  winHeight: number;
+  winRow: number;
+  winWidth: number;
 };
 
 export class Ui extends BaseUi<Params> {
@@ -49,6 +54,8 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
+    await this.setDefaultParams(args.denops, args.uiParams);
+
     const floating = args.uiParams.split == "floating" &&
       await fn.has(args.denops, "nvim");
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
@@ -60,12 +67,10 @@ export class Ui extends BaseUi<Params> {
       } else if (floating) {
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
-          "row": Math.ceil(
-            (await args.denops.call("eval", "&lines") as number) / 2 - 10,
-          ),
-          "col": Math.ceil((await op.columns.getGlobal(args.denops)) / 4),
-          "width": Math.ceil((await op.columns.getGlobal(args.denops)) / 2),
-          "height": 20,
+          "row": args.uiParams.winRow,
+          "col": args.uiParams.winCol,
+          "width": args.uiParams.winWidth,
+          "height": args.uiParams.winHeight,
         });
       } else if (args.uiParams.split == "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
@@ -86,7 +91,10 @@ export class Ui extends BaseUi<Params> {
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
     if (floating) {
       if (this.saveTitle == "") {
-        this.saveTitle = await args.denops.call("nvim_get_option", "titlestring") as string;
+        this.saveTitle = await args.denops.call(
+          "nvim_get_option",
+          "titlestring",
+        ) as string;
       }
 
       args.denops.call(
@@ -220,9 +228,12 @@ export class Ui extends BaseUi<Params> {
     },
     openFilterWindow: async (args: {
       denops: Denops;
+      context: Context;
       options: DduOptions;
       uiParams: Params;
     }) => {
+      await this.setDefaultParams(args.denops, args.uiParams);
+
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
@@ -244,8 +255,13 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {
+      filterSplitDirection: "botright",
       split: "horizontal",
       startFilter: false,
+      winCol: 0,
+      winHeight: 20,
+      winRow: 0,
+      winWidth: 0,
     };
   }
 
@@ -290,5 +306,21 @@ export class Ui extends BaseUi<Params> {
     );
 
     await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
+  }
+
+  private async setDefaultParams(denops: Denops, uiParams: Params) {
+    if (uiParams.winRow == 0) {
+      uiParams.winRow = Math.ceil(
+        (await denops.call("eval", "&lines") as number) / 2 - 10,
+      );
+    }
+    if (uiParams.winCol == 0) {
+      uiParams.winCol = Math.ceil(
+        (await op.columns.getGlobal(denops)) / 4,
+      );
+    }
+    if (uiParams.winWidth == 0) {
+      uiParams.winWidth = Math.ceil((await op.columns.getGlobal(denops)) / 2);
+    }
   }
 }
