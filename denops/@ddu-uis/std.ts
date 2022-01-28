@@ -251,6 +251,10 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.None);
     },
+    refreshItems: async (_: {
+    }) => {
+      return Promise.resolve(ActionFlags.RefreshItems);
+    },
     quit: async (args: {
       denops: Denops;
       options: DduOptions;

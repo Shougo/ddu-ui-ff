@@ -66,6 +66,10 @@ doAction
 openFilterWindow
 		Open the filter window.
 
+					*ddu-std-ui-action-refreshItems*
+refreshItems
+		Refresh the items.
+
 					*ddu-std-ui-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected item.
