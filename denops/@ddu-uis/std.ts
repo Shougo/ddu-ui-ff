@@ -61,9 +61,13 @@ export class Ui extends BaseUi<Params> {
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
       if (args.uiParams.split == "horizontal") {
-        await args.denops.cmd(`silent keepalt sbuffer ${bufnr}`);
+        const header = "silent keepalt ";
+        await args.denops.cmd(
+          header + `sbuffer +resize\\ ${args.uiParams.winHeight} ${bufnr}`);
       } else if (args.uiParams.split == "vertical") {
-        await args.denops.cmd(`silent keepalt vertical sbuffer ${bufnr}`);
+        const header = "silent keepalt vertical ";
+        await args.denops.cmd(
+          header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`);
       } else if (floating) {
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
