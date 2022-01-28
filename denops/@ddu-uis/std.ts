@@ -15,6 +15,7 @@ type DoActionParams = {
 };
 
 type Params = {
+  displaySourceName: "long" | "no";
   filterSplitDirection: "botright" | "floating";
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
@@ -25,7 +26,7 @@ type Params = {
 };
 
 export class Ui extends BaseUi<Params> {
-  private bufnr = -1;
+  private buffers: Record<string, number> = {};
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
@@ -48,8 +49,9 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
   }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
-    const bufnr = this.bufnr > 0
-      ? this.bufnr
+    const initialized = this.buffers[args.options.name];
+    const bufnr = initialized
+      ? this.buffers[args.options.name]
       : await this.initBuffer(args.denops, bufferName);
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
@@ -63,11 +65,13 @@ export class Ui extends BaseUi<Params> {
       if (args.uiParams.split == "horizontal") {
         const header = "silent keepalt ";
         await args.denops.cmd(
-          header + `sbuffer +resize\\ ${args.uiParams.winHeight} ${bufnr}`);
+          header + `sbuffer +resize\\ ${args.uiParams.winHeight} ${bufnr}`,
+        );
       } else if (args.uiParams.split == "vertical") {
         const header = "silent keepalt vertical ";
         await args.denops.cmd(
-          header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`);
+          header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`,
+        );
       } else if (floating) {
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
@@ -87,7 +91,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (this.bufnr <= 0) {
+    if (!initialized) {
       // Highlights must be initialized when not exists
       await this.initHighlights(args.denops, bufnr);
     }
@@ -111,21 +115,22 @@ export class Ui extends BaseUi<Params> {
     } else {
       await fn.setwinvar(
         args.denops,
-        await fn.bufwinnr(args.denops, this.bufnr),
+        await fn.bufwinnr(args.denops, bufnr),
         "&statusline",
         header + " %#LineNR#%{" + linenr + "}%*",
       );
     }
 
     // Update main buffer
+    const displaySourceName = args.uiParams.displaySourceName;
     await args.denops.call(
       "ddu#ui#std#update_buffer",
       bufnr,
       this.items.map(
         (c, i) =>
-          `${this.selectedItems.has(i) ? "*" : " "}${
-            c.display ? c.display : c.word
-          }`,
+          `${this.selectedItems.has(i) ? "*" : " "}` +
+          `${displaySourceName == "long" ? c.__sourceName : ""} ` +
+          (c.display ? c.display : c.word),
       ),
     );
 
@@ -136,11 +141,7 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
 
-    const filterIds = await fn.win_findbuf(
-      args.denops,
-      this.filterBufnr,
-    ) as number[];
-    if (filterIds.length == 0 && args.uiParams.startFilter) {
+    if (!initialized && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
@@ -150,23 +151,25 @@ export class Ui extends BaseUi<Params> {
       ) as number;
     }
 
-    this.bufnr = bufnr;
+    this.buffers[args.options.name] = bufnr;
   }
 
   async quit(args: {
     denops: Denops;
     options: DduOptions;
   }): Promise<void> {
-    if (this.bufnr <= 0) {
+    const bufnr = this.buffers[args.options.name];
+
+    if (!bufnr) {
       return;
     }
 
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
-    const ids = await fn.win_findbuf(args.denops, this.bufnr) as number[];
+    const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
-      await args.denops.cmd(`buffer ${this.bufnr}`);
+      await args.denops.cmd(`buffer ${bufnr}`);
       return;
     }
 
@@ -259,6 +262,7 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {
+      displaySourceName: "no",
       filterSplitDirection: "botright",
       split: "horizontal",
       startFilter: false,
@@ -296,6 +300,9 @@ export class Ui extends BaseUi<Params> {
       "highlight default link dduStdSelectedLine Statement",
     );
 
+    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
+
+    // Syntax
     await denops.cmd(
       `syntax match dduStdNormalLine /^[ ].*/` +
         " contains=dduStdConcealedMark",
@@ -308,8 +315,6 @@ export class Ui extends BaseUi<Params> {
       `syntax match dduStdConcealedMark /^[ *]/` +
         " conceal contained",
     );
-
-    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
   }
 
   private async setDefaultParams(denops: Denops, uiParams: Params) {

@@ -77,6 +77,16 @@ quit
 ==============================================================================
 PARAMS						*ddu-std-ui-params*
 
+				    	*ddu-std-ui-param-displaySourceName*
+displaySourceName (string)
+		Display source name in the buffer. Following values are
+		available:
+
+		"long": display source name
+		"no": does not display
+
+		Default: "no"
+
 				    	*ddu-option-filterSplitDirection*
 filterSplitDirection
 		Specify the filter window direction as {direction}.
