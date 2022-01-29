@@ -196,7 +196,7 @@ export class Ui extends BaseUi<Params> {
     string,
     (args: ActionArguments<Params>) => Promise<ActionFlags>
   > = {
-    doAction: async (args: {
+    itemAction: async (args: {
       denops: Denops;
       options: DduOptions;
       actionParams: unknown;
@@ -211,7 +211,7 @@ export class Ui extends BaseUi<Params> {
 
       const params = args.actionParams as DoActionParams;
       await args.denops.call(
-        "ddu#do_action",
+        "ddu#item_action",
         args.options.name,
         params.name ?? "default",
         items,
