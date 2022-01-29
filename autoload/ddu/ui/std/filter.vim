@@ -1,5 +1,3 @@
-let g:ddu#ui#std#_filter_name = ''
-
 function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
   let ids = win_findbuf(a:bufnr)
   if !empty(ids)
@@ -26,7 +24,6 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
   startinsert!
 
   let g:ddu#ui#std#_filter_prev_input = getline('.')
-  let g:ddu#ui#std#_filter_name = a:name
   return bufnr('%')
 endfunction
 
@@ -90,5 +87,5 @@ function! s:update() abort
 
   let g:ddu#ui#std#_filter_prev_input = input
 
-  call ddu#redraw(g:ddu#ui#std#_filter_name, { 'input': input })
+  call ddu#redraw(g:ddu#ui#std#_name, { 'input': input })
 endfunction

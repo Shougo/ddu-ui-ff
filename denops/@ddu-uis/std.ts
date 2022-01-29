@@ -6,7 +6,7 @@ import {
   DduOptions,
   UiOptions,
 } from "https://deno.land/x/ddu_vim@v0.2.4/types.ts";
-import { Denops, fn, op } from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
+import { Denops, fn, op, vars } from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
 import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.4/base/ui.ts";
 
 type DoActionParams = {
@@ -124,7 +124,7 @@ export class Ui extends BaseUi<Params> {
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
     await args.denops.call(
-      "ddu#ui#std#update_buffer",
+      "ddu#ui#std#_update_buffer",
       bufnr,
       this.items.map(
         (c, i) =>
@@ -140,6 +140,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
+    await vars.g.set(args.denops, "ddu#ui#std#_name", args.options.name);
 
     if (!initialized && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(

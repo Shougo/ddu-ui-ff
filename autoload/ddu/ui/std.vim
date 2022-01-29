@@ -1,9 +1,10 @@
-function! ddu#ui#std#do_map(name, ...) abort
+function! ddu#ui#std#do_action(name, ...) abort
   call ddu#ui_action(
-        \ b:ddu_ui_name, a:name, get(a:000, 0, {}))
+        \ get(b:, 'ddu_ui_name', g:ddu#ui#std#_name),
+        \ a:name, get(a:000, 0, {}))
 endfunction
 
-function! ddu#ui#std#update_buffer(bufnr, items) abort
+function! ddu#ui#std#_update_buffer(bufnr, items) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:items)
