@@ -6,7 +6,12 @@ import {
   DduOptions,
   UiOptions,
 } from "https://deno.land/x/ddu_vim@v0.2.4/types.ts";
-import { Denops, fn, op, vars } from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
+import {
+  Denops,
+  fn,
+  op,
+  vars,
+} from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
 import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.4/base/ui.ts";
 
 type DoActionParams = {
@@ -252,8 +257,7 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.None);
     },
-    refreshItems: async (_: {
-    }) => {
+    refreshItems: async (_: {}) => {
       return Promise.resolve(ActionFlags.RefreshItems);
     },
     quit: async (args: {
@@ -261,6 +265,16 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
     }) => {
       await this.quit({ denops: args.denops, options: args.options });
+      return Promise.resolve(ActionFlags.None);
+    },
+    updateOptions: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      await args.denops.call("ddu#redraw", args.options.name, {
+        updateOptions: args.actionParams,
+      });
       return Promise.resolve(ActionFlags.None);
     },
   };

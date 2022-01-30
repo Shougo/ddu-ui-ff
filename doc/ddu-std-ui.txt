@@ -72,6 +72,14 @@ toggleSelectItem
 quit
 		Quit the UI window.
 
+					*ddu-std-ui-action-updateOptions*
+updateOptions
+		params:
+			{option-name}: option name and value
+
+		Update current options and redraw the UI.
+		Refer to |ddu-options| about options.
+
 ==============================================================================
 PARAMS						*ddu-std-ui-params*
 
