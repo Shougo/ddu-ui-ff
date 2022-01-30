@@ -142,7 +142,7 @@ export class Ui extends BaseUi<Params> {
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
     await vars.g.set(args.denops, "ddu#ui#std#_name", args.options.name);
 
-    if (!initialized && args.uiParams.startFilter) {
+    if (ids.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
         "ddu#ui#std#filter#_open",
         args.options.name,
