@@ -35,7 +35,7 @@ export class Ui extends BaseUi<Params> {
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
-  private saveTitle: string = "";
+  private saveTitle = "";
   private saveCursor: number[] = [];
 
   refreshItems(args: {
@@ -131,9 +131,8 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call(
       "ddu#ui#std#_update_buffer",
       bufnr,
-      this.items.map(
-        (c, i) =>
-          `${this.selectedItems.has(i) ? "*" : " "}` +
+      [...this.selectedItems],
+      this.items.map((c) =>
           `${displaySourceName == "long" ? c.__sourceName : ""} ` +
           (c.display ? c.display : c.word),
       ),
@@ -226,19 +225,6 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.None);
     },
-    toggleSelectItem: async (args: {
-      denops: Denops;
-      options: DduOptions;
-    }) => {
-      const idx = (await fn.line(args.denops, ".")) - 1;
-      if (this.selectedItems.has(idx)) {
-        this.selectedItems.delete(idx);
-      } else {
-        this.selectedItems.add(idx);
-      }
-
-      return Promise.resolve(ActionFlags.Redraw);
-    },
     openFilterWindow: async (args: {
       denops: Denops;
       context: Context;
@@ -257,7 +243,10 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.None);
     },
-    refreshItems: async (_: {}) => {
+    // deno-lint-ignore require-await
+    refreshItems: async (_: {
+      denops: Denops;
+    }) => {
       return Promise.resolve(ActionFlags.RefreshItems);
     },
     quit: async (args: {
@@ -266,6 +255,19 @@ export class Ui extends BaseUi<Params> {
     }) => {
       await this.quit({ denops: args.denops, options: args.options });
       return Promise.resolve(ActionFlags.None);
+    },
+    toggleSelectItem: async (args: {
+      denops: Denops;
+      options: DduOptions;
+    }) => {
+      const idx = (await fn.line(args.denops, ".")) - 1;
+      if (this.selectedItems.has(idx)) {
+        this.selectedItems.delete(idx);
+      } else {
+        this.selectedItems.add(idx);
+      }
+
+      return Promise.resolve(ActionFlags.Redraw);
     },
     updateOptions: async (args: {
       denops: Denops;
@@ -309,31 +311,10 @@ export class Ui extends BaseUi<Params> {
     const winid = await fn.win_getid(denops);
 
     // Set options
-    await fn.setwinvar(denops, winid, "&conceallevel", 3);
-    await fn.setwinvar(denops, winid, "&concealcursor", "inv");
     await fn.setwinvar(denops, winid, "&list", 0);
     await fn.setwinvar(denops, winid, "&colorcolumn", 0);
 
-    // Highlights
-    await denops.cmd(
-      "highlight default link dduStdSelectedLine Statement",
-    );
-
     await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
-
-    // Syntax
-    await denops.cmd(
-      `syntax match dduStdNormalLine /^[ ].*/` +
-        " contains=dduStdConcealedMark",
-    );
-    await denops.cmd(
-      `syntax match dduStdSelectedLine /^[*].*/` +
-        " contains=dduStdConcealedMark",
-    );
-    await denops.cmd(
-      `syntax match dduStdConcealedMark /^[ *]/` +
-        " conceal contained",
-    );
   }
 
   private async setDefaultParams(denops: Denops, uiParams: Params) {
