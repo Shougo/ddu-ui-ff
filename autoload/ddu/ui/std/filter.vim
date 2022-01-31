@@ -40,7 +40,11 @@ function! s:init_buffer(params) abort
     let wincol = a:params.winCol
     let winrow = a:params.winRow
     let winwidth = a:params.winWidth
-    let row = win_screenpos(win_getid())[0] - 1
+    let winheight = a:params.winHeight
+    let winScreenpos = win_screenpos(win_getid())[0]
+    let row = a:params.filterPosition == 'bottom'
+          \ ? winScreenpos - 1
+          \ : winScreenpos - winheight - 2
     let bordered_row = row + winheight(0)
     if a:params.filterSplitDirection ==# 'floating'
       let wincol = win_screenpos(0)[1] - 1
