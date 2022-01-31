@@ -21,7 +21,13 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
   augroup END
 
   call cursor(line('$'), 0)
-  startinsert!
+
+  if has('nvim')
+    startinsert!
+  else
+    " Note: startinsert! does not work in Vim
+    call feedkeys('A', 'n')
+  endif
 
   let g:ddu#ui#std#_filter_prev_input = getline('.')
   return bufnr('%')

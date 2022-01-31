@@ -12,4 +12,9 @@ function! ddu#ui#std#_update_buffer(bufnr, items) abort
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
+
+  if !has('nvim')
+    " Note: :redraw is needed for Vim
+    redraw
+  endif
 endfunction
