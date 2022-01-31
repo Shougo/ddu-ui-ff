@@ -214,6 +214,12 @@ export class Ui extends BaseUi<Params> {
         items = [...this.selectedItems].map((i) => this.items[i]);
       }
 
+      items = items.filter((item) => item);
+
+      if (items.length == 0) {
+        return Promise.resolve(ActionFlags.None);
+      }
+
       const params = args.actionParams as DoActionParams;
       await args.denops.call(
         "ddu#item_action",
@@ -260,6 +266,10 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
     }) => {
+      if (this.items.length == 0) {
+        return Promise.resolve(ActionFlags.None);
+      }
+
       const idx = (await fn.line(args.denops, ".")) - 1;
       if (this.selectedItems.has(idx)) {
         this.selectedItems.delete(idx);
