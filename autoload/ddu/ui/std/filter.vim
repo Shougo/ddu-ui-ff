@@ -34,9 +34,11 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
 endfunction
 
 function! s:init_buffer(params) abort
-  if has('nvim') &&
-        \ (a:params.split ==# 'floating' ||
-        \  a:params.filterSplitDirection ==# 'floating')
+  let is_floating =
+        \ a:params.split ==# 'floating' ||
+        \ a:params.filterSplitDirection ==# 'floating'
+
+  if has('nvim') && is_floating
     let wincol = a:params.winCol
     let winrow = a:params.winRow
     let winwidth = a:params.winWidth
@@ -58,7 +60,8 @@ function! s:init_buffer(params) abort
           \ 'height': 1,
           \})
   else
-    split
+    let direction = is_floating ? 'botright' : a:params.filterSplitDirection
+    silent execute direction 'split'
   endif
 
   let bufnr = bufadd('ddu-std-filter')
