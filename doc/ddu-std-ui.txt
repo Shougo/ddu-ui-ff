@@ -95,13 +95,14 @@ displaySourceName (string)
 
 				    	*ddu-option-filterPosition*
 filterPosition
-
 		Specify the filter window position as {position}.
 
-		If {position} is set to "bottom", the filter will be displayed at the bottom.
+		If {position} is set to "bottom", the filter will be displayed
+		at the bottom.
 		If {position} is "top", the filter will be displayed at the top.
 
-		Note: To use "positon", you need to use neovim.
+		Note: To use it, you need to use neovim and
+		|ddu-option-filterSplitDirection|must be "floating".
 
 		Default: "bottom"
 
