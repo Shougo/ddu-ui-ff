@@ -45,16 +45,15 @@ function! s:init_buffer(params) abort
     let winheight = a:params.winHeight
     let winScreenpos = win_screenpos(win_getid())[0]
     let row = a:params.filterPosition == 'bottom'
-          \ ? winScreenpos - 1
-          \ : winScreenpos - winheight - 2
-    let bordered_row = row + winheight(0)
+          \ ? winScreenpos + winheight - 1
+          \ : winScreenpos - 2
     if a:params.filterSplitDirection ==# 'floating'
       let wincol = win_screenpos(0)[1] - 1
     endif
 
     call nvim_open_win(bufnr('%'), v:true, {
           \ 'relative': 'editor',
-          \ 'row': winrow == 1 ? 0 : bordered_row,
+          \ 'row': winrow == 1 ? 0 : row,
           \ 'col': wincol,
           \ 'width': winwidth,
           \ 'height': 1,
