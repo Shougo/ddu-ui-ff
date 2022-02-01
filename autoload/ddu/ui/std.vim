@@ -6,11 +6,12 @@ function! ddu#ui#std#do_action(name, ...) abort
         \ a:name, get(a:000, 0, {}))
 endfunction
 
-function! ddu#ui#std#_update_buffer(bufnr, selected_items, items) abort
+function! ddu#ui#std#_update_buffer(
+      \  bufnr, selected_items, highlight_items, lines) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
 
-  call setbufline(a:bufnr, 1, a:items)
-  call deletebufline(a:bufnr, len(a:items) + 1, '$')
+  call setbufline(a:bufnr, 1, a:lines)
+  call deletebufline(a:bufnr, len(a:lines) + 1, '$')
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
@@ -19,8 +20,17 @@ function! ddu#ui#std#_update_buffer(bufnr, selected_items, items) abort
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
   else
-    call prop_clear(1, len(a:items) + 1, { 'bufnr': a:bufnr })
+    call prop_clear(1, len(a:lines) + 1, { 'bufnr': a:bufnr })
   endif
+
+  " Highlighted items
+  for item in a:highlight_items
+    for hl in item.highlights
+      call ddu#ui#std#_highlight(
+            \ hl.hl_group, hl.name, 1,
+            \ s:namespace, a:bufnr, item.row, hl.col, hl.col + hl.width)
+    endfor
+  endfor
 
   " Selected items highlights
   for item_nr in a:selected_items

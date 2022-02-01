@@ -5,14 +5,14 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.2.4/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.5.0/types.ts";
 import {
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.2.4/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.2.4/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.5.0/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.5.0/base/ui.ts";
 
 type DoActionParams = {
   name?: string;
@@ -133,6 +133,12 @@ export class Ui extends BaseUi<Params> {
       "ddu#ui#std#_update_buffer",
       bufnr,
       [...this.selectedItems],
+      this.items.map((c, i) => {
+        return {
+          highlights: c.highlights,
+          row: i + 1,
+        };
+      }).filter((c) => c.highlights),
       this.items.map((c) =>
           `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
           (c.display ? c.display : c.word),
