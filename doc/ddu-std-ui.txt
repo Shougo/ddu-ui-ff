@@ -93,9 +93,9 @@ displaySourceName (string)
 
 		Default: "no"
 
-				    	*ddu-option-filterPosition*
-filterPosition
-		Specify the filter window position as {position}.
+				    	*ddu-option-filterFloatingPosition*
+filterFloatingPosition
+		Specify the filter floating window position as {position}.
 
 		If {position} is set to "bottom", the filter will be displayed
 		at the bottom.
@@ -195,6 +195,9 @@ EXAMPLES					*ddu-std-ui-examples*
 
 ==============================================================================
 COMPATIBILITY					*ddu-std-ui-compatibility*
+
+2022.02.01
+* Rename "filterPosition" to "filterFloatingPosition".
 
 2022.01.29
 * Rename ddu#ui#std#do_map() to ddu#ui#std#do_action().

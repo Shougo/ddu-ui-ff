@@ -44,7 +44,7 @@ function! s:init_buffer(params) abort
     let winwidth = a:params.winWidth
     let winheight = a:params.winHeight
     let winScreenpos = win_screenpos(win_getid())[0]
-    let row = a:params.filterPosition == 'bottom'
+    let row = a:params.filterFloatingPosition == 'bottom'
           \ ? winScreenpos + winheight - 1
           \ : winScreenpos - 2
     if a:params.filterSplitDirection ==# 'floating'

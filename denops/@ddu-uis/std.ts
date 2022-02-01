@@ -21,7 +21,7 @@ type DoActionParams = {
 
 type Params = {
   displaySourceName: "long" | "no";
-  filterPosition: "top" | "bottom";
+  filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
@@ -134,7 +134,7 @@ export class Ui extends BaseUi<Params> {
       bufnr,
       [...this.selectedItems],
       this.items.map((c) =>
-          `${displaySourceName == "long" ? c.__sourceName : ""} ` +
+          `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
           (c.display ? c.display : c.word),
       ),
     );
@@ -295,7 +295,7 @@ export class Ui extends BaseUi<Params> {
   params(): Params {
     return {
       displaySourceName: "no",
-      filterPosition: "bottom",
+      filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
       split: "horizontal",
       startFilter: false,
