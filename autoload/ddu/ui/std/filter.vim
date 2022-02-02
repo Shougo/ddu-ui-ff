@@ -53,10 +53,10 @@ function! s:init_buffer(params) abort
       let wincol = win_screenpos(0)[1] - 1
     endif
 
-    let promptBuf = nvim_create_buf(v:false, v:true)
-    call nvim_buf_set_lines(promptBuf, 0, -1, v:true,
-          \ [a:params.filterFloatingPromptPrefix])
-    let g:promptWin = nvim_open_win(promptBuf, v:false, {
+    let prefixBuf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_lines(prefixBuf, 0, -1, v:true,
+          \ [a:params.filterFloatingPrefix])
+    let g:promptWin = nvim_open_win(prefixBuf, v:false, {
           \ 'relative': 'editor',
           \ 'row': winrow == 1 ? 0 : row,
           \ 'col': wincol,

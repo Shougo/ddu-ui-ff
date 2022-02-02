@@ -106,8 +106,8 @@ filterFloatingPosition
 
 		Default: "bottom"
 
-				    	*ddu-option-filterFloatingPromptPrefix*
-filterFloatingPromptPrefix
+				    	*ddu-option-filterFloatingPrefix*
+filterFloatingPrefix
 		Specify the prefix of the floating window filter as {prefix}.
 
 		Note: To use it, you need to use neovim and
