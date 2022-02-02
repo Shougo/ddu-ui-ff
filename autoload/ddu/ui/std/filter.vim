@@ -54,7 +54,8 @@ function! s:init_buffer(params) abort
     endif
 
     let promptBuf = nvim_create_buf(v:false, v:true)
-    call nvim_buf_set_lines(promptBuf, 0, -1, v:true, ["> "])
+    call nvim_buf_set_lines(promptBuf, 0, -1, v:true,
+          \ [a:params.filterFloatingPromptPrefix])
     let g:promptWin = nvim_open_win(promptBuf, v:false, {
           \ 'relative': 'editor',
           \ 'row': winrow == 1 ? 0 : row,

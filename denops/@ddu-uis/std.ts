@@ -22,6 +22,7 @@ type DoActionParams = {
 type Params = {
   displaySourceName: "long" | "no";
   filterFloatingPosition: "top" | "bottom";
+  filterFloatingPromptPrefix: string;
   filterSplitDirection: "botright" | "floating";
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
@@ -302,6 +303,7 @@ export class Ui extends BaseUi<Params> {
     return {
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
+      filterFloatingPromptPrefix: ">",
       filterSplitDirection: "botright",
       split: "horizontal",
       startFilter: false,
