@@ -11,7 +11,7 @@ function! ddu#ui#std#_update_buffer(
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:lines)
-  call deletebufline(a:bufnr, len(a:lines) + 1, '$')
+  silent call deletebufline(a:bufnr, len(a:lines) + 1, '$')
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
