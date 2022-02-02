@@ -18,6 +18,8 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
           \ <buffer> call s:update()
+    autocmd WinClosed
+          \ <buffer> call nvim_win_close(g:promptWin, v:true)
   augroup END
 
   call cursor(line('$'), 0)
@@ -51,11 +53,22 @@ function! s:init_buffer(params) abort
       let wincol = win_screenpos(0)[1] - 1
     endif
 
-    call nvim_open_win(bufnr('%'), v:true, {
+    let promptBuf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_lines(promptBuf, 0, -1, v:true, ["> "])
+    let g:promptWin = nvim_open_win(promptBuf, v:false, {
           \ 'relative': 'editor',
           \ 'row': winrow == 1 ? 0 : row,
           \ 'col': wincol,
-          \ 'width': winwidth,
+          \ 'width': 2,
+          \ 'height': 1,
+          \ 'style': 'minimal',
+          \ })
+
+    call nvim_open_win(bufnr('%'), v:true, {
+          \ 'relative': 'editor',
+          \ 'row': winrow == 1 ? 0 : row,
+          \ 'col': wincol + 2,
+          \ 'width': winwidth - 2,
           \ 'height': 1,
           \})
   else
