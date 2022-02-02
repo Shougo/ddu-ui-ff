@@ -330,7 +330,7 @@ export class Ui extends BaseUi<Params> {
 
     // Set options
     await fn.setwinvar(denops, winid, "&list", 0);
-    await fn.setwinvar(denops, winid, "&colorcolumn", 0);
+    await fn.setwinvar(denops, winid, "&colorcolumn", "");
 
     await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
   }
