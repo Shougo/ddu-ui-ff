@@ -14,6 +14,13 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     endif
   endif
 
+  if a:params.prompt != '' && strwidth(a:params.prompt) <= 2
+    setlocal signcolumn=yes
+    call s:init_prompt(a:params.prompt, 'Special')
+  else
+    setlocal signcolumn=no
+  endif
+
   augroup ddu-std-filter
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
@@ -81,12 +88,23 @@ function! s:init_buffer(params) abort
   setlocal nospell
   setlocal noswapfile
   setlocal nowrap
-  setlocal signcolumn=auto
   setlocal winfixheight
 
   resize 1
 
   setfiletype ddu-std-filter
+endfunction
+
+function! s:init_prompt(prompt, highlight_prompt) abort
+  let name = 'ddu_ui_std_filter_prompt'
+  let id = 2000
+
+  call sign_define(name, {
+        \ 'text': a:prompt,
+        \ 'texthl': a:highlight_prompt,
+        \ })
+  call sign_unplace('', {'id': id, 'buffer': bufnr('%')})
+  call sign_place(id, '', name, bufnr('%'), {'lnum': line('$')})
 endfunction
 
 function! s:update() abort

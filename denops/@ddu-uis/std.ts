@@ -23,6 +23,7 @@ type Params = {
   displaySourceName: "long" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
+  prompt: string;
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
   winCol: number;
@@ -129,6 +130,9 @@ export class Ui extends BaseUi<Params> {
 
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
+    const promptPrefix = args.uiParams.prompt == "" ? "" : " ".repeat(
+      1 + (await fn.strwidth(args.denops, args.uiParams.prompt) as number),
+    );
     await args.denops.call(
       "ddu#ui#std#_update_buffer",
       bufnr,
@@ -140,8 +144,9 @@ export class Ui extends BaseUi<Params> {
         };
       }).filter((c) => c.highlights),
       this.items.map((c) =>
-          `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
-          (c.display ? c.display : c.word),
+        promptPrefix +
+        `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
+        (c.display ? c.display : c.word)
       ),
     );
 
@@ -303,6 +308,7 @@ export class Ui extends BaseUi<Params> {
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
+      prompt: "",
       split: "horizontal",
       startFilter: false,
       winCol: 0,

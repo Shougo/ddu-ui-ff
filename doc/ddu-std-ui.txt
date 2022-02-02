@@ -119,6 +119,13 @@ filterSplitDirection
 
 		Default: "botright"
 
+				    		*ddu-std-ui-param-prompt*
+prompt		(string)
+		Specify the prompt in the filter window.
+		Note: It must one or two characters.
+
+		Default: ""
+
 				    		*ddu-std-ui-param-split*
 split		(string)
 		Specify split mode. Following values are available:
