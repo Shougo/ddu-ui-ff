@@ -18,6 +18,8 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
           \ <buffer> call s:update()
+    autocmd WinClosed
+          \ <buffer> call s:close_prefix_window() 
   augroup END
 
   call cursor(line('$'), 0)
@@ -51,11 +53,23 @@ function! s:init_buffer(params) abort
       let wincol = win_screenpos(0)[1] - 1
     endif
 
-    call nvim_open_win(bufnr('%'), v:true, {
+    let prefixBuf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_lines(prefixBuf, 0, -1, v:true,
+          \ [a:params.filterFloatingPrefix])
+    let g:prefixWin = nvim_open_win(prefixBuf, v:false, {
           \ 'relative': 'editor',
           \ 'row': winrow == 1 ? 0 : row,
           \ 'col': wincol,
-          \ 'width': winwidth,
+          \ 'width': 2,
+          \ 'height': 1,
+          \ 'style': 'minimal',
+          \ })
+
+    call nvim_open_win(bufnr('%'), v:true, {
+          \ 'relative': 'editor',
+          \ 'row': winrow == 1 ? 0 : row,
+          \ 'col': wincol + 2,
+          \ 'width': winwidth - 2,
           \ 'height': 1,
           \})
   else
@@ -100,4 +114,10 @@ function! s:update() abort
   let g:ddu#ui#std#_filter_prev_input = input
 
   call ddu#redraw(g:ddu#ui#std#_name, { 'input': input })
+endfunction
+
+function! s:close_prefix_window() abort
+  if has('nvim') && exists('g:prefixWin')
+    call nvim_win_close(g:prefixWin, v:true)
+  endif
 endfunction
