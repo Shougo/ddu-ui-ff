@@ -16,6 +16,9 @@ function! ddu#ui#std#_update_buffer(
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
 
+  " Init the cursor
+  call win_execute(bufwinid(a:bufnr), 'call cursor(1, 0) | redraw')
+
   " Clear all highlights
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
