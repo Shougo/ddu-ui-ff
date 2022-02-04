@@ -7,7 +7,7 @@ function! ddu#ui#std#do_action(name, ...) abort
 endfunction
 
 function! ddu#ui#std#_update_buffer(
-      \  bufnr, selected_items, highlight_items, lines) abort
+      \  bufnr, selected_items, highlight_items, lines, refreshed) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:lines)
@@ -16,8 +16,10 @@ function! ddu#ui#std#_update_buffer(
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
 
-  " Init the cursor
-  call win_execute(bufwinid(a:bufnr), 'call cursor(1, 0) | redraw')
+  if a:refreshed
+    " Init the cursor
+    call win_execute(bufwinid(a:bufnr), 'call cursor(1, 0) | redraw')
+  endif
 
   " Clear all highlights
   if has('nvim')

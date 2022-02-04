@@ -39,6 +39,7 @@ export class Ui extends BaseUi<Params> {
   private selectedItems: Set<number> = new Set();
   private saveTitle = "";
   private saveCursor: number[] = [];
+  private refreshed = false;
 
   refreshItems(args: {
     items: DduItem[];
@@ -46,6 +47,7 @@ export class Ui extends BaseUi<Params> {
     // Note: Use only 1000 items
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
+    this.refreshed = true;
   }
 
   async redraw(args: {
@@ -148,6 +150,7 @@ export class Ui extends BaseUi<Params> {
         `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
         (c.display ? c.display : c.word)
       ),
+      this.refreshed,
     );
 
     if (args.options.resume && this.saveCursor.length != 0) {
@@ -169,6 +172,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.buffers[args.options.name] = bufnr;
+    this.refreshed = false;
   }
 
   async quit(args: {
@@ -337,6 +341,7 @@ export class Ui extends BaseUi<Params> {
     // Set options
     await fn.setwinvar(denops, winid, "&list", 0);
     await fn.setwinvar(denops, winid, "&colorcolumn", "");
+    await fn.setwinvar(denops, winid, "&cursorline", 1);
     await fn.setwinvar(denops, winid, "&foldcolumn", 0);
     await fn.setwinvar(denops, winid, "&foldenable", 0);
     await fn.setwinvar(denops, winid, "&number", 0);

@@ -12,6 +12,7 @@ Interface		|ddu-std-ui-interface|
   Actions		  |ddu-std-ui-actions|
   Params		  |ddu-std-ui-params|
 Examples		|ddu-std-ui-examples|
+FAQ			|ddu-std-ui-faq|
 Compatibility		|ddu-std-ui-compatibility|
 
 
@@ -201,6 +202,16 @@ EXAMPLES					*ddu-std-ui-examples*
 	  nnoremap <buffer><silent> <CR>
 	  \ <Cmd>close<CR>
 	endfunction
+
+
+==============================================================================
+FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-std-ui-faq*
+
+Q: I want to change the cursor line color in the buffer.
+
+A: It uses 'cursorline' feature.
+So you can change the color by |hl-CursorLine| highlight. >
+
 
 ==============================================================================
 COMPATIBILITY					*ddu-std-ui-compatibility*
