@@ -20,6 +20,7 @@ type DoActionParams = {
 };
 
 type Params = {
+  autoResize: boolean;
   displaySourceName: "long" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
@@ -70,11 +71,15 @@ export class Ui extends BaseUi<Params> {
     const floating = args.uiParams.split == "floating" &&
       await fn.has(args.denops, "nvim");
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
+    const autoResize = args.uiParams.autoResize &&
+      this.items.length < args.uiParams.winHeight;
     if (ids.length == 0) {
+      const winHeight = autoResize ?
+        this.items.length : args.uiParams.winHeight;
       if (args.uiParams.split == "horizontal") {
         const header = "silent keepalt ";
         await args.denops.cmd(
-          header + `sbuffer +resize\\ ${args.uiParams.winHeight} ${bufnr}`,
+          header + `sbuffer +resize\\ ${winHeight} ${bufnr}`,
         );
       } else if (args.uiParams.split == "vertical") {
         const header = "silent keepalt vertical ";
@@ -87,7 +92,7 @@ export class Ui extends BaseUi<Params> {
           "row": args.uiParams.winRow,
           "col": args.uiParams.winCol,
           "width": args.uiParams.winWidth,
-          "height": args.uiParams.winHeight,
+          "height": winHeight,
         });
       } else if (args.uiParams.split == "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
@@ -98,6 +103,10 @@ export class Ui extends BaseUi<Params> {
         );
         return;
       }
+    } else if (autoResize) {
+      await fn.win_execute(
+        args.denops, await fn.bufwinid(args.denops, bufnr),
+        `resize ${this.items.length}`);
     }
 
     if (!initialized) {
@@ -309,6 +318,7 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {
+      autoResize: false,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",

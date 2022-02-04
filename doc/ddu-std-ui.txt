@@ -86,8 +86,14 @@ updateOptions
 ==============================================================================
 PARAMS						*ddu-std-ui-params*
 
+				    	*ddu-std-ui-param-autoResize*
+autoResize	(string)
+		Auto resize the window height automatically.
+
+		Default: v:false
+
 				    	*ddu-std-ui-param-displaySourceName*
-displaySourceName (string)
+displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
 
@@ -97,7 +103,7 @@ displaySourceName (string)
 		Default: "no"
 
 				    	*ddu-option-filterFloatingPosition*
-filterFloatingPosition
+filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
 
 		If {position} is set to "bottom", the filter will be displayed
@@ -110,7 +116,7 @@ filterFloatingPosition
 		Default: "bottom"
 
 				    	*ddu-option-filterSplitDirection*
-filterSplitDirection
+filterSplitDirection	(string)
 		Specify the filter window direction as {direction}.
 
 		When {direction} is "floating", the filter uses neovim
@@ -147,14 +153,14 @@ startFilter	(boolean)
 		Default: v:false
 
 						*ddu-std-ui-param-winCol*
-winCol
+winCol		(number)
 		Set the column position of the window if
 		|ddu-std-ui-param-split| is "floating".
 
 		Default: &columns / 4
 
 						*ddu-std-ui-param-winHeight*
-winHeight
+winHeight	(number)
 		Set the height of the window if |ddu-std-ui-param-split| is
 		"horizontal".
 		if |ddu-std-ui-param-split| is "floating",
@@ -163,7 +169,7 @@ winHeight
 		Default: 20
 
 						*ddu-std-ui-param-winRow*
-winRow
+winRow		(number)
 		Set the row position of the window if |ddu-std-ui-param-split|
 		is "floating".
 		If it is 1, the filter window position is always top.
@@ -171,7 +177,7 @@ winRow
 		Default: &lines / 2 - 10
 
 						*ddu-std-ui-param-winwidth*
-winWidth
+winWidth	(number)
 		Set the width of the window if |ddu-std-ui-param-split| is
 		"vertical".
 		if |ddu-std-ui-param-split| is "floating", set the width of
