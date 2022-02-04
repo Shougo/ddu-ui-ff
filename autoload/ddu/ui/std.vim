@@ -33,7 +33,7 @@ function! ddu#ui#std#_update_buffer(
     for hl in item.highlights
       call ddu#ui#std#_highlight(
             \ hl.hl_group, hl.name, 1,
-            \ s:namespace, a:bufnr, item.row, hl.col, hl.col + hl.width)
+            \ s:namespace, a:bufnr, item.row, hl.col, hl.width)
     endfor
   endfor
 
