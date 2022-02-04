@@ -350,17 +350,17 @@ export class Ui extends BaseUi<Params> {
 
   private async setDefaultParams(denops: Denops, uiParams: Params) {
     if (uiParams.winRow == 0) {
-      uiParams.winRow = Math.ceil(
+      uiParams.winRow = Math.trunc(
         (await denops.call("eval", "&lines") as number) / 2 - 10,
       );
     }
     if (uiParams.winCol == 0) {
-      uiParams.winCol = Math.ceil(
+      uiParams.winCol = Math.trunc(
         (await op.columns.getGlobal(denops)) / 4,
       );
     }
     if (uiParams.winWidth == 0) {
-      uiParams.winWidth = Math.ceil((await op.columns.getGlobal(denops)) / 2);
+      uiParams.winWidth = Math.trunc((await op.columns.getGlobal(denops)) / 2);
     }
   }
 }
