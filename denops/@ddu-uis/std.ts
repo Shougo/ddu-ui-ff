@@ -203,11 +203,11 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    await fn.win_gotoid(args.denops, ids[0]);
     if ((await fn.winnr(args.denops, "$")) == 1) {
       await args.denops.cmd("enew");
     } else {
       await args.denops.cmd("close!");
+      await fn.win_gotoid(args.denops, ids[0]);
     }
 
     // Restore options
