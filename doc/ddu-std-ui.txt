@@ -56,6 +56,8 @@ itemAction
 		You can find the actions list in item's kind documentation.
 		If {name} is empty, "default" will be used.
 
+		Note: You cannot mix multiple kinds/sources.
+
 					*ddu-std-ui-action-openFilterWindow*
 openFilterWindow
 		Open the filter window.
