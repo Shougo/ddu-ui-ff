@@ -5,14 +5,15 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.6.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.7.0/types.ts";
 import {
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.6.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.6.0/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.7.0/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.7.0/base/ui.ts";
+import { Lock } from "https://deno.land/x/async@v1.1.5/mod.ts";
 
 type DoActionParams = {
   name?: string;
@@ -41,6 +42,7 @@ export class Ui extends BaseUi<Params> {
   private saveTitle = "";
   private saveCursor: number[] = [];
   private refreshed = false;
+  private lock = new Lock();
 
   refreshItems(args: {
     items: DduItem[];
@@ -58,11 +60,25 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
+    // Note: redraw must be locked
+    await this.lock.with(async() => {
+      await this.lockedRedraw(args);
+    });
+  }
+
+  async lockedRedraw(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiOptions: UiOptions;
+    uiParams: Params;
+  }): Promise<void> {
     const bufferName = `ddu-std-${args.options.name}`;
     const initialized = this.buffers[args.options.name];
     const bufnr = initialized
       ? this.buffers[args.options.name]
       : await this.initBuffer(args.denops, bufferName);
+    this.buffers[args.options.name] = bufnr;
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
@@ -180,7 +196,6 @@ export class Ui extends BaseUi<Params> {
       ) as number;
     }
 
-    this.buffers[args.options.name] = bufnr;
     this.refreshed = false;
   }
 
