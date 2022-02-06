@@ -80,3 +80,75 @@ function! ddu#ui#std#_highlight(
           \ })
   endif
 endfunction
+
+function! ddu#ui#std#_preview_file(params, filename) abort
+  let preview_width = a:params.previewWidth
+  let preview_height = a:params.previewHeight
+  let pos = win_screenpos(win_getid())
+  let win_width = winwidth(0)
+  let win_height = winheight(0)
+
+  if a:params.previewVertical
+    if a:filename ==# ''
+      silent rightbelow vnew
+    else
+      call ddu#util#execute_path(
+            \ 'silent rightbelow vertical pedit!', a:filename)
+      wincmd P
+    endif
+
+    if a:params.previewFloating && exists('*nvim_win_set_config')
+      if a:params.split ==# 'floating'
+        let win_row = a:params['winrow']
+        let win_col = a:params['wincol']
+      else
+        let win_row = pos[0] - 1
+        let win_col = pos[1] - 1
+      endif
+      let win_col += win_width
+      if (win_col + preview_width) > &columns
+        let win_col -= preview_width
+      endif
+
+      call nvim_win_set_config(win_getid(), {
+           \ 'relative': 'editor',
+           \ 'row': win_row,
+           \ 'col': win_col,
+           \ 'width': preview_width,
+           \ 'height': preview_height,
+           \ })
+    else
+      execute 'vert resize ' . preview_width
+    endif
+  else
+    if a:filename ==# ''
+      silent aboveleft new
+    else
+      call ddu#util#execute_path('silent aboveleft pedit!', a:filename)
+
+      wincmd P
+    endif
+
+    if a:params.previewFloating && exists('*nvim_win_set_config')
+      let win_row = pos[0] - 1
+      let win_col = pos[1] + 1
+      if win_row <= preview_height
+        let win_row += win_height + 1
+        let anchor = 'NW'
+      else
+        let anchor = 'SW'
+      endif
+
+      call nvim_win_set_config(0, {
+            \ 'relative': 'editor',
+            \ 'anchor': anchor,
+            \ 'row': win_row,
+            \ 'col': win_col,
+            \ 'width': preview_width,
+            \ 'height': preview_height,
+            \ })
+    else
+      execute 'resize ' . preview_height
+    endif
+  endif
+endfunction

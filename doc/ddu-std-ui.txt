@@ -63,6 +63,10 @@ itemAction
 openFilterWindow
 		Open the filter window.
 
+					*ddu-std-ui-action-preview*
+preview
+		Preview the item in |preview-window|.
+
 					*ddu-std-ui-action-refreshItems*
 refreshItems
 		Refresh the items.
@@ -127,6 +131,37 @@ filterSplitDirection	(string)
 		Note: To use "floating", you need to use neovim.
 
 		Default: "botright"
+
+					*ddu-std-ui-param-previewFloating*
+previewFloating	(boolean)
+		Use floating window in |ddu-std-ui-action-preview|.
+
+		Default: false
+
+						*ddu-std-ui-param-previewHeight*
+previewHeight	(number)
+		Set the height of the |preview-window| in
+		|ddu-std-ui-action-preview|.
+		If |ddu-std-ui-param-previewFloating|, set the height of the
+		floating window.
+
+		Default: 10
+
+					*ddu-std-ui-param-previewVertical*
+previewVertical	(boolean)
+		Use vertical preview instead of horizontal preview in
+		|ddu-std-ui-action-preview|.
+
+		Default: false
+
+						*ddu-std-ui-param-previewWidth*
+previewWidth	(number)
+		Set the width of the |preview-window| in
+		|ddu-std-ui-action-preview|.
+		If |ddu-std-ui-param-previewFloating|, set the width of the
+		floating window.
+
+		Default: 40
 
 				    		*ddu-std-ui-param-prompt*
 prompt		(string)

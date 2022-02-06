@@ -5,14 +5,15 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.7.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.7.1/types.ts";
 import {
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.7.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.7.0/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.7.1/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.7.1/base/ui.ts";
+import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts";
 
 type DoActionParams = {
   name?: string;
@@ -24,6 +25,10 @@ type Params = {
   displaySourceName: "long" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
+  previewHeight: number;
+  previewVertical: boolean;
+  previewFloating: boolean;
+  previewWidth: number;
   prompt: string;
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
@@ -274,6 +279,35 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.None);
     },
+    preview: async (args: {
+      denops: Denops;
+      context: Context;
+      options: DduOptions;
+      uiParams: Params;
+    }) => {
+      const idx = (await fn.line(args.denops, ".")) - 1;
+      const item = this.items[idx];
+      if (!item) {
+        return Promise.resolve(ActionFlags.None);
+      }
+
+      const action = item.action as ActionData;
+      if (!action.path) {
+        return Promise.resolve(ActionFlags.None);
+      }
+
+      const prevId = await fn.win_getid(args.denops);
+
+      await args.denops.call(
+        "ddu#ui#std#_preview_file",
+        args.uiParams,
+        action.path,
+      );
+
+      await fn.win_gotoid(args.denops, prevId);
+
+      return Promise.resolve(ActionFlags.Persist);
+    },
     // deno-lint-ignore require-await
     refreshItems: async (_: {
       denops: Denops;
@@ -322,6 +356,10 @@ export class Ui extends BaseUi<Params> {
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
+      previewHeight: 10,
+      previewVertical: false,
+      previewFloating: false,
+      previewWidth: 40,
       prompt: "",
       split: "horizontal",
       startFilter: false,
