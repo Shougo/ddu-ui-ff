@@ -96,6 +96,12 @@ autoResize	(string)
 
 		Default: v:false
 
+						*ddu-std-ui-param-cursorPos*
+cursorPos	(number)
+		Select {number} candidate.
+
+		Default: 0
+
 				    	*ddu-std-ui-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are

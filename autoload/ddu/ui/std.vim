@@ -7,7 +7,7 @@ function! ddu#ui#std#do_action(name, ...) abort
 endfunction
 
 function! ddu#ui#std#_update_buffer(
-      \  bufnr, selected_items, highlight_items, lines, refreshed) abort
+      \  bufnr, selected_items, highlight_items, lines, refreshed, pos) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:lines)
@@ -18,7 +18,8 @@ function! ddu#ui#std#_update_buffer(
 
   if a:refreshed
     " Init the cursor
-    call win_execute(bufwinid(a:bufnr), 'call cursor(1, 0) | redraw')
+    call win_execute(bufwinid(a:bufnr),
+          \ printf('call cursor(%d, 0) | redraw', a:pos + 1))
   endif
 
   " Clear all highlights

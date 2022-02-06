@@ -22,6 +22,7 @@ type DoActionParams = {
 
 type Params = {
   autoResize: boolean;
+  cursorPos: number;
   displaySourceName: "long" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
@@ -166,6 +167,7 @@ export class Ui extends BaseUi<Params> {
         (c.display ? c.display : c.word)
       ),
       this.refreshed,
+      args.uiParams.cursorPos,
     );
 
     if (args.options.resume && this.saveCursor.length != 0) {
@@ -356,6 +358,7 @@ export class Ui extends BaseUi<Params> {
   params(): Params {
     return {
       autoResize: false,
+      cursorPos: 1,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
