@@ -225,6 +225,9 @@ export class Ui extends BaseUi<Params> {
 
       this.saveTitle = "";
     }
+
+    // Close preview window
+    await args.denops.cmd("pclose!");
   }
 
   actions: Record<
