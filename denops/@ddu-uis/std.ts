@@ -400,6 +400,7 @@ export class Ui extends BaseUi<Params> {
     await fn.setwinvar(denops, winid, "&foldenable", 0);
     await fn.setwinvar(denops, winid, "&number", 0);
     await fn.setwinvar(denops, winid, "&relativenumber", 0);
+    await fn.setwinvar(denops, winid, "&signcolumn", 'no');
     await fn.setwinvar(denops, winid, "&spell", 0);
     await fn.setwinvar(denops, winid, "&wrap", 0);
 
