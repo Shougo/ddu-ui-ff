@@ -358,7 +358,7 @@ export class Ui extends BaseUi<Params> {
   params(): Params {
     return {
       autoResize: false,
-      cursorPos: 1,
+      cursorPos: 0,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
