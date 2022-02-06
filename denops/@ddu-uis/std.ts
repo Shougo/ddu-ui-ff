@@ -81,7 +81,7 @@ export class Ui extends BaseUi<Params> {
       this.items.length < args.uiParams.winHeight;
     if (ids.length == 0) {
       const winHeight = autoResize ?
-        this.items.length : args.uiParams.winHeight;
+        this.items.length : Number(args.uiParams.winHeight);
       if (args.uiParams.split == "horizontal") {
         const header = "silent keepalt ";
         await args.denops.cmd(
@@ -95,9 +95,9 @@ export class Ui extends BaseUi<Params> {
       } else if (floating) {
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
-          "row": args.uiParams.winRow,
-          "col": args.uiParams.winCol,
-          "width": args.uiParams.winWidth,
+          "row": Number(args.uiParams.winRow),
+          "col": Number(args.uiParams.winCol),
+          "width": Number(args.uiParams.winWidth),
           "height": winHeight,
         });
       } else if (args.uiParams.split == "no") {
