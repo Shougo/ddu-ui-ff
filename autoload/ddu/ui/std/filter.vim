@@ -14,7 +14,7 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     endif
   endif
 
-  if a:params.prompt != '' && strwidth(a:params.prompt) <= 2
+  if a:params.prompt != ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt, 'Special')
   else
@@ -100,7 +100,7 @@ function! s:init_prompt(prompt, highlight_prompt) abort
   let id = 2000
 
   call sign_define(name, {
-        \ 'text': a:prompt,
+        \ 'text': strwidth(a:prompt) > 2 ? ">" : a:prompt,
         \ 'texthl': a:highlight_prompt,
         \ })
   call sign_unplace('', {'id': id, 'buffer': bufnr('%')})

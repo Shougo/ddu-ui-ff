@@ -172,7 +172,7 @@ previewWidth	(number)
 				    		*ddu-std-ui-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
-		Note: It must one or two characters.
+		Note: It must be one or two width characters.
 
 		Default: ""
 
