@@ -95,11 +95,11 @@ endfunction
 
 let s:prompt_name = 'ddu_ui_std_filter_prompt'
 function! s:init_prompt(prompt, highlight_prompt) abort
-
   call sign_define(s:prompt_name, {
         \ 'text': strwidth(a:prompt) > 2 ? ">" : a:prompt,
         \ 'texthl': a:highlight_prompt,
         \ })
+
   call s:update_prompt()
 
   augroup ddu-std-filter
