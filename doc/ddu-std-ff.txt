@@ -1,29 +1,29 @@
-*ddu-ff-ui.txt*	Standard UI for ddu.vim
+*ddu-ui-ff.txt*	Standard UI for ddu.vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS					*ddu-ff-ui-contents*
+CONTENTS					*ddu-ui-ff-contents*
 
-Introduction		|ddu-ff-ui-introduction|
-Install			|ddu-ff-ui-install|
-Interface		|ddu-ff-ui-interface|
-  Functions		  |ddu-ff-ui-functions|
-  Actions		  |ddu-ff-ui-actions|
-  Params		  |ddu-ff-ui-params|
-Examples		|ddu-ff-ui-examples|
-FAQ			|ddu-ff-ui-faq|
-Compatibility		|ddu-ff-ui-compatibility|
+Introduction		|ddu-ui-ff-introduction|
+Install			|ddu-ui-ff-install|
+Interface		|ddu-ui-ff-interface|
+  Functions		  |ddu-ui-ff-functions|
+  Actions		  |ddu-ui-ff-actions|
+  Params		  |ddu-ui-ff-params|
+Examples		|ddu-ui-ff-examples|
+FAQ			|ddu-ui-ff-faq|
+Compatibility		|ddu-ui-ff-compatibility|
 
 
 ==============================================================================
-INTRODUCTION					*ddu-ff-ui-introduction*
+INTRODUCTION					*ddu-ui-ff-introduction*
 
 This UI is standard fuzzy finder.
 
 
 ==============================================================================
-INSTALL						*ddu-ff-ui-install*
+INSTALL						*ddu-ui-ff-install*
 
 Please install both "ddu.vim" and "denops.vim".
 
@@ -32,23 +32,23 @@ https://github.com/vim-denops/denops.vim
 
 
 ==============================================================================
-INTERFACE					*ddu-ff-ui-interface*
+INTERFACE					*ddu-ui-ff-interface*
 
 
 ------------------------------------------------------------------------------
-FUNCTIONS					*ddu-ff-ui-functions*
+FUNCTIONS					*ddu-ui-ff-functions*
 
 						*ddu#ff#ui#do_action()*
 ddu#ff#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
-		actions list in |ddu-ff-ui-actions|.
+		actions list in |ddu-ui-ff-actions|.
 		{args} behavior depends on {action-name}.
 		Note: It cannot be used in the filter window. >
 
 ------------------------------------------------------------------------------
-ACTIONS						*ddu-ff-ui-actions*
+ACTIONS						*ddu-ui-ff-actions*
 
-						*ddu-ff-ui-action-itemAction*
+						*ddu-ui-ff-action-itemAction*
 itemAction
 		params:
 			{name}: action name
@@ -59,27 +59,27 @@ itemAction
 
 		Note: You cannot mix multiple kinds/sources.
 
-					*ddu-ff-ui-action-openFilterWindow*
+					*ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
 		Open the filter window.
 
-					*ddu-ff-ui-action-preview*
+					*ddu-ui-ff-action-preview*
 preview
 		Preview the item in |preview-window|.
 
-					*ddu-ff-ui-action-refreshItems*
+					*ddu-ui-ff-action-refreshItems*
 refreshItems
 		Refresh the items.
 
-					*ddu-ff-ui-action-toggleSelectItem*
+					*ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected item.
 
-						*ddu-ff-ui-action-quit*
+						*ddu-ui-ff-action-quit*
 quit
 		Quit the UI window.
 
-					*ddu-ff-ui-action-updateOptions*
+					*ddu-ui-ff-action-updateOptions*
 updateOptions
 		params:
 			{option-name}: option name and value
@@ -88,21 +88,21 @@ updateOptions
 		Refer to |ddu-options| about options.
 
 ==============================================================================
-PARAMS						*ddu-ff-ui-params*
+PARAMS						*ddu-ui-ff-params*
 
-				    	*ddu-ff-ui-param-autoResize*
+				    	*ddu-ui-ff-param-autoResize*
 autoResize	(string)
 		Auto resize the window height automatically.
 
 		Default: v:false
 
-						*ddu-ff-ui-param-cursorPos*
+						*ddu-ui-ff-param-cursorPos*
 cursorPos	(number)
 		Select {number} candidate.
 
 		Default: 0
 
-				    	*ddu-ff-ui-param-displaySourceName*
+				    	*ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
@@ -118,7 +118,8 @@ filterFloatingPosition	(string)
 
 		If {position} is set to "bottom", the filter will be displayed
 		at the bottom.
-		If {position} is "top", the filter will be displayed at the top.
+		If {position} is "top", the filter will be displayed at the
+		top.
 
 		Note: To use it, you need to use neovim and
 		|ddu-option-filterSplitDirection|must be "floating".
@@ -138,45 +139,45 @@ filterSplitDirection	(string)
 
 		Default: "botright"
 
-					*ddu-ff-ui-param-previewFloating*
+					*ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
-		Use floating window in |ddu-ff-ui-action-preview|.
+		Use floating window in |ddu-ui-ff-action-preview|.
 
 		Default: false
 
-						*ddu-ff-ui-param-previewHeight*
+					*ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in
-		|ddu-ff-ui-action-preview|.
-		If |ddu-ff-ui-param-previewFloating|, set the height of the
+		|ddu-ui-ff-action-preview|.
+		If |ddu-ui-ff-param-previewFloating|, set the height of the
 		floating window.
 
 		Default: 10
 
-					*ddu-ff-ui-param-previewVertical*
+					*ddu-ui-ff-param-previewVertical*
 previewVertical	(boolean)
 		Use vertical preview instead of horizontal preview in
-		|ddu-ff-ui-action-preview|.
+		|ddu-ui-ff-action-preview|.
 
 		Default: false
 
-						*ddu-ff-ui-param-previewWidth*
+						*ddu-ui-ff-param-previewWidth*
 previewWidth	(number)
 		Set the width of the |preview-window| in
-		|ddu-ff-ui-action-preview|.
-		If |ddu-ff-ui-param-previewFloating|, set the width of the
+		|ddu-ui-ff-action-preview|.
+		If |ddu-ui-ff-param-previewFloating|, set the width of the
 		floating window.
 
 		Default: 40
 
-				    		*ddu-ff-ui-param-prompt*
+				    		*ddu-ui-ff-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
 		Note: It must be one or two width characters.
 
 		Default: ""
 
-				    		*ddu-ff-ui-param-split*
+				    		*ddu-ui-ff-param-split*
 split		(string)
 		Specify split mode. Following values are available:
 
@@ -187,48 +188,48 @@ split		(string)
 
 		Default: "horizontal"
 
-				    		*ddu-ff-ui-param-startFilter*
+				    		*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
 
 		Default: v:false
 
-						*ddu-ff-ui-param-winCol*
+						*ddu-ui-ff-param-winCol*
 winCol		(number)
 		Set the column position of the window if
-		|ddu-ff-ui-param-split| is "floating".
+		|ddu-ui-ff-param-split| is "floating".
 
 		Default: &columns / 4
 
-						*ddu-ff-ui-param-winHeight*
+						*ddu-ui-ff-param-winHeight*
 winHeight	(number)
-		Set the height of the window if |ddu-ff-ui-param-split| is
+		Set the height of the window if |ddu-ui-ff-param-split| is
 		"horizontal".
-		if |ddu-ff-ui-param-split| is "floating",
+		if |ddu-ui-ff-param-split| is "floating",
 		set the height of the floating window.
 
 		Default: 20
 
-						*ddu-ff-ui-param-winRow*
+						*ddu-ui-ff-param-winRow*
 winRow		(number)
-		Set the row position of the window if |ddu-ff-ui-param-split|
+		Set the row position of the window if |ddu-ui-ff-param-split|
 		is "floating".
 		If it is 1, the filter window position is always top.
 
 		Default: &lines / 2 - 10
 
-						*ddu-ff-ui-param-winwidth*
+						*ddu-ui-ff-param-winwidth*
 winWidth	(number)
-		Set the width of the window if |ddu-ff-ui-param-split| is
+		Set the width of the window if |ddu-ui-ff-param-split| is
 		"vertical".
-		if |ddu-ff-ui-param-split| is "floating", set the width of
+		if |ddu-ui-ff-param-split| is "floating", set the width of
 		the floating window.
 
 		Default: &columns / 2
 
 
 ==============================================================================
-EXAMPLES					*ddu-ff-ui-examples*
+EXAMPLES					*ddu-ui-ff-examples*
 >
 	autocmd FileType ddu-ff call s:ddu_my_settings()
 	function! s:ddu_my_settings() abort
@@ -252,7 +253,7 @@ EXAMPLES					*ddu-ff-ui-examples*
 
 
 ==============================================================================
-FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ff-ui-faq*
+FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
 
 Q: I want to change the cursor line color in the buffer.
 
@@ -261,7 +262,7 @@ So you can change the color by |hl-CursorLine| highlight. >
 
 
 ==============================================================================
-COMPATIBILITY					*ddu-ff-ui-compatibility*
+COMPATIBILITY					*ddu-ui-ff-compatibility*
 
 2022.02.07
 * Rename to "ff".
