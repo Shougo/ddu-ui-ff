@@ -64,7 +64,7 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
-    const bufferName = `ddu-std-${args.options.name}`;
+    const bufferName = `ddu-ff-${args.options.name}`;
     const initialized = this.buffers[args.options.name];
     const bufnr = initialized
       ? this.buffers[args.options.name]
@@ -152,7 +152,7 @@ export class Ui extends BaseUi<Params> {
       1 + (await fn.strwidth(args.denops, args.uiParams.prompt) as number),
     );
     await args.denops.call(
-      "ddu#ui#std#_update_buffer",
+      "ddu#ui#ff#_update_buffer",
       bufnr,
       [...this.selectedItems],
       this.items.map((c, i) => {
@@ -176,11 +176,11 @@ export class Ui extends BaseUi<Params> {
     }
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
-    await vars.g.set(args.denops, "ddu#ui#std#_name", args.options.name);
+    await vars.g.set(args.denops, "ddu#ui#ff#_name", args.options.name);
 
     if (ids.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
-        "ddu#ui#std#filter#_open",
+        "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
         this.filterBufnr,
@@ -277,7 +277,7 @@ export class Ui extends BaseUi<Params> {
       await this.setDefaultParams(args.denops, args.uiParams);
 
       this.filterBufnr = await args.denops.call(
-        "ddu#ui#std#filter#_open",
+        "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
         this.filterBufnr,
@@ -306,7 +306,7 @@ export class Ui extends BaseUi<Params> {
       const prevId = await fn.win_getid(args.denops);
 
       await args.denops.call(
-        "ddu#ui#std#_preview_file",
+        "ddu#ui#ff#_preview_file",
         args.uiParams,
         action.path,
       );
@@ -407,7 +407,7 @@ export class Ui extends BaseUi<Params> {
     await fn.setwinvar(denops, winid, "&wrap", 0);
     await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
-    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
+    await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
     await fn.setbufvar(denops, bufnr, "&swapfile", 0);
   }
 

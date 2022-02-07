@@ -1,12 +1,12 @@
-let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-std') : 0
+let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function! ddu#ui#std#do_action(name, ...) abort
+function! ddu#ui#ff#do_action(name, ...) abort
   call ddu#ui_action(
-        \ get(b:, 'ddu_ui_name', g:ddu#ui#std#_name),
+        \ get(b:, 'ddu_ui_name', g:ddu#ui#ff#_name),
         \ a:name, get(a:000, 0, {}))
 endfunction
 
-function! ddu#ui#std#_update_buffer(
+function! ddu#ui#ff#_update_buffer(
       \  bufnr, selected_items, highlight_items, lines, refreshed, pos) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
 
@@ -32,7 +32,7 @@ function! ddu#ui#std#_update_buffer(
   " Highlighted items
   for item in a:highlight_items
     for hl in item.highlights
-      call ddu#ui#std#_highlight(
+      call ddu#ui#ff#_highlight(
             \ hl.hl_group, hl.name, 1,
             \ s:namespace, a:bufnr, item.row, hl.col, hl.width)
     endfor
@@ -40,7 +40,7 @@ function! ddu#ui#std#_update_buffer(
 
   " Selected items highlights
   for item_nr in a:selected_items
-    call ddu#ui#std#_highlight(
+    call ddu#ui#ff#_highlight(
           \ 'Statement', 'ddu-ui-selected', 10000,
           \ s:namespace, a:bufnr, item_nr + 1, 1, 1000)
   endfor
@@ -51,7 +51,7 @@ function! ddu#ui#std#_update_buffer(
   endif
 endfunction
 
-function! ddu#ui#std#_highlight(
+function! ddu#ui#ff#_highlight(
       \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
   if !has('nvim')
     " Add prop_type
@@ -82,7 +82,7 @@ function! ddu#ui#std#_highlight(
   endif
 endfunction
 
-function! ddu#ui#std#_preview_file(params, filename) abort
+function! ddu#ui#ff#_preview_file(params, filename) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
   let pos = win_screenpos(win_getid())

@@ -1,29 +1,29 @@
-*ddu-std-ui.txt*	Standard UI for ddu.vim
+*ddu-ff-ui.txt*	Standard UI for ddu.vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS					*ddu-std-ui-contents*
+CONTENTS					*ddu-ff-ui-contents*
 
-Introduction		|ddu-std-ui-introduction|
-Install			|ddu-std-ui-install|
-Interface		|ddu-std-ui-interface|
-  Functions		  |ddu-std-ui-functions|
-  Actions		  |ddu-std-ui-actions|
-  Params		  |ddu-std-ui-params|
-Examples		|ddu-std-ui-examples|
-FAQ			|ddu-std-ui-faq|
-Compatibility		|ddu-std-ui-compatibility|
+Introduction		|ddu-ff-ui-introduction|
+Install			|ddu-ff-ui-install|
+Interface		|ddu-ff-ui-interface|
+  Functions		  |ddu-ff-ui-functions|
+  Actions		  |ddu-ff-ui-actions|
+  Params		  |ddu-ff-ui-params|
+Examples		|ddu-ff-ui-examples|
+FAQ			|ddu-ff-ui-faq|
+Compatibility		|ddu-ff-ui-compatibility|
 
 
 ==============================================================================
-INTRODUCTION					*ddu-std-ui-introduction*
+INTRODUCTION					*ddu-ff-ui-introduction*
 
 This UI is standard fuzzy finder.
 
 
 ==============================================================================
-INSTALL						*ddu-std-ui-install*
+INSTALL						*ddu-ff-ui-install*
 
 Please install both "ddu.vim" and "denops.vim".
 
@@ -32,23 +32,23 @@ https://github.com/vim-denops/denops.vim
 
 
 ==============================================================================
-INTERFACE					*ddu-std-ui-interface*
+INTERFACE					*ddu-ff-ui-interface*
 
 
 ------------------------------------------------------------------------------
-FUNCTIONS					*ddu-std-ui-functions*
+FUNCTIONS					*ddu-ff-ui-functions*
 
-						*ddu#std#ui#do_action()*
-ddu#std#ui#do_action({action-name}[, {params}])
+						*ddu#ff#ui#do_action()*
+ddu#ff#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
-		actions list in |ddu-std-ui-actions|.
+		actions list in |ddu-ff-ui-actions|.
 		{args} behavior depends on {action-name}.
 		Note: It cannot be used in the filter window. >
 
 ------------------------------------------------------------------------------
-ACTIONS						*ddu-std-ui-actions*
+ACTIONS						*ddu-ff-ui-actions*
 
-						*ddu-std-ui-action-itemAction*
+						*ddu-ff-ui-action-itemAction*
 itemAction
 		params:
 			{name}: action name
@@ -59,27 +59,27 @@ itemAction
 
 		Note: You cannot mix multiple kinds/sources.
 
-					*ddu-std-ui-action-openFilterWindow*
+					*ddu-ff-ui-action-openFilterWindow*
 openFilterWindow
 		Open the filter window.
 
-					*ddu-std-ui-action-preview*
+					*ddu-ff-ui-action-preview*
 preview
 		Preview the item in |preview-window|.
 
-					*ddu-std-ui-action-refreshItems*
+					*ddu-ff-ui-action-refreshItems*
 refreshItems
 		Refresh the items.
 
-					*ddu-std-ui-action-toggleSelectItem*
+					*ddu-ff-ui-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected item.
 
-						*ddu-std-ui-action-quit*
+						*ddu-ff-ui-action-quit*
 quit
 		Quit the UI window.
 
-					*ddu-std-ui-action-updateOptions*
+					*ddu-ff-ui-action-updateOptions*
 updateOptions
 		params:
 			{option-name}: option name and value
@@ -88,21 +88,21 @@ updateOptions
 		Refer to |ddu-options| about options.
 
 ==============================================================================
-PARAMS						*ddu-std-ui-params*
+PARAMS						*ddu-ff-ui-params*
 
-				    	*ddu-std-ui-param-autoResize*
+				    	*ddu-ff-ui-param-autoResize*
 autoResize	(string)
 		Auto resize the window height automatically.
 
 		Default: v:false
 
-						*ddu-std-ui-param-cursorPos*
+						*ddu-ff-ui-param-cursorPos*
 cursorPos	(number)
 		Select {number} candidate.
 
 		Default: 0
 
-				    	*ddu-std-ui-param-displaySourceName*
+				    	*ddu-ff-ui-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
@@ -138,45 +138,45 @@ filterSplitDirection	(string)
 
 		Default: "botright"
 
-					*ddu-std-ui-param-previewFloating*
+					*ddu-ff-ui-param-previewFloating*
 previewFloating	(boolean)
-		Use floating window in |ddu-std-ui-action-preview|.
+		Use floating window in |ddu-ff-ui-action-preview|.
 
 		Default: false
 
-						*ddu-std-ui-param-previewHeight*
+						*ddu-ff-ui-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in
-		|ddu-std-ui-action-preview|.
-		If |ddu-std-ui-param-previewFloating|, set the height of the
+		|ddu-ff-ui-action-preview|.
+		If |ddu-ff-ui-param-previewFloating|, set the height of the
 		floating window.
 
 		Default: 10
 
-					*ddu-std-ui-param-previewVertical*
+					*ddu-ff-ui-param-previewVertical*
 previewVertical	(boolean)
 		Use vertical preview instead of horizontal preview in
-		|ddu-std-ui-action-preview|.
+		|ddu-ff-ui-action-preview|.
 
 		Default: false
 
-						*ddu-std-ui-param-previewWidth*
+						*ddu-ff-ui-param-previewWidth*
 previewWidth	(number)
 		Set the width of the |preview-window| in
-		|ddu-std-ui-action-preview|.
-		If |ddu-std-ui-param-previewFloating|, set the width of the
+		|ddu-ff-ui-action-preview|.
+		If |ddu-ff-ui-param-previewFloating|, set the width of the
 		floating window.
 
 		Default: 40
 
-				    		*ddu-std-ui-param-prompt*
+				    		*ddu-ff-ui-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
 		Note: It must be one or two width characters.
 
 		Default: ""
 
-				    		*ddu-std-ui-param-split*
+				    		*ddu-ff-ui-param-split*
 split		(string)
 		Specify split mode. Following values are available:
 
@@ -187,62 +187,62 @@ split		(string)
 
 		Default: "horizontal"
 
-				    		*ddu-std-ui-param-startFilter*
+				    		*ddu-ff-ui-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
 
 		Default: v:false
 
-						*ddu-std-ui-param-winCol*
+						*ddu-ff-ui-param-winCol*
 winCol		(number)
 		Set the column position of the window if
-		|ddu-std-ui-param-split| is "floating".
+		|ddu-ff-ui-param-split| is "floating".
 
 		Default: &columns / 4
 
-						*ddu-std-ui-param-winHeight*
+						*ddu-ff-ui-param-winHeight*
 winHeight	(number)
-		Set the height of the window if |ddu-std-ui-param-split| is
+		Set the height of the window if |ddu-ff-ui-param-split| is
 		"horizontal".
-		if |ddu-std-ui-param-split| is "floating",
+		if |ddu-ff-ui-param-split| is "floating",
 		set the height of the floating window.
 
 		Default: 20
 
-						*ddu-std-ui-param-winRow*
+						*ddu-ff-ui-param-winRow*
 winRow		(number)
-		Set the row position of the window if |ddu-std-ui-param-split|
+		Set the row position of the window if |ddu-ff-ui-param-split|
 		is "floating".
 		If it is 1, the filter window position is always top.
 
 		Default: &lines / 2 - 10
 
-						*ddu-std-ui-param-winwidth*
+						*ddu-ff-ui-param-winwidth*
 winWidth	(number)
-		Set the width of the window if |ddu-std-ui-param-split| is
+		Set the width of the window if |ddu-ff-ui-param-split| is
 		"vertical".
-		if |ddu-std-ui-param-split| is "floating", set the width of
+		if |ddu-ff-ui-param-split| is "floating", set the width of
 		the floating window.
 
 		Default: &columns / 2
 
 
 ==============================================================================
-EXAMPLES					*ddu-std-ui-examples*
+EXAMPLES					*ddu-ff-ui-examples*
 >
-	autocmd FileType ddu-std call s:ddu_my_settings()
+	autocmd FileType ddu-ff call s:ddu_my_settings()
 	function! s:ddu_my_settings() abort
 	  nnoremap <buffer><silent> <CR>
-	  \ <Cmd>call ddu#ui#std#do_action('itemAction')<CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
 	  nnoremap <buffer><silent> <Space>
-	  \ <Cmd>call ddu#ui#std#do_action('toggleSelectItem')<CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('toggleSelectItem')<CR>
 	  nnoremap <buffer><silent> i
-	  \ <Cmd>call ddu#ui#std#do_action('openFilterWindow')<CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('openFilterWindow')<CR>
 	  nnoremap <buffer><silent> q
-	  \ <Cmd>call ddu#ui#std#do_action('quit')<CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('quit')<CR>
 	endfunction
 
-	autocmd FileType ddu-std-filter call s:ddu_filter_my_settings()
+	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer><silent> <CR>
 	  \ <Esc><Cmd>close<CR>
@@ -252,7 +252,7 @@ EXAMPLES					*ddu-std-ui-examples*
 
 
 ==============================================================================
-FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-std-ui-faq*
+FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ff-ui-faq*
 
 Q: I want to change the cursor line color in the buffer.
 
@@ -261,13 +261,16 @@ So you can change the color by |hl-CursorLine| highlight. >
 
 
 ==============================================================================
-COMPATIBILITY					*ddu-std-ui-compatibility*
+COMPATIBILITY					*ddu-ff-ui-compatibility*
+
+2022.02.07
+* Rename to "ff".
 
 2022.02.01
 * Rename "filterPosition" to "filterFloatingPosition".
 
 2022.01.29
-* Rename ddu#ui#std#do_map() to ddu#ui#std#do_action().
+* Rename ddu#ui#ff#do_map() to ddu#ui#ff#do_action().
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:fen:noet:

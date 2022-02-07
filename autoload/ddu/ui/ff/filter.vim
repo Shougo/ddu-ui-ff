@@ -1,4 +1,4 @@
-function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
+function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   let ids = win_findbuf(a:bufnr)
   if !empty(ids)
     call win_gotoid(ids[0])
@@ -16,7 +16,7 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
 
   call cursor(line('$'), 0)
 
-  augroup ddu-std-filter
+  augroup ddu-ff-filter
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
           \ <buffer> call s:check_redraw()
@@ -71,7 +71,7 @@ function! s:init_buffer(params) abort
     silent execute direction 'split'
   endif
 
-  let bufnr = bufadd('ddu-std-filter')
+  let bufnr = bufadd('ddu-ff-filter')
   execute bufnr 'buffer'
 
   setlocal bufhidden=hide
@@ -91,10 +91,10 @@ function! s:init_buffer(params) abort
 
   resize 1
 
-  setfiletype ddu-std-filter
+  setfiletype ddu-ff-filter
 endfunction
 
-let s:prompt_name = 'ddu_ui_std_filter_prompt'
+let s:prompt_name = 'ddu_ui_ff_filter_prompt'
 function! s:init_prompt(prompt, highlight_prompt) abort
   call sign_define(s:prompt_name, {
         \ 'text': strwidth(a:prompt) > 2 ? ">" : a:prompt,
@@ -103,7 +103,7 @@ function! s:init_prompt(prompt, highlight_prompt) abort
 
   call s:update_prompt()
 
-  augroup ddu-std-filter
+  augroup ddu-ff-filter
     autocmd TextChangedI,TextChangedP,TextChanged <buffer>
           \ if s:prev_lnum != line('$') | call s:update_prompt() | endif
   augroup END
@@ -118,12 +118,12 @@ endfunction
 function! s:check_redraw() abort
   let input = getline('.')
 
-  if &filetype !=# 'ddu-std-filter'
+  if &filetype !=# 'ddu-ff-filter'
         \ || input ==# s:filter_prev_input
     return
   endif
 
   let s:filter_prev_input = input
 
-  call ddu#redraw(g:ddu#ui#std#_name, { 'input': input })
+  call ddu#redraw(g:ddu#ui#ff#_name, { 'input': input })
 endfunction

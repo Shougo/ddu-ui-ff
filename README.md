@@ -1,6 +1,6 @@
-# ddu-ui-std
+# ddu-ui-ff
 
-Standard UI for ddu.vim
+Fuzzy finder UI for ddu.vim
 
 This UI is standard fuzzy finder.
 
@@ -17,8 +17,8 @@ https://github.com/Shougo/ddu.vim
 ## Configuration
 
 ```vim
-" Use std ui.
+" Use ff ui.
 call ddu#custom#patch_global({
-    \ 'ui': 'std',
+    \ 'ui': 'ff',
     \ })
 ```
