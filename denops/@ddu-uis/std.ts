@@ -116,8 +116,8 @@ export class Ui extends BaseUi<Params> {
         `resize ${this.items.length}`);
     }
 
-    if (this.refreshed) {
-      await this.initOptions(args.denops, bufnr, args.uiParams);
+    if (!initialized) {
+      await this.initOptions(args.denops, bufnr);
     }
 
     const header = `${args.context.done ? "" : "[async]"}` +
@@ -147,6 +147,9 @@ export class Ui extends BaseUi<Params> {
 
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
+    const promptPrefix = args.uiParams.prompt == "" ? "" : " ".repeat(
+      1 + (await fn.strwidth(args.denops, args.uiParams.prompt) as number),
+    );
     await args.denops.call(
       "ddu#ui#std#_update_buffer",
       bufnr,
@@ -158,6 +161,7 @@ export class Ui extends BaseUi<Params> {
         };
       }).filter((c) => c.highlights),
       this.items.map((c) =>
+        promptPrefix +
         `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
         (c.display ? c.display : c.word)
       ),
@@ -384,9 +388,8 @@ export class Ui extends BaseUi<Params> {
   private async initOptions(
     denops: Denops,
     bufnr: number,
-    uiParams: Params,
   ): Promise<void> {
-    const winid = await fn.win_getid(denops);
+    const winid = await fn.bufwinid(denops, bufnr);
 
     // Set options
     await fn.setwinvar(denops, winid, "&list", 0);
@@ -399,8 +402,7 @@ export class Ui extends BaseUi<Params> {
     await fn.setwinvar(denops, winid, "&signcolumn", "no");
     await fn.setwinvar(denops, winid, "&spell", 0);
     await fn.setwinvar(denops, winid, "&wrap", 0);
-    await fn.setwinvar(denops, winid, "&signcolumn",
-                       uiParams.prompt != '' ? "yes" : "no");
+    await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
     await fn.setbufvar(denops, bufnr, "&filetype", "ddu-std");
     await fn.setbufvar(denops, bufnr, "&swapfile", 0);
