@@ -5,14 +5,14 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.7.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.8.0/types.ts";
 import {
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.7.1/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.7.1/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.8.0/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.8.0/base/ui.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts";
 
 type DoActionParams = {
@@ -199,6 +199,8 @@ export class Ui extends BaseUi<Params> {
     if (!bufnr) {
       return;
     }
+
+    await args.denops.call("ddu#quit", args.options.name);
 
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
