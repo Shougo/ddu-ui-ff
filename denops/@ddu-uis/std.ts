@@ -120,9 +120,10 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, bufnr);
     }
 
-    const header = `${args.context.done ? "" : "[async]"}` +
+    const header =
       `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}`;
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
+    const async = `${args.context.done ? "" : "[async]"}`
     if (floating) {
       if (this.saveTitle == "") {
         this.saveTitle = await args.denops.call(
@@ -134,14 +135,14 @@ export class Ui extends BaseUi<Params> {
       args.denops.call(
         "nvim_set_option",
         "titlestring",
-        header + " %{" + linenr + "}%*",
+        header + " %{" + linenr + "}%*" + async,
       );
     } else {
       await fn.setwinvar(
         args.denops,
         await fn.bufwinnr(args.denops, bufnr),
         "&statusline",
-        header + " %#LineNR#%{" + linenr + "}%*",
+        header + " %#LineNR#%{" + linenr + "}%*" + async,
       );
     }
 
