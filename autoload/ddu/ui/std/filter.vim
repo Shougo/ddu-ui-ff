@@ -104,14 +104,14 @@ function! s:init_prompt(prompt, highlight_prompt) abort
 
   augroup ddu-std-filter
     autocmd TextChangedI,TextChangedP,TextChanged <buffer>
-          \ if s:sign_lnum != line('$') | call s:update_prompt() | endif
+          \ if s:prev_lnum != line('$') | call s:update_prompt() | endif
   augroup END
 endfunction
 function! s:update_prompt() abort
   let id = 2000
   call sign_unplace('', {'id': id, 'buffer': bufnr('%')})
-  call sign_place(id, '', s:prompt_name, bufnr('%'), {'lnum': line('$')})
-  let s:sign_lnum = line('$')
+  call sign_place(id, '', s:prompt_name, bufnr('%'), {'lnum': line('.')})
+  let s:prev_lnum = line('$')
 endfunction
 
 function! s:check_redraw() abort
