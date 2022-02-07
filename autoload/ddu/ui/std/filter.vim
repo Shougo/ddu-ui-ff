@@ -20,14 +20,14 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
           \ <buffer> call s:check_redraw()
   augroup END
 
+  call cursor(line('$'), 0)
+
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt, 'Special')
   else
     setlocal signcolumn=no
   endif
-
-  call cursor(line('$'), 0)
 
   if has('nvim')
     startinsert!
