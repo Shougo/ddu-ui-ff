@@ -14,14 +14,15 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     endif
   endif
 
+  call cursor(line('$'), 0)
+
   augroup ddu-std-filter
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
           \ <buffer> call s:check_redraw()
   augroup END
 
-  call cursor(line('$'), 0)
-
+  " Note: prompt must set after cursor move
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt, 'Special')
