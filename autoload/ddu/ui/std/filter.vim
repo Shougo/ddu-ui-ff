@@ -14,18 +14,18 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     endif
   endif
 
-  if a:params.prompt != ''
+  augroup ddu-std-filter
+    autocmd!
+    autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
+          \ <buffer> call s:check_redraw()
+  augroup END
+
+  if a:params.prompt !=# ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt, 'Special')
   else
     setlocal signcolumn=no
   endif
-
-  augroup ddu-std-filter
-    autocmd!
-    autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
-          \ <buffer> call s:update()
-  augroup END
 
   call cursor(line('$'), 0)
 
@@ -36,7 +36,7 @@ function! ddu#ui#std#filter#_open(name, input, bufnr, params) abort
     call feedkeys('A', 'n')
   endif
 
-  let g:ddu#ui#std#_filter_prev_input = getline('.')
+  let s:filter_prev_input = getline('.')
   return bufnr('%')
 endfunction
 
@@ -73,8 +73,6 @@ function! s:init_buffer(params) abort
   let bufnr = bufadd('ddu-std-filter')
   execute bufnr 'buffer'
 
-  let g:ddu#ui#std#_filter_winid = win_getid()
-
   setlocal bufhidden=hide
   setlocal buftype=nofile
   setlocal colorcolumn=
@@ -95,27 +93,36 @@ function! s:init_buffer(params) abort
   setfiletype ddu-std-filter
 endfunction
 
+let s:prompt_name = 'ddu_ui_std_filter_prompt'
 function! s:init_prompt(prompt, highlight_prompt) abort
-  let name = 'ddu_ui_std_filter_prompt'
-  let id = 2000
 
-  call sign_define(name, {
+  call sign_define(s:prompt_name, {
         \ 'text': strwidth(a:prompt) > 2 ? ">" : a:prompt,
         \ 'texthl': a:highlight_prompt,
         \ })
+  call s:update_prompt()
+
+  augroup ddu-std-filter
+    autocmd TextChangedI,TextChangedP,TextChanged <buffer>
+          \ if s:sign_lnum != line('$') | call s:update_prompt() | endif
+  augroup END
+endfunction
+function! s:update_prompt() abort
+  let id = 2000
   call sign_unplace('', {'id': id, 'buffer': bufnr('%')})
-  call sign_place(id, '', name, bufnr('%'), {'lnum': line('$')})
+  call sign_place(id, '', s:prompt_name, bufnr('%'), {'lnum': line('$')})
+  let s:sign_lnum = line('$')
 endfunction
 
-function! s:update() abort
+function! s:check_redraw() abort
   let input = getline('.')
 
   if &filetype !=# 'ddu-std-filter'
-        \ || input ==# g:ddu#ui#std#_filter_prev_input
+        \ || input ==# s:filter_prev_input
     return
   endif
 
-  let g:ddu#ui#std#_filter_prev_input = input
+  let s:filter_prev_input = input
 
   call ddu#redraw(g:ddu#ui#std#_name, { 'input': input })
 endfunction
