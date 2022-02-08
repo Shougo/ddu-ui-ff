@@ -52,6 +52,7 @@ ACTIONS						*ddu-ui-ff-actions*
 itemAction
 		params:
 			{name}: action name
+			{params}: action params dictionary
 
 		Close the UI window and fire {name} action for items.
 		You can find the actions list in item's kind documentation.
