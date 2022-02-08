@@ -24,7 +24,7 @@ type DoActionParams = {
 type Params = {
   autoResize: boolean;
   cursorPos: number;
-  displaySourceName: "long" | "no";
+  displaySourceName: "long" | "short" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
   previewHeight: number;
@@ -152,6 +152,17 @@ export class Ui extends BaseUi<Params> {
     const promptPrefix = args.uiParams.prompt == "" ? "" : " ".repeat(
       1 + (await fn.strwidth(args.denops, args.uiParams.prompt) as number),
     );
+    const getSourceName = (sourceName: string) => {
+      if (displaySourceName == "long") {
+        return sourceName + " ";
+      }
+      if (displaySourceName == "short") {
+        return sourceName.match(/[^a-zA-Z]/) ?
+          sourceName.replaceAll(/([a-zA-Z])[a-zA-Z]+/g, "$1") + " " :
+          sourceName.slice(0, 2) + " ";
+      }
+      return "";
+    }
     await args.denops.call(
       "ddu#ui#ff#_update_buffer",
       bufnr,
@@ -164,7 +175,7 @@ export class Ui extends BaseUi<Params> {
       }).filter((c) => c.highlights),
       this.items.map((c) =>
         promptPrefix +
-        `${displaySourceName == "long" ? c.__sourceName + " " : ""}` +
+        `${getSourceName(c.__sourceName)}` +
         (c.display ? c.display : c.word)
       ),
       this.refreshed,

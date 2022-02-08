@@ -107,7 +107,8 @@ displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
 
-		"long": display source name
+		"long": display full source name
+		"short": display shorter source name
 		"no": does not display
 
 		Default: "no"
