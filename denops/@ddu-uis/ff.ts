@@ -5,15 +5,15 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.8.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.10.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.8.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.8.0/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.10.0/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.10.0/base/ui.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts";
 
 type DoActionParams = {
@@ -178,7 +178,7 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ? c.display : c.word)
       ),
-      this.refreshed,
+      this.refreshed && args.context.done,
       args.uiParams.cursorPos,
     );
 
@@ -213,8 +213,6 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    await args.denops.call("ddu#quit", args.options.name);
-
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
@@ -244,6 +242,8 @@ export class Ui extends BaseUi<Params> {
 
     // Close preview window
     await args.denops.cmd("pclose!");
+
+    await args.denops.call("ddu#event", args.options.name, "close");
   }
 
   actions: Record<
@@ -338,6 +338,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
     }) => {
       await this.quit({ denops: args.denops, options: args.options });
+      await args.denops.call("ddu#event", args.options.name, "cancel");
       return Promise.resolve(ActionFlags.None);
     },
     toggleSelectItem: async (args: {
