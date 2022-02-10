@@ -48,6 +48,7 @@ export class Ui extends BaseUi<Params> {
   private saveTitle = "";
   private saveCursor: number[] = [];
   private refreshed = false;
+  private prevInput = "";
 
   refreshItems(args: {
     items: DduItem[];
@@ -71,6 +72,7 @@ export class Ui extends BaseUi<Params> {
       ? this.buffers[args.options.name]
       : await this.initBuffer(args.denops, bufferName);
     this.buffers[args.options.name] = bufnr;
+    const inputChanged = this.prevInput != args.context.input;
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
@@ -178,7 +180,7 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ? c.display : c.word)
       ),
-      this.refreshed && args.context.done,
+      inputChanged,
       args.uiParams.cursorPos,
     );
 
@@ -201,6 +203,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.refreshed = false;
+    this.prevInput = args.context.input;
   }
 
   async quit(args: {
