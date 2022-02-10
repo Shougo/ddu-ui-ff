@@ -119,7 +119,7 @@ export class Ui extends BaseUi<Params> {
         `resize ${this.items.length}`);
     }
 
-    if (!initialized) {
+    if (this.refreshed) {
       await this.initOptions(args.denops, bufnr);
     }
 
@@ -180,7 +180,7 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      inputChanged,
+      inputChanged || (this.refreshed && autoResize),
       args.uiParams.cursorPos,
     );
 
