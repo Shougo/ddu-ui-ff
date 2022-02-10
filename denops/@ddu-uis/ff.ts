@@ -178,7 +178,7 @@ export class Ui extends BaseUi<Params> {
       this.items.map((c) =>
         promptPrefix +
         `${getSourceName(c.__sourceName)}` +
-        (c.display ? c.display : c.word)
+        (c.display ?? c.word)
       ),
       inputChanged,
       args.uiParams.cursorPos,
