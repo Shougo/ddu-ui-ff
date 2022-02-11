@@ -5,16 +5,16 @@ import {
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.10.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.11.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.10.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.10.0/base/ui.ts";
-import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.1.0/file.ts";
+} from "https://deno.land/x/ddu_vim@v0.11.0/deps.ts";
+import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.11.0/base/ui.ts";
+import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
   name?: string;
