@@ -19,7 +19,7 @@ function! ddu#ui#ff#_update_buffer(
   if a:refreshed
     " Init the cursor
     call win_execute(bufwinid(a:bufnr),
-          \ printf('call cursor(%d, 0) | redraw', a:pos + 1))
+          \ printf('call cursor(%d, 0) | redraw', a:pos < 0 ? 0 : a:pos + 1))
   endif
 
   " Clear all highlights

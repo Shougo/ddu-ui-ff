@@ -86,8 +86,9 @@ export class Ui extends BaseUi<Params> {
     const autoResize = args.uiParams.autoResize &&
       this.items.length < args.uiParams.winHeight;
     if (ids.length == 0) {
-      const winHeight = autoResize ?
-        this.items.length : Number(args.uiParams.winHeight);
+      const winHeight = autoResize
+        ? this.items.length
+        : Number(args.uiParams.winHeight);
       if (args.uiParams.split == "horizontal") {
         const header = "silent keepalt ";
         await args.denops.cmd(
@@ -117,8 +118,10 @@ export class Ui extends BaseUi<Params> {
       }
     } else if (autoResize) {
       await fn.win_execute(
-        args.denops, await fn.bufwinid(args.denops, bufnr),
-        `resize ${this.items.length}`);
+        args.denops,
+        await fn.bufwinid(args.denops, bufnr),
+        `resize ${this.items.length}`,
+      );
     }
 
     if (this.refreshed) {
@@ -128,7 +131,7 @@ export class Ui extends BaseUi<Params> {
     const header =
       `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}`;
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
-    const async = `${args.context.done ? "" : "[async]"}`
+    const async = `${args.context.done ? "" : "[async]"}`;
     if (floating) {
       if (this.saveTitle == "") {
         this.saveTitle = await args.denops.call(
@@ -161,12 +164,12 @@ export class Ui extends BaseUi<Params> {
         return sourceName + " ";
       }
       if (displaySourceName == "short") {
-        return sourceName.match(/[^a-zA-Z]/) ?
-          sourceName.replaceAll(/([a-zA-Z])[a-zA-Z]+/g, "$1") + " " :
-          sourceName.slice(0, 2) + " ";
+        return sourceName.match(/[^a-zA-Z]/)
+          ? sourceName.replaceAll(/([a-zA-Z])[a-zA-Z]+/g, "$1") + " "
+          : sourceName.slice(0, 2) + " ";
       }
       return "";
-    }
+    };
     await args.denops.call(
       "ddu#ui#ff#_update_buffer",
       bufnr,
@@ -182,7 +185,8 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      inputChanged || (this.refreshed && this.items.length < this.prevLength),
+      inputChanged || args.uiParams.cursorPos > 0 ||
+        (this.refreshed && this.items.length < this.prevLength),
       args.uiParams.cursorPos,
     );
 
@@ -343,7 +347,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
     }) => {
       await this.quit({ denops: args.denops, options: args.options });
-      await args.denops.call("ddu#event", args.options.name, "cancel");
+      await args.denops.call("ddu#pop", args.options.name);
       return Promise.resolve(ActionFlags.None);
     },
     toggleSelectItem: async (args: {
@@ -378,7 +382,7 @@ export class Ui extends BaseUi<Params> {
   params(): Params {
     return {
       autoResize: false,
-      cursorPos: 0,
+      cursorPos: -1,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
