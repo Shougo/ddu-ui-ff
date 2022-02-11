@@ -49,11 +49,13 @@ export class Ui extends BaseUi<Params> {
   private saveCursor: number[] = [];
   private refreshed = false;
   private prevInput = "";
+  private prevLength = 0;
 
   refreshItems(args: {
     items: DduItem[];
   }): void {
     // Note: Use only 1000 items
+    this.prevLength = this.items.length;
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
     this.refreshed = true;
@@ -180,7 +182,7 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      inputChanged || (this.refreshed && autoResize),
+      inputChanged || (this.refreshed && this.items.length < this.prevLength),
       args.uiParams.cursorPos,
     );
 
