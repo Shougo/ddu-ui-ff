@@ -1,19 +1,19 @@
 import {
-  Actions,
   ActionFlags,
   BaseUi,
   Context,
   DduItem,
   DduOptions,
+  UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.12.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.12.2/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.12.1/deps.ts";
+} from "https://deno.land/x/ddu_vim@v0.12.2/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
@@ -267,7 +267,7 @@ export class Ui extends BaseUi<Params> {
     return items.filter((item) => item);
   }
 
-  actions: Actions<Params> = {
+  actions: UiActions<Params> = {
     chooseAction: async (args: {
       denops: Denops;
       options: DduOptions;
