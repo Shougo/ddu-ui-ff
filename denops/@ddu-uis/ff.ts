@@ -18,6 +18,7 @@ import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
   name?: string;
+  items?: DduItem[];
   params?: unknown;
 };
 
@@ -228,6 +229,12 @@ export class Ui extends BaseUi<Params> {
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     if (ids.length == 0) {
       await args.denops.cmd(`buffer ${bufnr}`);
+
+      // Don't restore to ddu-ff buffer
+      if ((await op.filetype.getLocal(args.denops)) == "ddu-ff") {
+        await args.denops.cmd("enew");
+      }
+
       return;
     }
 
@@ -307,12 +314,12 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      const items = await this.getItems(args.denops);
+      const params = args.actionParams as DoActionParams;
+      const items = params.items ?? await this.getItems(args.denops);
       if (items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
 
-      const params = args.actionParams as DoActionParams;
       await args.denops.call(
         "ddu#item_action",
         args.options.name,
