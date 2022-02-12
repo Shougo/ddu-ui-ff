@@ -48,6 +48,13 @@ ddu#ff#ui#do_action({action-name}[, {params}])
 ------------------------------------------------------------------------------
 ACTIONS						*ddu-ui-ff-actions*
 
+					*ddu-ui-ff-action-chooseAction*
+chooseAction
+		Choose and fire the action.
+
+		Note: "ddu-source-action" is required.
+		https://github.com/Shougo/ddu-source-action
+
 						*ddu-ui-ff-action-itemAction*
 itemAction
 		params:
@@ -68,6 +75,10 @@ openFilterWindow
 preview
 		Preview the item in |preview-window|.
 
+						*ddu-ui-ff-action-quit*
+quit
+		Quit the UI window.
+
 					*ddu-ui-ff-action-refreshItems*
 refreshItems
 		Refresh the items.
@@ -75,10 +86,6 @@ refreshItems
 					*ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected item.
-
-						*ddu-ui-ff-action-quit*
-quit
-		Quit the UI window.
 
 					*ddu-ui-ff-action-updateOptions*
 updateOptions

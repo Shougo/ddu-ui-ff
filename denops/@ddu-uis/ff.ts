@@ -1,19 +1,19 @@
 import {
+  Actions,
   ActionFlags,
   BaseUi,
   Context,
   DduItem,
   DduOptions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.11.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.12.1/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.11.0/deps.ts";
-import { ActionArguments } from "https://deno.land/x/ddu_vim@v0.11.0/base/ui.ts";
+} from "https://deno.land/x/ddu_vim@v0.12.1/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
@@ -255,25 +255,59 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#event", args.options.name, "close");
   }
 
-  actions: Record<
-    string,
-    (args: ActionArguments<Params>) => Promise<ActionFlags>
-  > = {
+  private async getItems(denops: Denops): Promise<DduItem[]> {
+    let items: DduItem[];
+    if (this.selectedItems.size == 0) {
+      const idx = (await fn.line(denops, ".")) - 1;
+      items = [this.items[idx]];
+    } else {
+      items = [...this.selectedItems].map((i) => this.items[i]);
+    }
+
+    return items.filter((item) => item);
+  }
+
+  actions: Actions<Params> = {
+    chooseAction: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      const items = await this.getItems(args.denops);
+      if (items.length == 0) {
+        return Promise.resolve(ActionFlags.None);
+      }
+
+      const actions = await args.denops.call(
+        "ddu#get_item_actions",
+        args.options.name,
+        items,
+      );
+
+      await args.denops.call("ddu#start", {
+        name: args.options.name,
+        push: true,
+        sources: [
+          {
+            name: "action",
+            options: {},
+            params: {
+              actions: actions,
+              name: args.options.name,
+              items: items,
+            },
+          },
+        ],
+      });
+
+      return Promise.resolve(ActionFlags.None);
+    },
     itemAction: async (args: {
       denops: Denops;
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      let items: DduItem[];
-      if (this.selectedItems.size == 0) {
-        const idx = (await fn.line(args.denops, ".")) - 1;
-        items = [this.items[idx]];
-      } else {
-        items = [...this.selectedItems].map((i) => this.items[i]);
-      }
-
-      items = items.filter((item) => item);
-
+      const items = await this.getItems(args.denops);
       if (items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
