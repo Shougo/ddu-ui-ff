@@ -211,20 +211,18 @@ export class Ui extends BaseUi<Params> {
 
   async quit(args: {
     denops: Denops;
+    context: Context;
     options: DduOptions;
   }): Promise<void> {
-    const bufnr = this.buffers[args.options.name];
-
-    if (!bufnr) {
-      return;
-    }
-
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
-    const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
+    const ids = await fn.win_findbuf(
+      args.denops,
+      args.context.bufNr,
+    ) as number[];
     if (ids.length == 0) {
-      await args.denops.cmd(`buffer ${bufnr}`);
+      await args.denops.cmd(`buffer ${args.context.bufNr}`);
 
       // Don't restore to ddu-ff buffer
       if ((await op.filetype.getLocal(args.denops)) == "ddu-ff") {
@@ -381,9 +379,14 @@ export class Ui extends BaseUi<Params> {
     },
     quit: async (args: {
       denops: Denops;
+      context: Context;
       options: DduOptions;
     }) => {
-      await this.quit({ denops: args.denops, options: args.options });
+      await this.quit({
+        denops: args.denops,
+        context: args.context,
+        options: args.options,
+      });
       await args.denops.call("ddu#pop", args.options.name);
       return Promise.resolve(ActionFlags.None);
     },
