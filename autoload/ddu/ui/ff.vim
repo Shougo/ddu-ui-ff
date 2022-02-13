@@ -152,4 +152,7 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
       execute 'resize ' . preview_height
     endif
   endif
+
+  " Note: Open folds and centering
+  normal! zvzz
 endfunction
