@@ -186,6 +186,12 @@ prompt		(string)
 
 		Default: ""
 
+				    		*ddu-ui-ff-param-reversed*
+reversed	(boolean)
+		Display the items in reversed order.
+
+		Default: v:false
+
 				    		*ddu-ui-ff-param-split*
 split		(string)
 		Specify split mode. Following values are available:

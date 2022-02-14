@@ -33,6 +33,7 @@ type Params = {
   previewFloating: boolean;
   previewWidth: number;
   prompt: string;
+  reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
   startFilter: boolean;
   winCol: number;
@@ -49,7 +50,7 @@ export class Ui extends BaseUi<Params> {
   private saveTitle = "";
   private saveCursor: number[] = [];
   private refreshed = false;
-  private prevLength = 0;
+  private prevLength = -1;
 
   refreshItems(args: {
     items: DduItem[];
@@ -170,6 +171,9 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
+    const cursorPos = args.uiParams.cursorPos >= 0
+      ? args.uiParams.cursorPos
+      : 0;
     await args.denops.call(
       "ddu#ui#ff#_update_buffer",
       bufnr,
@@ -185,8 +189,10 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      args.uiParams.cursorPos > 0 || (this.items.length < this.prevLength),
-      args.uiParams.cursorPos,
+      args.uiParams.cursorPos >= 0 || this.prevLength <= 0 ||
+        this.items.length < this.prevLength,
+      args.uiParams.reversed,
+      cursorPos,
     );
 
     if (args.options.resume && this.saveCursor.length != 0) {
@@ -257,10 +263,10 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#event", args.options.name, "close");
   }
 
-  private async getItems(denops: Denops): Promise<DduItem[]> {
+  private async getItems(denops: Denops, uiParams: Params): Promise<DduItem[]> {
     let items: DduItem[];
     if (this.selectedItems.size == 0) {
-      const idx = (await fn.line(denops, ".")) - 1;
+      const idx = await this.getIndex(denops, uiParams);
       items = [this.items[idx]];
     } else {
       items = [...this.selectedItems].map((i) => this.items[i]);
@@ -273,9 +279,10 @@ export class Ui extends BaseUi<Params> {
     chooseAction: async (args: {
       denops: Denops;
       options: DduOptions;
+      uiParams: Params;
       actionParams: unknown;
     }) => {
-      const items = await this.getItems(args.denops);
+      const items = await this.getItems(args.denops, args.uiParams);
       if (items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
@@ -307,10 +314,14 @@ export class Ui extends BaseUi<Params> {
     itemAction: async (args: {
       denops: Denops;
       options: DduOptions;
+      uiParams: Params;
       actionParams: unknown;
     }) => {
       const params = args.actionParams as DoActionParams;
-      const items = params.items ?? await this.getItems(args.denops);
+      const items = params.items ?? await this.getItems(
+        args.denops,
+        args.uiParams,
+      );
       if (items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
@@ -349,7 +360,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      const idx = (await fn.line(args.denops, ".")) - 1;
+      const idx = await this.getIndex(args.denops, args.uiParams);
       const item = this.items[idx];
       if (!item) {
         return Promise.resolve(ActionFlags.None);
@@ -394,12 +405,13 @@ export class Ui extends BaseUi<Params> {
     toggleSelectItem: async (args: {
       denops: Denops;
       options: DduOptions;
+      uiParams: Params;
     }) => {
       if (this.items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
 
-      const idx = (await fn.line(args.denops, ".")) - 1;
+      const idx = await this.getIndex(args.denops, args.uiParams);
       if (this.selectedItems.has(idx)) {
         this.selectedItems.delete(idx);
       } else {
@@ -432,6 +444,7 @@ export class Ui extends BaseUi<Params> {
       previewFloating: false,
       previewWidth: 40,
       prompt: "",
+      reversed: false,
       split: "horizontal",
       startFilter: false,
       winCol: 0,
@@ -490,5 +503,13 @@ export class Ui extends BaseUi<Params> {
     if (uiParams.winWidth == 0) {
       uiParams.winWidth = Math.trunc((await op.columns.getGlobal(denops)) / 2);
     }
+  }
+
+  private async getIndex(
+    denops: Denops,
+    uiParams: Params,
+  ): Promise<number> {
+    const idx = (await fn.line(denops, ".")) - 1;
+    return uiParams.reversed ? this.items.length - 1 - idx : idx;
   }
 }
