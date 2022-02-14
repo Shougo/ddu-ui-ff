@@ -99,7 +99,7 @@ updateOptions
 PARAMS						*ddu-ui-ff-params*
 
 				    	*ddu-ui-ff-param-autoResize*
-autoResize	(string)
+autoResize	(boolean)
 		Auto resize the window height automatically.
 
 		Default: v:false
