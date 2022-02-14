@@ -131,7 +131,8 @@ export class Ui extends BaseUi<Params> {
       `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}`;
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
     const async = `${args.context.done ? "" : "[async]"}`;
-    if (floating) {
+    const laststatus = await op.laststatus.get(args.denops);
+    if (floating || laststatus == 0) {
       if (this.saveTitle == "") {
         this.saveTitle = await args.denops.call(
           "nvim_get_option",
