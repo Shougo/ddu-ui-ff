@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.12.2/types.ts";
+} from "https://deno.land/x/ddu_vim@v0.13/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.12.2/deps.ts";
+} from "https://deno.land/x/ddu_vim@v0.13/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
@@ -220,22 +220,13 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     context: Context;
     options: DduOptions;
+    uiParams: Params;
   }): Promise<void> {
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
-    const ids = await fn.win_findbuf(
-      args.denops,
-      args.context.bufNr,
-    ) as number[];
-    if (ids.length == 0) {
+    if (args.uiParams.split == "no") {
       await args.denops.cmd(`buffer ${args.context.bufNr}`);
-
-      // Don't restore to ddu-ff buffer
-      if ((await op.filetype.getLocal(args.denops)) == "ddu-ff") {
-        await args.denops.cmd("enew");
-      }
-
       return;
     }
 
@@ -243,7 +234,7 @@ export class Ui extends BaseUi<Params> {
       await args.denops.cmd("enew");
     } else {
       await args.denops.cmd("close!");
-      await fn.win_gotoid(args.denops, ids[0]);
+      await fn.win_gotoid(args.denops, args.context.winId);
     }
 
     // Restore options
@@ -393,11 +384,13 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       context: Context;
       options: DduOptions;
+      uiParams: Params;
     }) => {
       await this.quit({
         denops: args.denops,
         context: args.context,
         options: args.options,
+        uiParams: args.uiParams,
       });
       await args.denops.call("ddu#pop", args.options.name);
       return Promise.resolve(ActionFlags.None);
