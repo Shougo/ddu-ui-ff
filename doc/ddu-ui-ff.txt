@@ -148,6 +148,13 @@ filterSplitDirection	(string)
 
 		Default: "botright"
 
+				    	*ddu-option-filterUpdateTime*
+filterUpdateTime	(number)
+		Specify the update time in the filter window.
+		If it is less than equal 0, the feature will be disabled.
+
+		Default: 0
+
 					*ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.

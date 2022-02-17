@@ -28,6 +28,7 @@ type Params = {
   displaySourceName: "long" | "short" | "no";
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "floating";
+  filterUpdateTime: number;
   previewHeight: number;
   previewVertical: boolean;
   previewFloating: boolean;
@@ -432,6 +433,7 @@ export class Ui extends BaseUi<Params> {
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
+      filterUpdateTime: 0,
       previewHeight: 10,
       previewVertical: false,
       previewFloating: false,

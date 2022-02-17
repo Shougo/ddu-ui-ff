@@ -19,7 +19,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   augroup ddu-ff-filter
     autocmd!
     autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
-          \ <buffer> call s:check_redraw()
+          \ <buffer> call s:check_update()
   augroup END
 
   " Note: prompt must set after cursor move
@@ -38,6 +38,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   endif
 
   let s:filter_prev_input = getline('.')
+  let s:filter_updatetime = a:params.filterUpdateTime
   return bufnr('%')
 endfunction
 
@@ -115,7 +116,20 @@ function! s:update_prompt() abort
   let s:prev_lnum = line('$')
 endfunction
 
+function! s:check_update() abort
+  if s:filter_updatetime > 0
+    if exists('s:update_timer')
+      call timer_stop(s:update_timer)
+    endif
+    let s:update_timer = timer_start(
+          \ s:filter_updatetime, {-> s:check_redraw()})
+  else
+    call s:check_redraw()
+  endif
+endfunction
 function! s:check_redraw() abort
+  unlet! s:update_timer
+
   let input = getline('.')
 
   if &filetype !=# 'ddu-ff-filter'
