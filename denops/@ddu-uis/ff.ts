@@ -81,7 +81,7 @@ export class Ui extends BaseUi<Params> {
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
-    const hasNvim = await fn.has(args.denops, "nvim");
+    const hasNvim = args.denops.meta.host == "nvim";
     const floating = args.uiParams.split == "floating" && hasNvim;
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     const autoResize = args.uiParams.autoResize &&
