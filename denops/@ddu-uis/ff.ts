@@ -81,8 +81,8 @@ export class Ui extends BaseUi<Params> {
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
-    const floating = args.uiParams.split == "floating" &&
-      await fn.has(args.denops, "nvim");
+    const hasNvim = await fn.has(args.denops, "nvim");
+    const floating = args.uiParams.split == "floating" && hasNvim;
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     const autoResize = args.uiParams.autoResize &&
       this.items.length < args.uiParams.winHeight;
@@ -134,7 +134,7 @@ export class Ui extends BaseUi<Params> {
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
     const async = `${args.context.done ? "" : "[async]"}`;
     const laststatus = await op.laststatus.get(args.denops);
-    if (floating || laststatus == 0) {
+    if (hasNvim && (floating || laststatus == 0)) {
       if (this.saveTitle == "") {
         this.saveTitle = await args.denops.call(
           "nvim_get_option",
