@@ -288,6 +288,10 @@ Q: I want to change the cursor line color in the buffer.
 A: It uses 'cursorline' feature.
 So you can change the color by |hl-CursorLine| highlight. >
 
+Q: I want to start narrowing in the first.
+
+A: Please set |ddu-ui-ff-param-startFilter|.
+
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
