@@ -27,7 +27,7 @@ type Params = {
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
   filterFloatingPosition: "top" | "bottom";
-  filterSplitDirection: "botright" | "floating";
+  filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
   previewHeight: number;
   previewVertical: boolean;
@@ -36,6 +36,7 @@ type Params = {
   prompt: string;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
+  splitDirection: "botright" | "topleft";
   startFilter: boolean;
   winCol: number;
   winHeight: number;
@@ -90,13 +91,14 @@ export class Ui extends BaseUi<Params> {
       const winHeight = autoResize
         ? this.items.length
         : Number(args.uiParams.winHeight);
+      const direction = args.uiParams.splitDirection;
       if (args.uiParams.split == "horizontal") {
-        const header = "silent keepalt ";
+        const header = `silent keepalt ${direction} `;
         await args.denops.cmd(
           header + `sbuffer +resize\\ ${winHeight} ${bufnr}`,
         );
       } else if (args.uiParams.split == "vertical") {
-        const header = "silent keepalt vertical ";
+        const header = `silent keepalt vertical ${direction} `;
         await args.denops.cmd(
           header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`,
         );
@@ -441,6 +443,7 @@ export class Ui extends BaseUi<Params> {
       prompt: "",
       reversed: false,
       split: "horizontal",
+      splitDirection: "botright",
       startFilter: false,
       winCol: 0,
       winHeight: 20,

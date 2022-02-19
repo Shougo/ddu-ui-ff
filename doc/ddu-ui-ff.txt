@@ -210,6 +210,12 @@ split		(string)
 
 		Default: "horizontal"
 
+				    	*ddu-ui-ff-param-splitDirection*
+splitDirection	(string)
+		Specify split direction.
+
+		Default: "botright"
+
 				    		*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
