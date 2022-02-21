@@ -102,8 +102,8 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
 
     if a:params.previewFloating && exists('*nvim_win_set_config')
       if a:params.split ==# 'floating'
-        let win_row = a:params['winrow']
-        let win_col = a:params['wincol']
+        let win_row = a:params['winRow']
+        let win_col = a:params['winCol']
       else
         let win_row = pos[0] - 1
         let win_col = pos[1] - 1
