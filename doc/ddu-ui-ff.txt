@@ -155,6 +155,17 @@ filterUpdateTime	(number)
 
 		Default: 0
 
+				    	*ddu-option-highlights*
+highlights	(dictionary)
+		It specifies ddu-ui-ff buffer highlights.
+		It can contain following keys
+
+		prompt				(string)
+		Specify narrowing text highlight.
+		Default: "Special"
+
+		Default: {}
+
 					*ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.

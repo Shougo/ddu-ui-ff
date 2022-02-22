@@ -22,6 +22,10 @@ type DoActionParams = {
   params?: unknown;
 };
 
+type HighlightGroup = {
+  prompt?: string;
+};
+
 type Params = {
   autoResize: boolean;
   cursorPos: number;
@@ -29,6 +33,7 @@ type Params = {
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
+  highlights: HighlightGroup;
   previewHeight: number;
   previewVertical: boolean;
   previewFloating: boolean;
@@ -179,12 +184,14 @@ export class Ui extends BaseUi<Params> {
       : 0;
     await args.denops.call(
       "ddu#ui#ff#_update_buffer",
+      args.uiParams,
       bufnr,
       [...this.selectedItems],
       this.items.map((c, i) => {
         return {
-          highlights: c.highlights,
+          highlights: c.highlights ?? [],
           row: i + 1,
+          prefix: promptPrefix + `${getSourceName(c.__sourceName)}`,
         };
       }).filter((c) => c.highlights),
       this.items.map((c) =>
@@ -194,7 +201,6 @@ export class Ui extends BaseUi<Params> {
       ),
       args.uiParams.cursorPos >= 0 || this.prevLength <= 0 ||
         this.items.length < this.prevLength,
-      args.uiParams.reversed,
       cursorPos,
     );
 
@@ -436,6 +442,7 @@ export class Ui extends BaseUi<Params> {
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
       filterUpdateTime: 0,
+      highlights: {},
       previewHeight: 10,
       previewVertical: false,
       previewFloating: false,

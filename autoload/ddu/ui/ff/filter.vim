@@ -25,7 +25,8 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   " Note: prompt must set after cursor move
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
-    call s:init_prompt(a:params.prompt, 'Special')
+    call s:init_prompt(a:params.prompt,
+          \ get(a:params.highlights, 'prompt', 'Special'))
   else
     setlocal signcolumn=no
   endif
