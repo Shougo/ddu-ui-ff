@@ -40,6 +40,7 @@ type Params = {
   previewFloating: boolean;
   previewWidth: number;
   prompt: string;
+  quitEmpty: boolean;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "botright" | "topleft";
@@ -77,6 +78,11 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
+    if (args.uiParams.quitEmpty && args.context.maxItems == 0) {
+      // Disable redraw when empty items
+      return;
+    }
+
     const bufferName = `ddu-ff-${args.options.name}`;
     const initialized = this.buffers[args.options.name];
     const bufnr = initialized
@@ -458,6 +464,7 @@ export class Ui extends BaseUi<Params> {
       previewFloating: false,
       previewWidth: 40,
       prompt: "",
+      quitEmpty: false,
       reversed: false,
       split: "horizontal",
       splitDirection: "botright",

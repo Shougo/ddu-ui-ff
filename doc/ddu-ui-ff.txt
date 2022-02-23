@@ -174,7 +174,7 @@ highlights	(dictionary)
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.
 
-		Default: false
+		Default: v:false
 
 					*ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
@@ -190,7 +190,7 @@ previewVertical	(boolean)
 		Use vertical preview instead of horizontal preview in
 		|ddu-ui-ff-action-preview|.
 
-		Default: false
+		Default: v:false
 
 						*ddu-ui-ff-param-previewWidth*
 previewWidth	(number)
@@ -207,6 +207,12 @@ prompt		(string)
 		Note: It must be one or two width characters.
 
 		Default: ""
+
+				    		*ddu-ui-ff-param-quitEmpty*
+quitEmpty	(boolean)
+		Don't open the UI window if the items are empty.
+
+		Default: v:false
 
 				    		*ddu-ui-ff-param-reversed*
 reversed	(boolean)
