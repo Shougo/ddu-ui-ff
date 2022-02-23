@@ -160,6 +160,10 @@ highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.
 		It can contain following keys
 
+		floating			(string)
+		Specify floating window background highlight.
+		Default: "NormalFloat"
+
 		prompt				(string)
 		Specify narrowing text highlight.
 		Default: "Special"

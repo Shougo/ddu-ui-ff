@@ -76,6 +76,11 @@ function! s:init_buffer(params) abort
   let bufnr = bufadd('ddu-ff-filter')
   execute bufnr 'buffer'
 
+  if has('nvim') && is_floating && has_key(a:params.highlights, 'floating')
+    call setwinvar(bufwinnr(bufnr),
+          \ '&winhighlight', a:params.highlights.floating)
+  endif
+
   setlocal bufhidden=hide
   setlocal buftype=nofile
   setlocal colorcolumn=

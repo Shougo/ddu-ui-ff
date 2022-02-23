@@ -23,6 +23,7 @@ type DoActionParams = {
 };
 
 type HighlightGroup = {
+  floating?: string;
   prompt?: string;
 };
 
@@ -115,6 +116,15 @@ export class Ui extends BaseUi<Params> {
           "width": Number(args.uiParams.winWidth),
           "height": winHeight,
         });
+
+        if (args.uiParams.highlights?.floating) {
+          await fn.setwinvar(
+            args.denops,
+            await fn.bufwinnr(args.denops, bufnr),
+            "&winhighlight",
+            args.uiParams.highlights.floating,
+          );
+        }
       } else if (args.uiParams.split == "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       } else {
