@@ -208,8 +208,8 @@ prompt		(string)
 
 		Default: ""
 
-				    		*ddu-ui-ff-param-quitEmpty*
-quitEmpty	(boolean)
+				    		*ddu-ui-ff-param-ignoreEmpty*
+ignoreEmpty	(boolean)
 		Don't open the UI window if the items are empty.
 
 		Default: v:false

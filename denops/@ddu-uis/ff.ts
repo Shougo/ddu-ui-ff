@@ -35,12 +35,12 @@ type Params = {
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
   highlights: HighlightGroup;
+  ignoreEmpty: boolean;
+  previewFloating: boolean;
   previewHeight: number;
   previewVertical: boolean;
-  previewFloating: boolean;
   previewWidth: number;
   prompt: string;
-  quitEmpty: boolean;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "botright" | "topleft";
@@ -78,7 +78,7 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
-    if (args.uiParams.quitEmpty && args.context.maxItems == 0) {
+    if (args.uiParams.ignoreEmpty && args.context.maxItems == 0) {
       // Disable redraw when empty items
       return;
     }
@@ -459,12 +459,12 @@ export class Ui extends BaseUi<Params> {
       filterSplitDirection: "botright",
       filterUpdateTime: 0,
       highlights: {},
+      ignoreEmpty: false,
+      previewFloating: false,
       previewHeight: 10,
       previewVertical: false,
-      previewFloating: false,
       previewWidth: 40,
       prompt: "",
-      quitEmpty: false,
       reversed: false,
       split: "horizontal",
       splitDirection: "botright",
