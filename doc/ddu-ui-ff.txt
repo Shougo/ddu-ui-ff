@@ -43,7 +43,11 @@ ddu#ff#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
 		actions list in |ddu-ui-ff-actions|.
 		{args} behavior depends on {action-name}.
-		Note: It cannot be used in the filter window. >
+		Note: It cannot be used in the filter window.
+
+						*ddu#ff#ui#execute()*
+ddu#ff#ui#execute({command})
+		Execute {command} in the UI window.
 
 ------------------------------------------------------------------------------
 ACTIONS						*ddu-ui-ff-actions*
@@ -313,6 +317,29 @@ Q: I want to start narrowing in the first.
 
 A: Please set |ddu-ui-ff-param-startFilter|.
 
+Q: I want to call default action in the filter window.
+
+A: >
+
+	autocmd FileType ddu-filter call s:ddu_filter_my_settings()
+	function! s:ddu_filter_my_settings() abort
+	  inoremap <buffer> <CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
+	endfunction
+
+Q: I want to move the cursor in the filter window, while in insert mode.
+
+A: Really? It is not the Vim way to move the cursor while in insert mode. You
+must force this behaviour. >
+>
+	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
+	function! s:ddu_filter_my_settings() abort
+	  inoremap <buffer> <C-j>
+	  \ <Cmd>call ddu#ui#ff#execute("call cursor(line('.')+1,0)")<CR>
+	  inoremap <buffer> <C-k>
+	  \ <Cmd>call ddu#ui#ff#execute("call cursor(line('.')-1,0)")<CR>
+	endfunction
+<
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*

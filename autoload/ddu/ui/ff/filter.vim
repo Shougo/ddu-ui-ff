@@ -1,4 +1,6 @@
 function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
+  let parent_id = win_getid()
+
   let ids = win_findbuf(a:bufnr)
   if !empty(ids)
     call win_gotoid(ids[0])
@@ -40,6 +42,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
 
   let s:filter_prev_input = getline('.')
   let s:filter_updatetime = a:params.filterUpdateTime
+  let g:ddu#ui#ff#_filter_parent_winid = parent_id
   return bufnr('%')
 endfunction
 

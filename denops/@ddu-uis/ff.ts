@@ -227,6 +227,7 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
     await vars.g.set(args.denops, "ddu#ui#ff#_name", args.options.name);
+    await vars.g.set(args.denops, "ddu#ui#ff#_filter_parent_winid", -1);
 
     if (ids.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
@@ -247,6 +248,20 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions;
     uiParams: Params;
   }): Promise<void> {
+    const ft = await op.filetype.getLocal(args.denops);
+    if (ft == "ddu-ff-filter") {
+      // Close filter window and move to the UI window.
+      await args.denops.cmd("close!");
+      const parentId = await vars.g.get(
+        args.denops,
+        "ddu#ui#ff#_filter_parent_winid",
+      );
+      await fn.win_gotoid(args.denops, parentId);
+
+      // Stop insert mode
+      await args.denops.cmd(`stopinsert`);
+    }
+
     // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
@@ -531,7 +546,14 @@ export class Ui extends BaseUi<Params> {
     denops: Denops,
     uiParams: Params,
   ): Promise<number> {
-    const idx = (await fn.line(denops, ".")) - 1;
+    const ft = await op.filetype.getLocal(denops);
+    const parentId = await vars.g.get(
+      denops,
+      "ddu#ui#ff#_filter_parent_winid",
+    );
+    const idx = ft == "ddu-ff"
+      ? (await fn.line(denops, ".")) - 1
+      : (await denops.call("getcurpos", parentId) as number[])[1] - 1;
     return uiParams.reversed ? this.items.length - 1 - idx : idx;
   }
 }

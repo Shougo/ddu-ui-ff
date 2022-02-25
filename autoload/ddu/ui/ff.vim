@@ -6,6 +6,14 @@ function! ddu#ui#ff#do_action(name, ...) abort
         \ a:name, get(a:000, 0, {}))
 endfunction
 
+function! ddu#ui#ff#execute(command) abort
+  if !exists('g:ddu#ui#ff#_filter_parent_winid')
+    return
+  endif
+  call win_execute(g:ddu#ui#ff#_filter_parent_winid, a:command)
+  call win_execute(g:ddu#ui#ff#_filter_parent_winid, 'redraw')
+endfunction
+
 function! ddu#ui#ff#_update_buffer(
       \ params, bufnr, selected_items, highlight_items, lines, refreshed, pos) abort
   call setbufvar(a:bufnr, '&modifiable', 1)
