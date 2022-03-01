@@ -149,7 +149,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (this.refreshed) {
-      await this.initOptions(args.denops, bufnr);
+      await this.initOptions(args.denops, args.options, bufnr);
     }
 
     const header =
@@ -215,8 +215,9 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      args.uiParams.cursorPos >= 0 || this.prevLength <= 0 ||
-        this.items.length < this.prevLength,
+      args.uiParams.cursorPos >= 0 ||
+        (this.refreshed && this.prevLength > 0
+         && this.items.length < this.prevLength),
       cursorPos,
     );
 
@@ -224,10 +225,6 @@ export class Ui extends BaseUi<Params> {
       await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
       this.saveCursor = [];
     }
-
-    await fn.setbufvar(args.denops, bufnr, "ddu_ui_name", args.options.name);
-    await vars.g.set(args.denops, "ddu#ui#ff#_name", args.options.name);
-    await vars.g.set(args.denops, "ddu#ui#ff#_filter_parent_winid", -1);
 
     if (ids.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
@@ -255,6 +252,7 @@ export class Ui extends BaseUi<Params> {
       const parentId = await vars.g.get(
         args.denops,
         "ddu#ui#ff#_filter_parent_winid",
+        -1
       );
       await fn.win_gotoid(args.denops, parentId);
 
@@ -503,11 +501,14 @@ export class Ui extends BaseUi<Params> {
 
   private async initOptions(
     denops: Denops,
+    options: DduOptions,
     bufnr: number,
   ): Promise<void> {
     const winid = await fn.bufwinid(denops, bufnr);
 
     await batch(denops, async (denops: Denops) => {
+      await fn.setbufvar(denops, bufnr, "ddu_ui_name", options.name);
+
       // Set options
       await fn.setwinvar(denops, winid, "&list", 0);
       await fn.setwinvar(denops, winid, "&colorcolumn", "");
@@ -550,6 +551,7 @@ export class Ui extends BaseUi<Params> {
     const parentId = await vars.g.get(
       denops,
       "ddu#ui#ff#_filter_parent_winid",
+      -1
     );
     const idx = ft == "ddu-ff"
       ? (await fn.line(denops, ".")) - 1

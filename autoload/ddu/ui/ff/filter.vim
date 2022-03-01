@@ -6,7 +6,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
     call win_gotoid(ids[0])
     call cursor(line('$'), 0)
   else
-    call s:init_buffer(a:params)
+    call s:init_buffer(a:name, a:params)
 
     " Set the current input
     if getline('$') ==# ''
@@ -46,7 +46,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   return bufnr('%')
 endfunction
 
-function! s:init_buffer(params) abort
+function! s:init_buffer(name, params) abort
   let is_floating =
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
@@ -83,6 +83,8 @@ function! s:init_buffer(params) abort
     call setwinvar(bufwinnr(bufnr),
           \ '&winhighlight', a:params.highlights.floating)
   endif
+
+  let b:ddu_ui_name = a:name
 
   setlocal bufhidden=hide
   setlocal buftype=nofile
@@ -148,5 +150,5 @@ function! s:check_redraw() abort
 
   let s:filter_prev_input = input
 
-  call ddu#redraw(g:ddu#ui#ff#_name, { 'input': input })
+  call ddu#redraw(b:ddu_ui_name, { 'input': input })
 endfunction

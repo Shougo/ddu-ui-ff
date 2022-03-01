@@ -43,7 +43,7 @@ ddu#ff#ui#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
 		actions list in |ddu-ui-ff-actions|.
 		{args} behavior depends on {action-name}.
-		Note: It cannot be used in the filter window.
+		Note: It can be called in the filter window or UI window.
 
 						*ddu#ff#ui#execute()*
 ddu#ff#ui#execute({command})
@@ -290,21 +290,21 @@ EXAMPLES					*ddu-ui-ff-examples*
 
 	autocmd FileType ddu-ff call s:ddu_my_settings()
 	function! s:ddu_my_settings() abort
-	  nnoremap <buffer><silent> <CR>
+	  nnoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
-	  nnoremap <buffer><silent> <Space>
+	  nnoremap <buffer> <Space>
 	  \ <Cmd>call ddu#ui#ff#do_action('toggleSelectItem')<CR>
-	  nnoremap <buffer><silent> i
+	  nnoremap <buffer> i
 	  \ <Cmd>call ddu#ui#ff#do_action('openFilterWindow')<CR>
-	  nnoremap <buffer><silent> q
+	  nnoremap <buffer> q
 	  \ <Cmd>call ddu#ui#ff#do_action('quit')<CR>
 	endfunction
 
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
-	  inoremap <buffer><silent> <CR>
+	  inoremap <buffer> <CR>
 	  \ <Esc><Cmd>close<CR>
-	  nnoremap <buffer><silent> <CR>
+	  nnoremap <buffer> <CR>
 	  \ <Cmd>close<CR>
 	endfunction
 
@@ -344,6 +344,26 @@ must force this behaviour. >
 	  \ <Cmd>call ddu#ui#ff#execute("call cursor(line('.')-1,0)")<CR>
 	endfunction
 <
+Q: I want to define |ddu-option-name| depend key mappings.
+
+A: You can use "b:ddu_ui_name". >
+
+	autocmd FileType ddu-ff call s:ddu_my_settings()
+	function! s:ddu_my_settings() abort
+	  if b:ddu_ui_name ==# 'foo'
+	    nnoremap <buffer> e
+	    \ <Cmd>call ddu#ui#ff#do_action(
+	    \ 'itemAction', {'name': 'edit'})<CR>
+	  endif
+	endfunction
+	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
+	function! s:ddu_filter_my_settings() abort
+	  if b:ddu_ui_name ==# 'foo'
+	    nnoremap <buffer> <CR>
+	    \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
+	  endif
+	endfunction
+
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*

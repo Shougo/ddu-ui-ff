@@ -2,7 +2,7 @@ let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
 function! ddu#ui#ff#do_action(name, ...) abort
   call ddu#ui_action(
-        \ get(b:, 'ddu_ui_name', g:ddu#ui#ff#_name),
+        \ get(b:, 'ddu_ui_name', ''),
         \ a:name, get(a:000, 0, {}))
 endfunction
 
