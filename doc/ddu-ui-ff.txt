@@ -284,6 +284,10 @@ winWidth	(number)
 ==============================================================================
 EXAMPLES					*ddu-ui-ff-examples*
 >
+	call ddu#custom#patch_global({
+	    \ 'ui': 'ff',
+	    \ })
+
 	autocmd FileType ddu-ff call s:ddu_my_settings()
 	function! s:ddu_my_settings() abort
 	  nnoremap <buffer><silent> <CR>
