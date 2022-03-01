@@ -38,15 +38,15 @@ INTERFACE					*ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS					*ddu-ui-ff-functions*
 
-						*ddu#ff#ui#do_action()*
-ddu#ff#ui#do_action({action-name}[, {params}])
+						*ddu#ui#ff#do_action()*
+ddu#ui#ff#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
 		actions list in |ddu-ui-ff-actions|.
 		{args} behavior depends on {action-name}.
 		Note: It can be called in the filter window or UI window.
 
-						*ddu#ff#ui#execute()*
-ddu#ff#ui#execute({command})
+						*ddu#ui#ff#execute()*
+ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
 
 ------------------------------------------------------------------------------
