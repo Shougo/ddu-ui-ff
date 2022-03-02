@@ -97,12 +97,11 @@ export class Ui extends BaseUi<Params> {
     const hasNvim = args.denops.meta.host == "nvim";
     const floating = args.uiParams.split == "floating" && hasNvim;
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
-    const autoResize = args.uiParams.autoResize &&
-      this.items.length < args.uiParams.winHeight;
+    const winHeight = args.uiParams.autoResize &&
+        this.items.length < Number(args.uiParams.winHeight)
+      ? this.items.length
+      : Number(args.uiParams.winHeight);
     if (ids.length == 0) {
-      const winHeight = autoResize
-        ? this.items.length
-        : Number(args.uiParams.winHeight);
       const direction = args.uiParams.splitDirection;
       if (args.uiParams.split == "horizontal") {
         const header = `silent keepalt ${direction} `;
@@ -140,11 +139,11 @@ export class Ui extends BaseUi<Params> {
         );
         return;
       }
-    } else if (autoResize) {
+    } else if (args.uiParams.autoResize) {
       await fn.win_execute(
         args.denops,
         await fn.bufwinid(args.denops, bufnr),
-        `resize ${this.items.length}`,
+        `resize ${winHeight}`,
       );
     }
 
@@ -215,9 +214,9 @@ export class Ui extends BaseUi<Params> {
         `${getSourceName(c.__sourceName)}` +
         (c.display ?? c.word)
       ),
-      args.uiParams.cursorPos >= 0 ||
-        (this.refreshed && this.prevLength > 0
-         && this.items.length < this.prevLength),
+      args.uiParams.cursorPos >= 0 || (this.refreshed &&
+          (this.prevLength > 0 && this.items.length < this.prevLength) ||
+          (args.uiParams.reversed && this.items.length != this.prevLength)),
       cursorPos,
     );
 
@@ -254,7 +253,7 @@ export class Ui extends BaseUi<Params> {
       const parentId = await vars.g.get(
         args.denops,
         "ddu#ui#ff#_filter_parent_winid",
-        -1
+        -1,
       );
       await fn.win_gotoid(args.denops, parentId);
 
@@ -555,7 +554,7 @@ export class Ui extends BaseUi<Params> {
     const parentId = await vars.g.get(
       denops,
       "ddu#ui#ff#_filter_parent_winid",
-      -1
+      -1,
     );
     const idx = ft == "ddu-ff"
       ? (await fn.line(denops, ".")) - 1
