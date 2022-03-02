@@ -364,6 +364,17 @@ A: You can use "b:ddu_ui_name". >
 	  endif
 	endfunction
 
+Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
+
+A: You can pass params like this.
+>
+	autocmd FileType ddu-ff call s:ddu_my_settings()
+	function! s:ddu_my_settings() abort
+	  nnoremap <buffer> E
+	  \ <Cmd>call ddu#ui#ff#do_action('itemAction',
+	  \ {'params': eval(input('params: '))})<CR>
+	endfunction
+
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*

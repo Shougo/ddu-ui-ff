@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v0.13/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.1.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v0.13/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.1.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.2.0/file.ts";
 
 type DoActionParams = {
