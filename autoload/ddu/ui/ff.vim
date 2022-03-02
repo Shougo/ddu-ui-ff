@@ -31,7 +31,7 @@ function! ddu#ui#ff#_update_buffer(
           \ a:params.reversed ? len(a:lines) - a:pos : a:pos + 1))
   endif
 
-  call win_execute(bufwinid(a:bufnr), 'normal! zvzz')
+  call win_execute(bufwinid(a:bufnr), 'normal! zb')
 
   " Clear all highlights
   if has('nvim')
