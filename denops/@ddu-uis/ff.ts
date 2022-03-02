@@ -236,6 +236,8 @@ export class Ui extends BaseUi<Params> {
       ) as number;
     }
 
+    this.saveCursor = await fn.getcurpos(args.denops) as number[];
+
     this.refreshed = false;
   }
 
@@ -260,7 +262,6 @@ export class Ui extends BaseUi<Params> {
       await args.denops.cmd(`stopinsert`);
     }
 
-    // Save the cursor
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
     if (args.uiParams.split == "no") {
@@ -315,6 +316,8 @@ export class Ui extends BaseUi<Params> {
       if (items.length == 0) {
         return Promise.resolve(ActionFlags.None);
       }
+
+      this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
       const actions = await args.denops.call(
         "ddu#get_item_actions",
@@ -431,6 +434,7 @@ export class Ui extends BaseUi<Params> {
         uiParams: args.uiParams,
       });
       await args.denops.call("ddu#pop", args.options.name);
+
       return Promise.resolve(ActionFlags.None);
     },
     toggleSelectItem: async (args: {
