@@ -288,8 +288,8 @@ EXAMPLES					*ddu-ui-ff-examples*
 	    \ 'ui': 'ff',
 	    \ })
 
-	autocmd FileType ddu-ff call s:ddu_my_settings()
-	function! s:ddu_my_settings() abort
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
 	  nnoremap <buffer> <Space>
@@ -348,8 +348,8 @@ Q: I want to define |ddu-option-name| depend key mappings.
 
 A: You can use "b:ddu_ui_name". >
 
-	autocmd FileType ddu-ff call s:ddu_my_settings()
-	function! s:ddu_my_settings() abort
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
 	    \ <Cmd>call ddu#ui#ff#do_action(
@@ -368,8 +368,8 @@ Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
 A: You can pass params like this.
 >
-	autocmd FileType ddu-ff call s:ddu_my_settings()
-	function! s:ddu_my_settings() abort
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> E
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
