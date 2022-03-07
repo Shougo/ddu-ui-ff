@@ -125,7 +125,7 @@ displaySourceName	(string)
 
 		Default: "no"
 
-				    	*ddu-ui-ff-param-filterFloatingPosition*
+			    	*ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
 
