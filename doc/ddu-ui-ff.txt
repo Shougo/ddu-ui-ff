@@ -125,7 +125,7 @@ displaySourceName	(string)
 
 		Default: "no"
 
-				    	*ddu-option-filterFloatingPosition*
+				    	*ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
 
@@ -135,11 +135,11 @@ filterFloatingPosition	(string)
 		top.
 
 		Note: To use it, you need to use neovim and
-		|ddu-option-filterSplitDirection|must be "floating".
+		|ddu-ui-ff-param-filterSplitDirection|must be "floating".
 
 		Default: "bottom"
 
-				    	*ddu-option-filterSplitDirection*
+				    	*ddu-ui-ff-param-filterSplitDirection*
 filterSplitDirection	(string)
 		Specify the filter window direction as {direction}.
 
@@ -152,14 +152,14 @@ filterSplitDirection	(string)
 
 		Default: "botright"
 
-				    	*ddu-option-filterUpdateTime*
+				    	*ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
 		Specify the update time in the filter window.
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
 
-				    	*ddu-option-highlights*
+				    	*ddu-ui-ff-param-highlights*
 highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.
 		It can contain following keys
