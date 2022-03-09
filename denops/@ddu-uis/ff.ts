@@ -414,12 +414,6 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.Persist);
     },
-    // deno-lint-ignore require-await
-    refreshItems: async (_: {
-      denops: Denops;
-    }) => {
-      return Promise.resolve(ActionFlags.RefreshItems);
-    },
     quit: async (args: {
       denops: Denops;
       context: Context;
@@ -435,6 +429,12 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("ddu#pop", args.options.name);
 
       return Promise.resolve(ActionFlags.None);
+    },
+    // deno-lint-ignore require-await
+    refreshItems: async (_: {
+      denops: Denops;
+    }) => {
+      return Promise.resolve(ActionFlags.RefreshItems);
     },
     toggleSelectItem: async (args: {
       denops: Denops;
