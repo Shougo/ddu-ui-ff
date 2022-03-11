@@ -125,6 +125,13 @@ displaySourceName	(string)
 
 		Default: "no"
 
+			    	*ddu-ui-ff-param-floatingBorder*
+floatingBorder		(string | list)
+		Specify the style of window border.
+		See |nvim_open_win()| for the detail.
+
+		Default: "none"
+
 			    	*ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.

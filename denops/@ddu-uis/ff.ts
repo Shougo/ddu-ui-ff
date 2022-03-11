@@ -31,6 +31,7 @@ type Params = {
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
+  floatingBorder: "none" | "single" | "double" | "rounded" | "solid" | "shadow" | string[];
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
@@ -120,6 +121,7 @@ export class Ui extends BaseUi<Params> {
           "col": Number(args.uiParams.winCol),
           "width": Number(args.uiParams.winWidth),
           "height": winHeight,
+          "border": args.uiParams.floatingBorder,
         });
 
         if (args.uiParams.highlights?.floating) {
@@ -471,6 +473,7 @@ export class Ui extends BaseUi<Params> {
       autoResize: false,
       cursorPos: -1,
       displaySourceName: "no",
+      floatingBorder: "none",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
       filterUpdateTime: 0,
