@@ -558,7 +558,7 @@ export class Ui extends BaseUi<Params> {
     );
     const idx = ft == "ddu-ff"
       ? (await fn.line(denops, ".")) - 1
-      : (await denops.call("getcurpos", parentId) as number[])[1] - 1;
+      : (await denops.call("line", ".", parentId) as number) - 1;
     return uiParams.reversed ? this.items.length - 1 - idx : idx;
   }
 }
