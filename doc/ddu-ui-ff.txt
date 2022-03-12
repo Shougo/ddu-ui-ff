@@ -127,8 +127,10 @@ displaySourceName	(string)
 
 			    	*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
-		Specify the style of window border.
+		Specify the style of window border if |ddu-ui-ff-param-split|
+		is "floating".
 		See |nvim_open_win()| for the detail.
+		Note: It is neovim only.
 
 		Default: "none"
 

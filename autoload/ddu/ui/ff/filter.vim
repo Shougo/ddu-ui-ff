@@ -52,24 +52,23 @@ function! s:init_buffer(name, params) abort
         \ a:params.filterSplitDirection ==# 'floating'
 
   if has('nvim') && is_floating
-    let wincol = a:params.winCol
-    let winrow = a:params.winRow
-    let winwidth = a:params.winWidth
-    let winheight = a:params.winHeight
-    let winScreenpos = win_screenpos(win_getid())[0]
-    let row = a:params.filterFloatingPosition == 'bottom'
-          \ ? winScreenpos + winheight - 1
-          \ : winScreenpos - 2
-    if a:params.filterSplitDirection ==# 'floating'
-      let wincol = win_screenpos(0)[1] - 1
+    let row = a:params.filterFloatingPosition ==# 'bottom'
+          \ ? winheight(0) : -1
+    let col = 0
+    if a:params.floatingBorder !=# 'none'
+      if a:params.filterFloatingPosition ==# 'top'
+        let row -= 2
+      endif
+      let col -= 1
     endif
 
     call nvim_open_win(bufnr('%'), v:true, {
-          \ 'relative': 'editor',
-          \ 'row': winrow == 1 ? 0 : row,
-          \ 'col': wincol,
-          \ 'width': winwidth,
+          \ 'relative': 'win',
+          \ 'row': row,
+          \ 'col': col,
+          \ 'width': a:params.winWidth,
           \ 'height': 1,
+          \ 'border': a:params.floatingBorder,
           \})
   else
     let direction = is_floating ? 'botright' : a:params.filterSplitDirection
