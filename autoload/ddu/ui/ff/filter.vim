@@ -64,10 +64,12 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     endif
     let col -= 1
   endif
+  let row += win_screenpos(a:parent)[0] - 1
+  let col += win_screenpos(a:parent)[1] - 1
 
+  " Note: relative: win does not work for resume feature
   let params = {
-        \ 'relative': 'win',
-        \ 'win': a:parent,
+        \ 'relative': 'editor',
         \ 'row': row,
         \ 'col': col,
         \ 'width': a:params.winWidth,
@@ -87,7 +89,7 @@ function! s:init_buffer(name, params) abort
         \ a:params.filterSplitDirection ==# 'floating'
 
   if has('nvim') && is_floating
-    call ddu#ui#ff#filter#_floating(-1, 0, a:params)
+    call ddu#ui#ff#filter#_floating(-1, win_getid(), a:params)
   else
     let direction = is_floating ? 'botright' : a:params.filterSplitDirection
     silent execute direction 'split'

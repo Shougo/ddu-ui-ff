@@ -31,7 +31,14 @@ type Params = {
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
-  floatingBorder: "none" | "single" | "double" | "rounded" | "solid" | "shadow" | string[];
+  floatingBorder:
+    | "none"
+    | "single"
+    | "double"
+    | "rounded"
+    | "solid"
+    | "shadow"
+    | string[];
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
@@ -100,7 +107,7 @@ export class Ui extends BaseUi<Params> {
     const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
-      ? this.items.length
+      ? Math.max(this.items.length, 1)
       : Number(args.uiParams.winHeight);
     if (ids.length == 0) {
       const direction = args.uiParams.splitDirection;
@@ -232,14 +239,9 @@ export class Ui extends BaseUi<Params> {
       ),
       args.uiParams.cursorPos >= 0 || (this.refreshed &&
           (this.prevLength > 0 && this.items.length < this.prevLength) ||
-          (args.uiParams.reversed && this.items.length != this.prevLength)),
+        (args.uiParams.reversed && this.items.length != this.prevLength)),
       cursorPos,
     );
-
-    if (args.options.resume && this.saveCursor.length != 0) {
-      await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
-      this.saveCursor = [];
-    }
 
     if (ids.length == 0 && args.uiParams.startFilter) {
       this.filterBufnr = await args.denops.call(
@@ -249,6 +251,14 @@ export class Ui extends BaseUi<Params> {
         this.filterBufnr,
         args.uiParams,
       ) as number;
+    }
+
+    if (
+      !args.uiParams.startFilter && args.options.resume &&
+      this.saveCursor.length != 0
+    ) {
+      await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
+      this.saveCursor = [];
     }
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
