@@ -147,6 +147,20 @@ export class Ui extends BaseUi<Params> {
         await fn.bufwinid(args.denops, bufnr),
         `resize ${winHeight}`,
       );
+      if (this.filterBufnr > 0) {
+        const parentId = await vars.g.get(
+          args.denops,
+          "ddu#ui#ff#_filter_parent_winid",
+          -1,
+        );
+        // Redraw floating window
+        await args.denops.call(
+          "ddu#ui#ff#filter#_floating",
+          this.filterBufnr,
+          parentId,
+          args.uiParams,
+        );
+      }
     }
 
     if (this.refreshed) {

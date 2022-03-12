@@ -46,30 +46,48 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   return bufnr('%')
 endfunction
 
+function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
+  let is_floating =
+        \ a:params.split ==# 'floating' ||
+        \ a:params.filterSplitDirection ==# 'floating'
+
+  if !has('nvim') || !is_floating
+    return
+  endif
+
+  let row = a:params.filterFloatingPosition ==# 'bottom'
+        \ ? winheight(a:parent) : -1
+  let col = 0
+  if a:params.floatingBorder !=# 'none'
+    if a:params.filterFloatingPosition ==# 'top'
+      let row -= 2
+    endif
+    let col -= 1
+  endif
+
+  let params = {
+        \ 'relative': 'win',
+        \ 'win': a:parent,
+        \ 'row': row,
+        \ 'col': col,
+        \ 'width': a:params.winWidth,
+        \ 'height': 1,
+        \ 'border': a:params.floatingBorder,
+        \}
+  if a:bufnr > 0
+    call nvim_win_set_config(bufwinid(a:bufnr), params)
+  else
+    call nvim_open_win(0, v:true, params)
+  endif
+endfunction
+
 function! s:init_buffer(name, params) abort
   let is_floating =
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
   if has('nvim') && is_floating
-    let row = a:params.filterFloatingPosition ==# 'bottom'
-          \ ? winheight(0) : -1
-    let col = 0
-    if a:params.floatingBorder !=# 'none'
-      if a:params.filterFloatingPosition ==# 'top'
-        let row -= 2
-      endif
-      let col -= 1
-    endif
-
-    call nvim_open_win(bufnr('%'), v:true, {
-          \ 'relative': 'win',
-          \ 'row': row,
-          \ 'col': col,
-          \ 'width': a:params.winWidth,
-          \ 'height': 1,
-          \ 'border': a:params.floatingBorder,
-          \})
+    call ddu#ui#ff#filter#_floating(-1, 0, a:params)
   else
     let direction = is_floating ? 'botright' : a:params.filterSplitDirection
     silent execute direction 'split'
