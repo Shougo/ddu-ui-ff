@@ -185,6 +185,13 @@ export class Ui extends BaseUi<Params> {
           "nvim_get_option",
           "titlestring",
         ) as string;
+        await vars.g.set(args.denops, "ddu#ui#ff#_save_title", this.saveTitle);
+        if (await fn.exists(args.denops, '##WinClosed')) {
+          await args.denops.cmd(
+            "autocmd WinClosed,BufLeave <buffer> ++once " +
+              " let &titlestring=g:ddu#ui#ff#_save_title",
+          );
+        }
       }
 
       args.denops.call(
