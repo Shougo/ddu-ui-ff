@@ -62,7 +62,6 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
     endif
-    let col -= 1
   endif
   let row += win_screenpos(a:parent)[0] - 1
   let col += win_screenpos(a:parent)[1] - 1
