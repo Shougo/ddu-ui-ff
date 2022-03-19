@@ -101,10 +101,10 @@ export class Ui extends BaseUi<Params> {
     }
 
     const bufferName = `ddu-ff-${args.options.name}`;
-    const initialized = this.buffers[args.options.name];
-    const bufnr = initialized
-      ? this.buffers[args.options.name]
-      : await this.initBuffer(args.denops, bufferName);
+    const initialized = this.buffers[args.options.name] ||
+      await fn.bufexists(args.denops, bufferName) &&
+        await fn.bufnr(args.denops, bufferName);
+    const bufnr = initialized || await this.initBuffer(args.denops, bufferName);
     this.buffers[args.options.name] = bufnr;
 
     await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
