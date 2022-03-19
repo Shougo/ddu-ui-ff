@@ -66,8 +66,17 @@ export class Ui extends BaseUi<Params> {
   private selectedItems: Set<number> = new Set();
   private saveTitle = "";
   private saveCursor: number[] = [];
+  private saveMode = "";
+  private checkEnd = false;
   private refreshed = false;
   private prevLength = -1;
+
+  async onInit(args: {
+    denops: Denops;
+  }): Promise<void> {
+    this.saveMode = await fn.mode(args.denops);
+    this.checkEnd = await fn.col(args.denops, "$") == await fn.col(args.denops, ".");
+  }
 
   refreshItems(args: {
     items: DduItem[];
@@ -250,14 +259,18 @@ export class Ui extends BaseUi<Params> {
       cursorPos,
     );
 
-    if (ids.length == 0 && args.uiParams.startFilter) {
-      this.filterBufnr = await args.denops.call(
-        "ddu#ui#ff#filter#_open",
-        args.options.name,
-        args.context.input,
-        this.filterBufnr,
-        args.uiParams,
-      ) as number;
+    if (ids.length == 0) {
+      if (args.uiParams.startFilter) {
+        this.filterBufnr = await args.denops.call(
+          "ddu#ui#ff#filter#_open",
+          args.options.name,
+          args.context.input,
+          this.filterBufnr,
+          args.uiParams,
+        ) as number;
+      } else {
+        await args.denops.cmd("stopinsert");
+      }
     }
 
     if (
@@ -289,9 +302,6 @@ export class Ui extends BaseUi<Params> {
         -1,
       );
       await fn.win_gotoid(args.denops, parentId);
-
-      // Stop insert mode
-      await args.denops.cmd(`stopinsert`);
     }
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
@@ -317,6 +327,17 @@ export class Ui extends BaseUi<Params> {
       );
 
       this.saveTitle = "";
+    }
+
+    // Restore mode
+    if (this.saveMode == "i") {
+      if (this.checkEnd) {
+        await fn.feedkeys(args.denops, "A", "n");
+      } else {
+        await args.denops.cmd("startinsert");
+      }
+    } else {
+      await args.denops.cmd("stopinsert");
     }
 
     // Close preview window
