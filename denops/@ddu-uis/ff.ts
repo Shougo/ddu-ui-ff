@@ -170,13 +170,18 @@ export class Ui extends BaseUi<Params> {
           "ddu#ui#ff#_filter_parent_winid",
           -1,
         );
-        // Redraw floating window
-        await args.denops.call(
-          "ddu#ui#ff#filter#_floating",
-          this.filterBufnr,
-          parentId,
-          args.uiParams,
-        );
+        const screenPos = await fn.win_screenpos(args.denops, parentId);
+
+        // Note: screenPos may be invalid
+        if (JSON.stringify(screenPos) != JSON.stringify([0, 0])) {
+          // Redraw floating window
+          await args.denops.call(
+            "ddu#ui#ff#filter#_floating",
+            this.filterBufnr,
+            parentId,
+            args.uiParams,
+          );
+        }
       }
     }
 

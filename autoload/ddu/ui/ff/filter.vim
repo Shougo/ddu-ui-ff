@@ -75,7 +75,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \ 'height': 1,
         \ 'border': a:params.floatingBorder,
         \}
-  if a:bufnr > 0
+  if bufwinid(a:bufnr) > 0
     call nvim_win_set_config(bufwinid(a:bufnr), params)
   else
     call nvim_open_win(0, v:true, params)
