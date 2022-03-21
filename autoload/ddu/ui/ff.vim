@@ -33,9 +33,8 @@ function! ddu#ui#ff#_update_buffer(
     call win_execute(bufwinid(a:bufnr),
           \ printf('call cursor(%d, 0) | redraw',
           \ a:params.reversed ? max_lines - a:pos : a:pos + 1))
+    call win_execute(bufwinid(a:bufnr), 'normal! zb')
   endif
-
-  call win_execute(bufwinid(a:bufnr), 'normal! zb')
 
   " Clear all highlights
   if has('nvim')
