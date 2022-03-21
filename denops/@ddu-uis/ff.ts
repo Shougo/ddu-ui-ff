@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.2.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.3.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.2.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.3.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 
 type DoActionParams = {
@@ -75,7 +75,8 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
-    this.checkEnd = await fn.col(args.denops, "$") == await fn.col(args.denops, ".");
+    this.checkEnd =
+      await fn.col(args.denops, "$") == await fn.col(args.denops, ".");
   }
 
   refreshItems(args: {
@@ -102,8 +103,8 @@ export class Ui extends BaseUi<Params> {
 
     const bufferName = `ddu-ff-${args.options.name}`;
     const initialized = this.buffers[args.options.name] ||
-      await fn.bufexists(args.denops, bufferName) &&
-        await fn.bufnr(args.denops, bufferName);
+      (await fn.bufexists(args.denops, bufferName) &&
+        await fn.bufnr(args.denops, bufferName));
     const bufnr = initialized || await this.initBuffer(args.denops, bufferName);
     this.buffers[args.options.name] = bufnr;
 
@@ -195,7 +196,7 @@ export class Ui extends BaseUi<Params> {
           "titlestring",
         ) as string;
         await vars.g.set(args.denops, "ddu#ui#ff#_save_title", this.saveTitle);
-        if (await fn.exists(args.denops, '##WinClosed')) {
+        if (await fn.exists(args.denops, "##WinClosed")) {
           await args.denops.cmd(
             "autocmd WinClosed,BufLeave <buffer> ++once " +
               " let &titlestring=g:ddu#ui#ff#_save_title",
