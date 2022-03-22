@@ -77,6 +77,7 @@ export class Ui extends BaseUi<Params> {
     this.saveMode = await fn.mode(args.denops);
     this.checkEnd =
       await fn.col(args.denops, "$") == await fn.col(args.denops, ".");
+    this.filterBufnr = -1;
   }
 
   refreshItems(args: {
@@ -114,12 +115,12 @@ export class Ui extends BaseUi<Params> {
 
     const hasNvim = args.denops.meta.host == "nvim";
     const floating = args.uiParams.split == "floating" && hasNvim;
-    const ids = await fn.win_findbuf(args.denops, bufnr) as number[];
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.items.length, 1)
       : Number(args.uiParams.winHeight);
-    if (ids.length == 0) {
+    const winid = await fn.bufwinid(args.denops, bufnr);
+    if (winid < 0) {
       const direction = args.uiParams.splitDirection;
       if (args.uiParams.split == "horizontal") {
         const header = `silent keepalt ${direction} `;
@@ -132,6 +133,7 @@ export class Ui extends BaseUi<Params> {
           header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`,
         );
       } else if (floating) {
+        console.log("floating");
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
           "row": Number(args.uiParams.winRow),
@@ -161,27 +163,17 @@ export class Ui extends BaseUi<Params> {
     } else if (args.uiParams.autoResize) {
       await fn.win_execute(
         args.denops,
-        await fn.bufwinid(args.denops, bufnr),
+        winid,
         `resize ${winHeight}`,
       );
       if (this.filterBufnr > 0) {
-        const parentId = await vars.g.get(
-          args.denops,
-          "ddu#ui#ff#_filter_parent_winid",
-          -1,
+        // Redraw floating window
+        await args.denops.call(
+          "ddu#ui#ff#filter#_floating",
+          this.filterBufnr,
+          winid,
+          args.uiParams,
         );
-        const screenPos = await fn.win_screenpos(args.denops, parentId);
-
-        // Note: screenPos may be invalid
-        if (JSON.stringify(screenPos) != JSON.stringify([0, 0])) {
-          // Redraw floating window
-          await args.denops.call(
-            "ddu#ui#ff#filter#_floating",
-            this.filterBufnr,
-            parentId,
-            args.uiParams,
-          );
-        }
       }
     }
 
@@ -265,7 +257,7 @@ export class Ui extends BaseUi<Params> {
       cursorPos,
     );
 
-    if (ids.length == 0) {
+    if (winid < 0) {
       if (args.uiParams.startFilter) {
         this.filterBufnr = await args.denops.call(
           "ddu#ui#ff#filter#_open",

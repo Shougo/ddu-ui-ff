@@ -57,14 +57,13 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   let row = a:params.filterFloatingPosition ==# 'bottom'
         \ ? winheight(a:parent) : -1
-  let col = 0
   if a:params.floatingBorder !=# 'none'
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
     endif
   endif
-  let row += win_screenpos(a:parent)[0] - 1
-  let col += win_screenpos(a:parent)[1] - 1
+  let row += a:params.winRow
+  let col = a:params.winCol
 
   " Note: relative: win does not work for resume feature
   let params = {
@@ -78,7 +77,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   if bufwinid(a:bufnr) > 0
     call nvim_win_set_config(bufwinid(a:bufnr), params)
   else
-    call nvim_open_win(0, v:true, params)
+    call nvim_open_win(a:bufnr, v:true, params)
   endif
 endfunction
 
@@ -87,15 +86,14 @@ function! s:init_buffer(name, params) abort
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
+  let bufnr = bufadd('ddu-ff-filter')
+
   if has('nvim') && is_floating
-    call ddu#ui#ff#filter#_floating(-1, win_getid(), a:params)
+    call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
   else
     let direction = is_floating ? 'botright' : a:params.filterSplitDirection
-    silent execute direction 'split'
+    silent execute direction 'split' bufnr
   endif
-
-  let bufnr = bufadd('ddu-ff-filter')
-  execute bufnr 'buffer'
 
   if has('nvim') && is_floating && has_key(a:params.highlights, 'floating')
     call setwinvar(bufwinnr(bufnr),
