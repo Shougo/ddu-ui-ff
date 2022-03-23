@@ -133,7 +133,6 @@ export class Ui extends BaseUi<Params> {
           header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`,
         );
       } else if (floating) {
-        console.log("floating");
         await args.denops.call("nvim_open_win", bufnr, true, {
           "relative": "editor",
           "row": Number(args.uiParams.winRow),
@@ -166,7 +165,7 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight}`,
       );
-      if (this.filterBufnr > 0) {
+      if (await fn.bufwinid(args.denops, this.filterBufnr) >= 0) {
         // Redraw floating window
         await args.denops.call(
           "ddu#ui#ff#filter#_floating",
