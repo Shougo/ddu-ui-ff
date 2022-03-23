@@ -165,7 +165,7 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight}`,
       );
-      if (await fn.bufwinid(args.denops, this.filterBufnr) >= 0) {
+      if ((await fn.bufwinid(args.denops, this.filterBufnr)) >= 0) {
         // Redraw floating window
         await args.denops.call(
           "ddu#ui#ff#filter#_floating",
