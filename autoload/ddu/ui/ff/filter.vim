@@ -62,8 +62,15 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
       let row -= 2
     endif
   endif
-  let row += a:params.winRow
-  let col = a:params.winCol
+
+  if a:params.split ==# 'floating'
+    let row += a:params.winRow
+    let col = a:params.winCol
+  else
+    let winpos = win_screenpos(a:parent)
+    let row += winpos[0] - 1
+    let col = winpos[1] - 1
+  endif
 
   " Note: relative: win does not work for resume feature
   let params = {
@@ -86,7 +93,7 @@ function! s:init_buffer(name, params) abort
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
-  let bufnr = bufadd('ddu-ff-filter')
+  let bufnr = bufadd('ddu-ff-filter-' . a:name)
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
