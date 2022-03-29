@@ -13,8 +13,8 @@ function! ddu#ui#ff#execute(command) abort
     return
   endif
 
-  call win_execute(g:ddu#ui#ff#_filter_parent_winid, a:command)
-  call win_execute(g:ddu#ui#ff#_filter_parent_winid, 'redraw')
+  call win_execute(g:ddu#ui#ff#_filter_parent_winid,
+        \ a:command . ' | redraw')
 endfunction
 
 function! ddu#ui#ff#_update_buffer(
@@ -35,7 +35,9 @@ function! ddu#ui#ff#_update_buffer(
     let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
     if curpos[1] != lnum
       call win_execute(winid,
-            \ printf('call cursor(%d, 0) | redraw | normal! zb', lnum))
+            \ printf('call cursor(%d, 0) | normal! zb', lnum))
+    elseif a:params.reversed
+      call win_execute(winid, 'normal! zb')
     endif
   endif
 

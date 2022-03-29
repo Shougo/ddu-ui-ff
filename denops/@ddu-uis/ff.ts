@@ -163,7 +163,7 @@ export class Ui extends BaseUi<Params> {
       await fn.win_execute(
         args.denops,
         winid,
-        `resize ${winHeight}`,
+        `resize ${winHeight} | normal! zb`,
       );
       if ((await fn.bufwinid(args.denops, this.filterBufnr)) >= 0) {
         // Redraw floating window
