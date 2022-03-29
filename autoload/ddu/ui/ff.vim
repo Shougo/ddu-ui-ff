@@ -30,10 +30,13 @@ function! ddu#ui#ff#_update_buffer(
 
   if a:refreshed
     " Init the cursor
-    call win_execute(bufwinid(a:bufnr),
-          \ printf('call cursor(%d, 0) | redraw',
-          \ a:params.reversed ? max_lines - a:pos : a:pos + 1))
-    call win_execute(bufwinid(a:bufnr), 'normal! zb')
+    let winid = bufwinid(a:bufnr)
+    let curpos = getcurpos(winid)
+    let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
+    if curpos[1] != lnum
+      call win_execute(winid,
+            \ printf('call cursor(%d, 0) | redraw | normal! zb', lnum))
+    endif
   endif
 
   " Clear all highlights
