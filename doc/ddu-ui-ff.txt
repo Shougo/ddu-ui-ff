@@ -230,6 +230,8 @@ prompt		(string)
 				    		*ddu-ui-ff-param-reversed*
 reversed	(boolean)
 		Display the items in reversed order.
+		Note: It may increase screen flicker.  Because the cursor must
+		be moved if you narrowing text.
 
 		Default: v:false
 
