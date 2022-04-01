@@ -144,7 +144,7 @@ filterFloatingPosition	(string)
 		top.
 
 		Note: To use it, you need to use neovim and
-		|ddu-ui-ff-param-filterSplitDirection|must be "floating".
+		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
 
 		Default: "bottom"
 
@@ -318,7 +318,7 @@ EXAMPLES					*ddu-ui-ff-examples*
 	  nnoremap <buffer> <CR>
 	  \ <Cmd>close<CR>
 	endfunction
-
+<
 
 ==============================================================================
 FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
@@ -326,7 +326,7 @@ FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
 Q: I want to change the cursor line color in the buffer.
 
 A: It uses 'cursorline' feature.
-So you can change the color by |hl-CursorLine| highlight. >
+So you can change the color by |hl-CursorLine| highlight.
 
 Q: I want to start narrowing in the first.
 
@@ -334,18 +334,18 @@ A: Please set |ddu-ui-ff-param-startFilter|.
 
 Q: I want to call default action in the filter window.
 
-A: >
-
+A:
+>
 	autocmd FileType ddu-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
 	endfunction
-
+<
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
-must force this behaviour. >
+must force this behaviour.
 >
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
@@ -357,8 +357,8 @@ must force this behaviour. >
 <
 Q: I want to define |ddu-option-name| depend key mappings.
 
-A: You can use "b:ddu_ui_name". >
-
+A: You can use "b:ddu_ui_name".
+>
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
@@ -374,6 +374,7 @@ A: You can use "b:ddu_ui_name". >
 	    \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
 	  endif
 	endfunction
+<
 
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
@@ -385,7 +386,7 @@ A: You can pass params like this.
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
-
+<
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
