@@ -31,7 +31,7 @@ function! ddu#ui#ff#_update_buffer(
   if a:refreshed
     " Init the cursor
     let winid = bufwinid(a:bufnr)
-    let curpos = getcurpos(winid)
+    let curpos = s:getcurpos(winid)
     let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
     if curpos[1] != lnum
       call win_execute(winid,
@@ -176,4 +176,17 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
 
   " Note: Open folds and centering
   normal! zvzz
+endfunction
+
+function! s:getcurpos(winid)
+  if has('nvim-0.7') || !has('nvim')
+    return getcurpos(a:winid)
+  endif
+
+  " Note: Old neovim does not support getcurpos({winid})
+  let prev_winid = win_getid()
+  call win_gotoid(a:winid)
+  let cursor = getcurpos()
+  call win_gotoid(prev_winid)
+  return cursor
 endfunction
