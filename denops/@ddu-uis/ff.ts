@@ -303,13 +303,10 @@ export class Ui extends BaseUi<Params> {
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
-    if (args.uiParams.split == "no") {
+    if (
+      args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+    ) {
       await args.denops.cmd(`buffer ${args.context.bufNr}`);
-      return;
-    }
-
-    if ((await fn.winnr(args.denops, "$")) == 1) {
-      await args.denops.cmd("enew");
     } else {
       await args.denops.cmd("close!");
       await fn.win_gotoid(args.denops, args.context.winId);
