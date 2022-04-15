@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.3.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.5.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.3.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 
 type DoActionParams = {
@@ -176,7 +176,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (this.refreshed) {
+    if (initialized) {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
