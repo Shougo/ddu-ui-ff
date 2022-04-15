@@ -573,6 +573,7 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&wrap", 0);
       await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
+      await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);
