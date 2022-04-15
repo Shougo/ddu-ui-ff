@@ -174,7 +174,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Note: buffers may be restored
-    if (!this.buffers[args.options.name]) {
+    if (!this.buffers[args.options.name] || winid < 0) {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
