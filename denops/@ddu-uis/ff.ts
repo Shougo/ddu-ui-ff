@@ -107,9 +107,6 @@ export class Ui extends BaseUi<Params> {
       (await fn.bufexists(args.denops, bufferName) &&
         await fn.bufnr(args.denops, bufferName));
     const bufnr = initialized || await this.initBuffer(args.denops, bufferName);
-    this.buffers[args.options.name] = bufnr;
-
-    await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
@@ -176,7 +173,8 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (initialized) {
+    // Note: buffers may be restored
+    if (!this.buffers[args.options.name]) {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
@@ -279,6 +277,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    this.buffers[args.options.name] = bufnr;
 
     this.refreshed = false;
   }
