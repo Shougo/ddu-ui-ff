@@ -174,7 +174,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Note: buffers may be restored
-    if (!this.buffers[args.options.name]) {
+    if (!this.buffers[args.options.name] || winid < 0) {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
@@ -573,6 +573,7 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&wrap", 0);
       await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
+      await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);
