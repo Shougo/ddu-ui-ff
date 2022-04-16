@@ -70,6 +70,9 @@ export class Ui extends BaseUi<Params> {
   private checkEnd = false;
   private refreshed = false;
   private prevLength = -1;
+  private previewWinId = -1;
+  private previewBufnr = -1;
+  private previewedTarget: ActionData = {};
 
   async onInit(args: {
     denops: Denops;
@@ -301,6 +304,8 @@ export class Ui extends BaseUi<Params> {
       await fn.win_gotoid(args.denops, parentId);
     }
 
+    await this.closePreview(args.denops);
+
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
     if (args.uiParams.split == "no") {
@@ -341,6 +346,18 @@ export class Ui extends BaseUi<Params> {
     await args.denops.cmd("pclose!");
 
     await args.denops.call("ddu#event", args.options.name, "close");
+  }
+
+  private async closePreview(denops: Denops): Promise<void> {
+    if (this.previewWinId > 0) {
+      const saveId = await fn.win_getid(denops);
+      await batch(denops, async (denops) => {
+        await fn.win_gotoid(denops, this.previewWinId);
+        await denops.cmd("close!");
+        await fn.win_gotoid(denops, saveId);
+      });
+      this.previewWinId = -1;
+    }
   }
 
   private async getItems(denops: Denops, uiParams: Params): Promise<DduItem[]> {
@@ -441,6 +458,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
+      actionParams: unknown;
     }) => {
       const idx = await this.getIndex(args.denops, args.uiParams);
       const item = this.items[idx];
@@ -452,15 +470,47 @@ export class Ui extends BaseUi<Params> {
       if (!action.path) {
         return Promise.resolve(ActionFlags.None);
       }
-
       const prevId = await fn.win_getid(args.denops);
 
-      await args.denops.call(
-        "ddu#ui#ff#_preview_file",
-        args.uiParams,
-        action.path,
+      if (this.previewWinId < 0) {
+        await args.denops.call(
+          "ddu#ui#ff#_preview_file",
+          args.uiParams,
+          "",
+        );
+      } else {
+        const previewd = this.previewedTarget;
+        if (JSON.stringify(action) == JSON.stringify(previewd)) {
+          await this.closePreview(args.denops);
+          return ActionFlags.None;
+        }
+        await batch(args.denops, async (denops: Denops) => {
+          await fn.win_gotoid(denops, this.previewWinId);
+          await denops.cmd("enew");
+        });
+      }
+      // delete previous buffer after opening new one to prevent flicker
+      if (
+        this.previewBufnr > 0 &&
+        (await fn.bufexists(args.denops, this.previewBufnr))
+      ) {
+        try {
+          await args.denops.cmd(`bdelete! ${this.previewBufnr}`);
+          this.previewBufnr = -1;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      await args.denops.dispatch(
+        "ddu",
+        "renderPreview",
+        args.options.name,
+        item,
+        args.actionParams
       );
-
+      this.previewWinId = await fn.win_getid(args.denops) as number;
+      this.previewBufnr = await fn.bufnr(args.denops);
+      this.previewedTarget = action;
       await fn.win_gotoid(args.denops, prevId);
 
       return Promise.resolve(ActionFlags.Persist);
