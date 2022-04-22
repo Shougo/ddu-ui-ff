@@ -387,6 +387,21 @@ A: You can pass params like this.
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
 <
+Q: I want to use Vim syntax highlight in the buffer.
+
+A: Please use |Syntax| autocmd.  |FileType| autocmd cannot change syntax
+highlights.  |Syntax| autocmd must be called in |FileType| autocmd. >
+Or you can use "syntax/ddu-ff.vim" file instead.
+>
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
+	  autocmd Syntax <buffer> call s:ddu_ff_my_syntax()
+	endfunction
+	function! s:ddu_ff_my_syntax()
+	  if b:ddu_ui_name ==# 'vim'
+	    runtime! syntax/vim.vim
+	  endif
+	endfunction
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*

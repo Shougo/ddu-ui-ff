@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.3.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.5.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.3.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 
 type DoActionParams = {
@@ -110,9 +110,6 @@ export class Ui extends BaseUi<Params> {
       (await fn.bufexists(args.denops, bufferName) &&
         await fn.bufnr(args.denops, bufferName));
     const bufnr = initialized || await this.initBuffer(args.denops, bufferName);
-    this.buffers[args.options.name] = bufnr;
-
-    await fn.setbufvar(args.denops, bufnr, "&modifiable", 1);
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
@@ -179,7 +176,8 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (this.refreshed) {
+    // Note: buffers may be restored
+    if (!this.buffers[args.options.name] || winid < 0) {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
@@ -282,6 +280,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    this.buffers[args.options.name] = bufnr;
 
     this.refreshed = false;
   }
@@ -308,13 +307,10 @@ export class Ui extends BaseUi<Params> {
 
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
-    if (args.uiParams.split == "no") {
+    if (
+      args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+    ) {
       await args.denops.cmd(`buffer ${args.context.bufNr}`);
-      return;
-    }
-
-    if ((await fn.winnr(args.denops, "$")) == 1) {
-      await args.denops.cmd("enew");
     } else {
       await args.denops.cmd("close!");
       await fn.win_gotoid(args.denops, args.context.winId);
@@ -627,6 +623,7 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&wrap", 0);
       await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
+      await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);
