@@ -6,7 +6,7 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "/home/denjo/.cache/dein/repos/github.com/Shougo/ddu.vim/denops/ddu/types.ts";
+} from "../../../ddu.vim/denops/ddu/types.ts";
 import {
   batch,
   Denops,

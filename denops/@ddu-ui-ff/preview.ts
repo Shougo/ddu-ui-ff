@@ -7,16 +7,23 @@ import {
   NoFilePreviewer,
   Previewer,
   TermPreviewer,
-} from "/home/denjo/.cache/dein/repos/github.com/Shougo/ddu.vim/denops/ddu/types.ts";
-import { batch, Denops, fn } from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
+} from "../../../ddu.vim/denops/ddu/types.ts";
+import {
+  batch,
+  Denops,
+  fn,
+  gather,
+} from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 import { replace } from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 export class PreviewUi {
   private previewWinId = -1;
-  private previewBufnr = -1;
+  private terminalBufnr = -1;
   private previewedTarget: ActionData = {};
+  private matchIds: Record<number, number> = {};
+  private previewBufnrs: Set<number> = new Set();
 
   async close(denops: Denops) {
     if (this.previewWinId > 0) {
@@ -28,6 +35,11 @@ export class PreviewUi {
       });
       this.previewWinId = -1;
     }
+    await batch(denops, async (denops) => {
+      for (const bufnr of this.previewBufnrs) {
+        await denops.cmd(`if buflisted(${bufnr}) | bdelete! ${bufnr}  | endif`);
+      }
+    });
   }
 
   async preview(
@@ -66,22 +78,23 @@ export class PreviewUi {
     // render preview
     if (previewer.kind == "terminal") {
       flag = await this.previewTerminal(denops, previewer, uiParams);
-    } else if (previewer.kind == "buffer") {
-      flag = await this.previewBuffer(denops, previewer, uiParams);
     } else {
-      flag = await this.previewNoFile(denops, previewer, uiParams);
+      flag = await this.previewBuffer(denops, previewer, uiParams, item);
     }
     if (flag == ActionFlags.None) {
       return flag;
     }
+    const [winid, bufnr] = await gather(denops, async (denops) => {
+      await fn.win_getid(denops);
+      await fn.bufnr(denops);
+    }) as [number, number];
 
-    if ("lineNr" in previewer) {
-      await this.jump(denops, previewer.lineNr);
-    }
-    await this.highlight(denops, previewer);
+    await this.jump(denops, previewer);
+    await this.highlight(denops, previewer, winid);
 
-    this.previewWinId = await fn.win_getid(denops) as number;
-    this.previewBufnr = await fn.bufnr(denops);
+    this.previewWinId = winid;
+    // this.previewBufnr = await fn.bufnr(denops);
+    this.previewBufnrs.add(bufnr);
     this.previewedTarget = action;
     await fn.win_gotoid(denops, prevId);
 
@@ -115,12 +128,12 @@ export class PreviewUi {
     }
     // delete previous buffer after opening new one to prevent flicker
     if (
-      this.previewBufnr > 0 &&
-      (await fn.bufexists(denops, this.previewBufnr))
+      this.terminalBufnr > 0 &&
+      (await fn.bufexists(denops, this.terminalBufnr))
     ) {
       try {
-        await denops.cmd(`bdelete! ${this.previewBufnr}`);
-        this.previewBufnr = -1;
+        await denops.cmd(`bdelete! ${this.terminalBufnr}`);
+        this.terminalBufnr = -1;
       } catch (e) {
         console.error(e);
       }
@@ -130,20 +143,17 @@ export class PreviewUi {
 
   private async previewBuffer(
     denops: Denops,
-    previewer: BufferPreviewer,
+    previewer: BufferPreviewer | NoFilePreviewer,
     uiParams: Params,
+    item: DduItem,
   ): Promise<ActionFlags> {
-    if (!previewer.expr && !previewer.path) {
+    if (
+      previewer.kind == "nofile" && !previewer.contents?.length ||
+      previewer.kind == "buffer" && !previewer.expr && !previewer.path
+    ) {
       return Promise.resolve(ActionFlags.None);
     }
-    const bufname = `ddu-ff:${
-      previewer.expr
-        ? await fn.bufname(
-          denops,
-          previewer.expr,
-        )
-        : previewer.path
-    }`;
+    const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.bufexists(denops, bufname);
     if (this.previewWinId < 0) {
       await denops.call(
@@ -157,12 +167,10 @@ export class PreviewUi {
     if (!exists) {
       await denops.cmd(`edit ${bufname}`);
       const bufnr = await fn.bufnr(denops) as number;
-      const data = Deno.readFileSync(previewer.path);
-      const text = new TextDecoder().decode(data);
+      const text = await this.getPreviewContents(denops, previewer);
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
-        await fn.setbufvar(denops, bufnr, "&cursorline", 1);
-        await replace(denops, bufnr, text.split("\n"));
+        await replace(denops, bufnr, text);
         await denops.cmd("filetype detect");
       });
     } else {
@@ -171,25 +179,64 @@ export class PreviewUi {
     return ActionFlags.Persist;
   }
 
-  private async previewNoFile(
+  private async getPreviewBufferName(
     denops: Denops,
-    previewer: NoFilePreviewer,
-    uiParams: Params,
-  ): Promise<ActionFlags> {
-    return ActionFlags.Persist;
+    previewer: BufferPreviewer | NoFilePreviewer,
+    item: DduItem,
+  ): Promise<string> {
+    if (previewer.kind == "buffer") {
+      return `ddu-ff:${
+        previewer.expr
+          ? await fn.bufname(
+            denops,
+            previewer.expr,
+          )
+          : previewer.path
+      }`;
+    } else {
+      return `ddu-ff:${item.word}`;
+    }
   }
 
-  private async jump(denops: Denops, lineNr: number) {
+  private async getPreviewContents(
+    denops: Denops,
+    previewer: BufferPreviewer | NoFilePreviewer,
+  ): Promise<string[]> {
+    if (previewer.kind == "buffer") {
+      if (previewer.expr && await fn.bufexists(denops, previewer.expr)) {
+        return await fn.getbufline(
+          denops,
+          await fn.bufnr(denops, previewer.expr),
+          1,
+          "$",
+        );
+      } else {
+        const data = Deno.readFileSync(previewer.path);
+        return new TextDecoder().decode(data).split("\n");
+      }
+    } else {
+      return previewer.contents;
+    }
+  }
+
+  private async jump(denops: Denops, previewer: Previewer) {
     await batch(denops, async (denops: Denops) => {
-      await fn.cursor(denops, [lineNr, 0]);
-      await denops.cmd("normal! zv");
-      await denops.cmd("normal! zz");
+      if (previewer && "lineNr" in previewer && previewer.lineNr) {
+        await fn.cursor(denops, [previewer.lineNr, 0]);
+        await denops.cmd("normal! zv");
+        await denops.cmd("normal! zz");
+      }
     });
   }
 
-  private async highlight(denops: Denops, previewer: Previewer) {
-    // if (previewer && "lineNr" in previewer) {
-    //   await fn.matchaddpos(denops, "Search", [previewer.lineNr]);
-    // }
+  private async highlight(denops: Denops, previewer: Previewer, winid: number) {
+    if (this.matchIds[winid] > 0) {
+      await fn.matchdelete(denops, this.matchIds[winid], winid);
+    }
+    if (previewer && "lineNr" in previewer && previewer.lineNr) {
+      this.matchIds[winid] = await fn.matchaddpos(denops, "Search", [
+        previewer.lineNr,
+      ]) as number;
+    }
   }
 }
