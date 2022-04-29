@@ -63,7 +63,7 @@ export class PreviewUi {
       options.name,
       item,
       actionParams,
-    ) as Previewer;
+    ) as Previewer | undefined;
 
     if (!previewer) {
       return Promise.resolve(ActionFlags.None);
@@ -158,7 +158,7 @@ export class PreviewUi {
     if (!exists) {
       await denops.cmd(`edit ${bufname}`);
       const text = await this.getPreviewContents(denops, previewer);
-    const bufnr = await fn.bufnr(denops) as number;
+      const bufnr = await fn.bufnr(denops) as number;
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
         await replace(denops, bufnr, text);
@@ -220,7 +220,10 @@ export class PreviewUi {
 
   private async jump(denops: Denops, previewer: Previewer) {
     await batch(denops, async (denops: Denops) => {
-      if (previewer && "lineNr" in previewer && previewer.lineNr) {
+      if ("pattern" in previewer && previewer.pattern) {
+        await fn.search(denops, previewer.pattern, "w");
+      }
+      if ("lineNr" in previewer && previewer.lineNr) {
         await fn.cursor(denops, [previewer.lineNr, 0]);
         await denops.cmd("normal! zv");
         await denops.cmd("normal! zz");
@@ -248,16 +251,20 @@ export class PreviewUi {
       await denops.call(
         "prop_clear",
         1,
-        await fn.line(denops, "$", winid),
-        0,
-        -1,
+        await denops.call("line", "$", winid),
       );
     }
 
-    if (previewer && "lineNr" in previewer && previewer.lineNr) {
+    if ("lineNr" in previewer && previewer.lineNr) {
       this.matchIds[winid] = await fn.matchaddpos(denops, "Search", [
         previewer.lineNr,
       ]) as number;
+    } else if ("pattern" in previewer && previewer.pattern) {
+      this.matchIds[winid] = await fn.matchadd(
+        denops,
+        "Search",
+        previewer.pattern,
+      ) as number;
     }
     await batch(denops, async (denops) => {
       if (previewer.highlights) {
