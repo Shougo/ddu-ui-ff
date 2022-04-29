@@ -32,7 +32,7 @@ export class PreviewUi {
     }
     await batch(denops, async (denops) => {
       for (const bufnr of this.previewBufnrs) {
-        await denops.cmd(`if buflisted(${bufnr}) | bdelete! ${bufnr} | endif`);
+        await denops.cmd(`if buflisted(${bufnr}) | bwipeout! ${bufnr} | endif`);
       }
     });
   }
