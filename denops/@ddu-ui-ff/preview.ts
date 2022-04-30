@@ -182,14 +182,16 @@ export class PreviewUi {
     item: DduItem,
   ): Promise<string> {
     if (previewer.kind == "buffer") {
-      return `ddu-ff:${
-        previewer.expr
-          ? await fn.bufname(
-            denops,
-            previewer.expr,
-          )
-          : previewer.path
-      }`;
+      if (previewer.expr) {
+        const bufname = await fn.bufname(denops, previewer.expr);
+        if (!bufname.length) {
+          return `ddu-ff:no-name:${previewer.expr}`;
+        } else {
+          return `ddu-ff:${bufname}`;
+        }
+      } else {
+        return `ddu-ff:${previewer.path}`;
+      }
     } else {
       return `ddu-ff:${item.word}`;
     }
