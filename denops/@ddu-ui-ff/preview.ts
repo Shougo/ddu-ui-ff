@@ -246,6 +246,7 @@ export class PreviewUi {
     // clear previous highlight
     if (this.matchIds[winid] > 0) {
       await fn.matchdelete(denops, this.matchIds[winid], winid);
+      this.matchIds[winid] = -1;
     }
     if (denops.meta.host == "nvim") {
       await denops.call("nvim_buf_clear_namespace", 0, ns, 0, -1);
