@@ -8,10 +8,19 @@ import {
   Previewer,
   TermPreviewer,
 } from "../../../ddu.vim/denops/ddu/types.ts";
-import { batch, Denops, fn } from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
+import {
+  batch,
+  Denops,
+  ensureObject,
+  fn,
+} from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
 import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 import { replace } from "https://deno.land/x/denops_std@v3.3.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
+
+type PreviewParams = {
+  syntaxLimitChars?: number;
+};
 
 export class PreviewUi {
   private previewWinId = -1;
@@ -47,6 +56,7 @@ export class PreviewUi {
   ): Promise<ActionFlags> {
     const action = item.action as ActionData;
     const prevId = await fn.win_getid(denops);
+    const previewParams = ensureObject(actionParams) as PreviewParams;
 
     // close if the target is the same as the previous one
     if (
@@ -74,7 +84,13 @@ export class PreviewUi {
     if (previewer.kind == "terminal") {
       flag = await this.previewTerminal(denops, previewer, uiParams);
     } else {
-      flag = await this.previewBuffer(denops, previewer, uiParams, item);
+      flag = await this.previewBuffer(
+        denops,
+        previewer,
+        uiParams,
+        previewParams,
+        item,
+      );
     }
     if (flag == ActionFlags.None) {
       return flag;
@@ -135,6 +151,7 @@ export class PreviewUi {
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     uiParams: Params,
+    actionParams: PreviewParams,
     item: DduItem,
   ): Promise<ActionFlags> {
     if (
@@ -162,10 +179,13 @@ export class PreviewUi {
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
         await replace(denops, bufnr, text);
-        if (previewer.syntax) {
-          await denops.cmd(`syntax ${previewer.syntax}`);
-        } else if (previewer.kind == "buffer") {
-          await denops.cmd("filetype detect");
+        const limit = actionParams.syntaxLimitChars ?? 200000;
+        if (text.join("\n").length < limit) {
+          if (previewer.syntax) {
+            await fn.setbufvar(denops, bufnr, "&syntax", previewer.syntax);
+          } else if (previewer.kind == "buffer") {
+            await denops.cmd("filetype detect");
+          }
         }
       });
     } else {
