@@ -5,6 +5,7 @@ import {
   DduItem,
   DduOptions,
   NoFilePreviewer,
+  PreviewContext,
   Previewer,
   TermPreviewer,
 } from "../../../ddu.vim/denops/ddu/types.ts";
@@ -67,12 +68,19 @@ export class PreviewUi {
       return Promise.resolve(ActionFlags.None);
     }
 
+    const previewContext: PreviewContext = {
+      width: uiParams.previewWidth,
+      height: uiParams.previewHeight,
+      isFloating: uiParams.previewFloating,
+      isVertical: uiParams.previewVertical,
+    };
     const previewer = await denops.dispatch(
       "ddu",
       "getPreviewer",
       options.name,
       item,
       actionParams,
+      previewContext,
     ) as Previewer | undefined;
 
     if (!previewer) {
