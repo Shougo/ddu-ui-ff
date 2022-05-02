@@ -410,6 +410,11 @@ Or you can use "syntax/ddu-ff.vim" file instead.
 	  endif
 	endfunction
 
+Q: I want to custom the statusline.
+
+A: You can disable the original statusline by |ddu-ui-ff-param-statusline|.
+And you can get the status line information by "w:ddu_ui_ff_status" variable.
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 

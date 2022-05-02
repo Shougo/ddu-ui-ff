@@ -188,16 +188,15 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, args.options, bufnr);
     }
 
-    if (args.uiParams.statusline) {
-      await this.setStatusline(
-        args.denops,
-        args.context,
-        args.options,
-        bufnr,
-        hasNvim,
-        floating,
-      );
-    }
+    await this.setStatusline(
+      args.denops,
+      args.context,
+      args.options,
+      args.uiParams,
+      bufnr,
+      hasNvim,
+      floating,
+    );
 
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
@@ -342,15 +341,34 @@ export class Ui extends BaseUi<Params> {
     denops: Denops,
     context: Context,
     options: DduOptions,
+    uiParams: Params,
     bufnr: number,
     hasNvim: boolean,
     floating: boolean,
   ): Promise<void> {
+    const statusState = {
+      done: context.done,
+      input: context.input,
+      name: options.name,
+      maxItems: context.maxItems,
+    };
+    await fn.setwinvar(
+      denops,
+      await fn.bufwinnr(denops, bufnr),
+      "ddu_ui_ff_status",
+      statusState,
+    );
+
+    if (!uiParams.statusline) {
+      return;
+    }
+
     const header =
       `[ddu-${options.name}] ${this.items.length}/${context.maxItems}`;
     const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
     const async = `${context.done ? "" : "[async]"}`;
     const laststatus = await op.laststatus.get(denops);
+
     if (hasNvim && (floating || laststatus == 0)) {
       if (this.saveTitle == "") {
         this.saveTitle = await denops.call(
