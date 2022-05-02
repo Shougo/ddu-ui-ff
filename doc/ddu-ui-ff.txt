@@ -258,6 +258,13 @@ startFilter	(boolean)
 
 		Default: v:false
 
+				    		*ddu-ui-ff-param-statusline*
+statusline	(boolean)
+		If it is true, the original |statusline| value is set on the
+		buffer.
+
+		Default: v:true
+
 						*ddu-ui-ff-param-winCol*
 winCol		(number)
 		Set the column position of the window if

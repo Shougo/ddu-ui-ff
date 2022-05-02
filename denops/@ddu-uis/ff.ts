@@ -53,6 +53,7 @@ type Params = {
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "botright" | "topleft";
   startFilter: boolean;
+  statusline: boolean;
   winCol: number;
   winHeight: number;
   winRow: number;
@@ -188,38 +189,44 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Set statusline
-    const header =
-      `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}`;
-    const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
-    const async = `${args.context.done ? "" : "[async]"}`;
-    const laststatus = await op.laststatus.get(args.denops);
-    if (hasNvim && (floating || laststatus == 0)) {
-      if (this.saveTitle == "") {
-        this.saveTitle = await args.denops.call(
-          "nvim_get_option",
-          "titlestring",
-        ) as string;
-        await vars.g.set(args.denops, "ddu#ui#ff#_save_title", this.saveTitle);
-        if (await fn.exists(args.denops, "##WinClosed")) {
-          await args.denops.cmd(
-            "autocmd WinClosed,BufLeave <buffer> ++once " +
-              " let &titlestring=g:ddu#ui#ff#_save_title",
-          );
+    const setStatusline = async () => {
+      const header =
+        `[ddu-${args.options.name}] ${this.items.length}/${args.context.maxItems}`;
+      const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
+      const async = `${args.context.done ? "" : "[async]"}`;
+      const laststatus = await op.laststatus.get(args.denops);
+      if (hasNvim && (floating || laststatus == 0)) {
+        if (this.saveTitle == "") {
+          this.saveTitle = await args.denops.call(
+            "nvim_get_option",
+            "titlestring",
+          ) as string;
+          await vars.g.set(args.denops, "ddu#ui#ff#_save_title", this.saveTitle);
+          if (await fn.exists(args.denops, "##WinClosed")) {
+            await args.denops.cmd(
+              "autocmd WinClosed,BufLeave <buffer> ++once " +
+                " let &titlestring=g:ddu#ui#ff#_save_title",
+            );
+          }
         }
-      }
 
-      args.denops.call(
-        "nvim_set_option",
-        "titlestring",
-        header + " %{" + linenr + "}%*" + async,
-      );
-    } else {
-      await fn.setwinvar(
-        args.denops,
-        await fn.bufwinnr(args.denops, bufnr),
-        "&statusline",
-        header + " %#LineNR#%{" + linenr + "}%*" + async,
-      );
+        args.denops.call(
+          "nvim_set_option",
+          "titlestring",
+          header + " %{" + linenr + "}%*" + async,
+        );
+      } else {
+        await fn.setwinvar(
+          args.denops,
+          await fn.bufwinnr(args.denops, bufnr),
+          "&statusline",
+          header + " %#LineNR#%{" + linenr + "}%*" + async,
+        );
+      }
+    };
+
+    if (args.uiParams.statusline) {
+      setStatusline();
     }
 
     // Update main buffer
@@ -543,6 +550,7 @@ export class Ui extends BaseUi<Params> {
       split: "horizontal",
       splitDirection: "botright",
       startFilter: false,
+      statusline: true,
       winCol: 0,
       winHeight: 20,
       winRow: 0,
