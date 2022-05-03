@@ -74,9 +74,8 @@ export class PreviewUi {
       isFloating: uiParams.previewFloating,
       isVertical: uiParams.previewVertical,
     };
-    const previewer = await denops.dispatch(
-      "ddu",
-      "getPreviewer",
+    const previewer = await denops.call(
+      "ddu#get_previewer",
       options.name,
       item,
       actionParams,
