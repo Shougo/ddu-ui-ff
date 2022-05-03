@@ -305,8 +305,6 @@ export class Ui extends BaseUi<Params> {
         "titlestring",
         saveTitle,
       );
-
-      await vars.g.set(args.denops, "ddu#ui#ff#_save_title", "");
     }
 
     // Restore mode
@@ -377,12 +375,13 @@ export class Ui extends BaseUi<Params> {
           "titlestring",
         ) as string;
         await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
-        if (await fn.exists(denops, "##WinClosed")) {
-          await denops.cmd(
-            "autocmd WinClosed,BufLeave <buffer> " +
-              " let &titlestring=g:ddu#ui#ff#_save_title",
-          );
-        }
+      }
+
+      if (await fn.exists(denops, "##WinClosed")) {
+        await denops.cmd(
+          "autocmd WinClosed,BufLeave <buffer> " +
+            " let &titlestring=g:ddu#ui#ff#_save_title",
+        );
       }
 
       const titleString = header + " %{" + linenr + "}%*" + async;
