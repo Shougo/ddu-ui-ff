@@ -65,7 +65,6 @@ export class Ui extends BaseUi<Params> {
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
-  private saveTitle = "";
   private saveCursor: number[] = [];
   private saveMode = "";
   private checkEnd = false;
@@ -298,14 +297,16 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Restore options
-    if (this.saveTitle != "") {
+    const saveTitle = await vars.g.get(
+      args.denops, "ddu#ui#ff#_save_title", "");
+    if (saveTitle != "") {
       args.denops.call(
         "nvim_set_option",
         "titlestring",
-        this.saveTitle,
+        saveTitle,
       );
 
-      this.saveTitle = "";
+      await vars.g.set(args.denops, "ddu#ui#ff#_save_title", "");
     }
 
     // Restore mode
@@ -370,12 +371,12 @@ export class Ui extends BaseUi<Params> {
     const laststatus = await op.laststatus.get(denops);
 
     if (hasNvim && (floating || laststatus == 0)) {
-      if (this.saveTitle == "") {
-        this.saveTitle = await denops.call(
+      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) == "") {
+        const saveTitle = await denops.call(
           "nvim_get_option",
           "titlestring",
         ) as string;
-        await vars.g.set(denops, "ddu#ui#ff#_save_title", this.saveTitle);
+        await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
         if (await fn.exists(denops, "##WinClosed")) {
           await denops.cmd(
             "autocmd WinClosed,BufLeave <buffer> " +
