@@ -98,7 +98,10 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
-    if (args.uiParams.ignoreEmpty && args.context.maxItems == 0) {
+    if (
+      this.prevLength < 0 && args.uiParams.ignoreEmpty &&
+      args.context.maxItems == 0
+    ) {
       // Disable redraw when empty items
       return;
     }
@@ -301,7 +304,10 @@ export class Ui extends BaseUi<Params> {
 
     // Restore options
     const saveTitle = await vars.g.get(
-      args.denops, "ddu#ui#ff#_save_title", "");
+      args.denops,
+      "ddu#ui#ff#_save_title",
+      "",
+    );
     if (saveTitle != "") {
       args.denops.call(
         "nvim_set_option",
