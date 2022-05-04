@@ -16,12 +16,13 @@ import {
   fn,
 } from "https://deno.land/x/ddu_vim@v1.6.0/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v3.3.1/buffer/mod.ts";
-import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 type PreviewParams = {
   syntaxLimitChars?: number;
 };
+
+type ActionData = Record<string, unknown>;
 
 export class PreviewUi {
   private previewWinId = -1;
