@@ -60,7 +60,7 @@ export class PreviewUi {
     const prevId = await fn.win_getid(denops);
     const previewParams = ensureObject(actionParams) as PreviewParams;
 
-    // close if the target is the same as the previous one
+    // Close if the target is the same as the previous one
     if (
       this.previewWinId > 0 &&
       JSON.stringify(action) == JSON.stringify(this.previewedTarget)
@@ -88,7 +88,7 @@ export class PreviewUi {
     }
 
     let flag: ActionFlags;
-    // render preview
+    // Render the preview
     if (previewer.kind == "terminal") {
       flag = await this.previewTerminal(denops, previewer, uiParams);
     } else {
@@ -128,6 +128,7 @@ export class PreviewUi {
         await denops.cmd("enew");
       });
     }
+
     if (denops.meta.host == "nvim") {
       await denops.call("termopen", previewer.cmds);
     } else {
@@ -136,7 +137,8 @@ export class PreviewUi {
         "term_kill": "kill",
       });
     }
-    // delete previous buffer after opening new one to prevent flicker
+
+    // Delete the previous buffer after opening new one to prevent flicker
     if (
       this.terminalBufnr > 0 &&
       (await fn.bufexists(denops, this.terminalBufnr))
@@ -148,6 +150,7 @@ export class PreviewUi {
         console.error(e);
       }
     }
+
     return ActionFlags.Persist;
   }
 
@@ -164,6 +167,7 @@ export class PreviewUi {
     ) {
       return Promise.resolve(ActionFlags.None);
     }
+
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.buflisted(denops, bufname);
     if (this.previewWinId < 0) {
@@ -191,6 +195,7 @@ export class PreviewUi {
     } else {
       await denops.cmd(`buffer ${bufname}`);
     }
+
     const bufnr = await fn.bufnr(denops) as number;
     await this.highlight(denops, previewer, bufnr);
     return ActionFlags.Persist;
@@ -263,7 +268,7 @@ export class PreviewUi {
       : 0;
     const winid = this.previewWinId;
 
-    // clear previous highlight
+    // Clear the previous highlight
     if (this.matchIds[winid] > 0) {
       await fn.matchdelete(denops, this.matchIds[winid], winid);
       this.matchIds[winid] = -1;
@@ -278,32 +283,35 @@ export class PreviewUi {
       );
     }
 
-    if ("lineNr" in previewer && previewer.lineNr) {
+    if (previewer?.lineNr) {
       this.matchIds[winid] = await fn.matchaddpos(denops, "Search", [
         previewer.lineNr,
       ]) as number;
-    } else if ("pattern" in previewer && previewer.pattern) {
+    } else if (previewer?.pattern) {
       this.matchIds[winid] = await fn.matchadd(
         denops,
         "Search",
         previewer.pattern,
       ) as number;
     }
+
     await batch(denops, async (denops) => {
-      if (previewer.highlights) {
-        for (const hl of previewer.highlights) {
-          await denops.call(
-            "ddu#ui#ff#_highlight",
-            hl.hl_group,
-            hl.name,
-            1,
-            ns,
-            bufnr,
-            hl.row,
-            hl.col,
-            hl.width,
-          );
-        }
+      if (!previewer.highlights) {
+        return;
+      }
+
+      for (const hl of previewer.highlights) {
+        await denops.call(
+          "ddu#ui#ff#_highlight",
+          hl.hl_group,
+          hl.name,
+          1,
+          ns,
+          bufnr,
+          hl.row,
+          hl.col,
+          hl.width,
+        );
       }
     });
   }
