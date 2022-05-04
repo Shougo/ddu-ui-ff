@@ -77,7 +77,16 @@ openFilterWindow
 
 					*ddu-ui-ff-action-preview*
 preview
-		Preview the item in |preview-window|.
+		params:
+			{syntaxLimitChars}: 	Max number of chars to apply
+						syntax to previewed contents.
+						(Default: 200000)
+
+			The remaining params are passed to |ddu-kinds|.
+			See also |ddu-kind-attribute-getPreviewer| and kinds
+			documentation.
+
+		Preview the item in preview window.
 
 						*ddu-ui-ff-action-quit*
 quit
