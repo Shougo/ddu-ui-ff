@@ -7,7 +7,7 @@ import {
   NoFilePreviewer,
   PreviewContext,
   Previewer,
-  TermPreviewer,
+  TerminalPreviewer,
 } from "../../../ddu.vim/denops/ddu/types.ts";
 import {
   batch,
@@ -115,7 +115,7 @@ export class PreviewUi {
 
   private async previewTerminal(
     denops: Denops,
-    previewer: TermPreviewer,
+    previewer: TerminalPreviewer,
     uiParams: Params,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
