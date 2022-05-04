@@ -103,7 +103,7 @@ function! ddu#ui#ff#_highlight(
   endif
 endfunction
 
-function! ddu#ui#ff#_preview_file(params, filename) abort
+function! ddu#ui#ff#_open_preview_window(params) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
   let pos = win_screenpos(win_getid())
@@ -111,13 +111,7 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
   let win_height = winheight(0)
 
   if a:params.previewVertical
-    if a:filename ==# ''
-      silent rightbelow vnew
-    else
-      call ddu#util#execute_path(
-            \ 'silent rightbelow vertical pedit!', a:filename)
-      wincmd P
-    endif
+    silent rightbelow vnew
 
     if a:params.previewFloating && exists('*nvim_win_set_config')
       if a:params.split ==# 'floating'
@@ -143,13 +137,7 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
       execute 'vert resize ' . preview_width
     endif
   else
-    if a:filename ==# ''
-      silent aboveleft new
-    else
-      call ddu#util#execute_path('silent aboveleft pedit!', a:filename)
-
-      wincmd P
-    endif
+    silent aboveleft new
 
     if a:params.previewFloating && exists('*nvim_win_set_config')
       let win_row = pos[0] - 1
@@ -173,9 +161,6 @@ function! ddu#ui#ff#_preview_file(params, filename) abort
       execute 'resize ' . preview_height
     endif
   endif
-
-  " Note: Open folds and centering
-  normal! zvzz
 endfunction
 
 function! s:getcurpos(winid)

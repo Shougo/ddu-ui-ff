@@ -6,15 +6,15 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.5.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.5.0/deps.ts";
-import { ActionData } from "https://deno.land/x/ddu_kind_file@v0.3.0/file.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.0/deps.ts";
+import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
   name?: string;
@@ -27,7 +27,7 @@ type HighlightGroup = {
   prompt?: string;
 };
 
-type Params = {
+export type Params = {
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
@@ -70,6 +70,7 @@ export class Ui extends BaseUi<Params> {
   private checkEnd = false;
   private refreshed = false;
   private prevLength = -1;
+  private previewUi = new PreviewUi();
 
   async onInit(args: {
     denops: Denops;
@@ -285,6 +286,8 @@ export class Ui extends BaseUi<Params> {
       await fn.win_gotoid(args.denops, parentId);
     }
 
+    await this.previewUi.close(args.denops);
+
     this.saveCursor = await fn.getcurpos(args.denops) as number[];
 
     if (
@@ -493,29 +496,21 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
+      actionParams: unknown;
     }) => {
       const idx = await this.getIndex(args.denops, args.uiParams);
       const item = this.items[idx];
       if (!item) {
         return Promise.resolve(ActionFlags.None);
       }
-
-      const action = item.action as ActionData;
-      if (!action.path) {
-        return Promise.resolve(ActionFlags.None);
-      }
-
-      const prevId = await fn.win_getid(args.denops);
-
-      await args.denops.call(
-        "ddu#ui#ff#_preview_file",
+      return this.previewUi.preview(
+        args.denops,
+        args.context,
+        args.options,
         args.uiParams,
-        action.path,
+        args.actionParams,
+        item,
       );
-
-      await fn.win_gotoid(args.denops, prevId);
-
-      return Promise.resolve(ActionFlags.Persist);
     },
     quit: async (args: {
       denops: Denops;
