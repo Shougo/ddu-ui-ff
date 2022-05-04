@@ -119,11 +119,7 @@ export class PreviewUi {
     uiParams: Params,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
-      await denops.call(
-        "ddu#ui#ff#_preview_file",
-        uiParams,
-        "",
-      );
+      await denops.call("ddu#ui#ff#_open_preview_window", uiParams);
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await batch(denops, async (denops: Denops) => {
@@ -170,11 +166,7 @@ export class PreviewUi {
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.buflisted(denops, bufname);
     if (this.previewWinId < 0) {
-      await denops.call(
-        "ddu#ui#ff#_preview_file",
-        uiParams,
-        "",
-      );
+      await denops.call("ddu#ui#ff#_open_preview_window", uiParams);
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await fn.win_gotoid(denops, this.previewWinId);
