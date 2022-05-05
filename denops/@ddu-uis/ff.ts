@@ -27,7 +27,13 @@ type HighlightGroup = {
   prompt?: string;
 };
 
+type AutoAction = {
+  name?: string;
+  params?: unknown;
+};
+
 export type Params = {
+  autoAction: AutoAction;
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
@@ -169,6 +175,16 @@ export class Ui extends BaseUi<Params> {
         );
         return;
       }
+      await batch(args.denops, async (denops) => {
+        await denops.call("ddu#ui#ff#_reset_auto_action");
+        const autoAction = args.uiParams.autoAction;
+        if ("name" in autoAction) {
+          await denops.call(
+            "ddu#ui#ff#_set_auto_action",
+            autoAction,
+          );
+        }
+      });
     } else if (args.uiParams.autoResize) {
       await fn.win_execute(
         args.denops,
@@ -572,6 +588,7 @@ export class Ui extends BaseUi<Params> {
 
   params(): Params {
     return {
+      autoAction: {},
       autoResize: false,
       cursorPos: -1,
       displaySourceName: "no",

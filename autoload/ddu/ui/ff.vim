@@ -175,3 +175,24 @@ function! s:getcurpos(winid)
   call win_gotoid(prev_winid)
   return cursor
 endfunction
+
+let s:cursor_row = -1
+let s:auto_action = {}
+function! s:do_auto_action() abort
+  let line = line('.')
+  if line != s:cursor_row
+    call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
+    let s:cursor_row = line
+  endif
+endfunction
+function! ddu#ui#ff#_reset_auto_action() abort
+  let s:cursor_row = -1
+  let s:auto_action = {}
+  augroup ddu-ui-auto_action
+    autocmd!
+  augroup END
+endfunction
+function! ddu#ui#ff#_set_auto_action(auto_action) abort
+  let s:auto_action = a:auto_action
+  autocmd ddu-ui-auto_action CursorMoved <buffer> call s:do_auto_action()
+endfunction
