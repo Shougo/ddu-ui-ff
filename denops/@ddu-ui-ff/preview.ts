@@ -109,6 +109,9 @@ export class PreviewUi {
     const bufnr = await fn.bufnr(denops);
     this.previewBufnrs.add(bufnr);
     this.previewedTarget = action;
+    if (previewer.kind == "terminal") {
+      this.terminalBufnr = bufnr;
+    }
     await fn.win_gotoid(denops, prevId);
 
     return Promise.resolve(ActionFlags.Persist);
@@ -139,12 +142,11 @@ export class PreviewUi {
     }
 
     // Delete the previous buffer after opening new one to prevent flicker
-    if (
-      this.terminalBufnr > 0 &&
-      (await fn.bufexists(denops, this.terminalBufnr))
-    ) {
+    if (this.terminalBufnr > 0) {
       try {
-        await denops.cmd(`bdelete! ${this.terminalBufnr}`);
+        await denops.cmd(
+          `if buflisted(${this.terminalBufnr}) | bwipeout! ${this.terminalBufnr} | endif`,
+        );
         this.terminalBufnr = -1;
       } catch (e) {
         console.error(e);
