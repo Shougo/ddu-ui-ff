@@ -179,6 +179,9 @@ export class Ui extends BaseUi<Params> {
         await denops.call("ddu#ui#ff#_reset_auto_action");
         const autoAction = args.uiParams.autoAction;
         if ("name" in autoAction) {
+          if (!("params" in autoAction)) {
+            autoAction.params = {};
+          }
           await denops.call(
             "ddu#ui#ff#_set_auto_action",
             autoAction,
