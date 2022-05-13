@@ -137,7 +137,8 @@ export class Ui extends BaseUi<Params> {
       } else if (args.uiParams.split == "vertical") {
         const header = `silent keepalt vertical ${direction} `;
         await args.denops.cmd(
-          header + `sbuffer +resize\\ ${args.uiParams.winWidth} ${bufnr}`,
+          header +
+            `sbuffer +vertical\\ resize\\ ${args.uiParams.winWidth} ${bufnr}`,
         );
       } else if (floating) {
         // statusline must be set for floating window
