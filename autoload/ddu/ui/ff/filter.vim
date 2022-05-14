@@ -57,7 +57,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   let row = a:params.filterFloatingPosition ==# 'bottom'
         \ ? winheight(a:parent) : -1
-  if a:params.floatingBorder !=# 'none'
+  if a:params.floatingBorder isnot# 'none'
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
     endif
