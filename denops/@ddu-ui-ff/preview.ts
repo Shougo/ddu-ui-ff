@@ -43,7 +43,9 @@ export class PreviewUi {
     }
     await batch(denops, async (denops) => {
       for (const bufnr of this.previewBufnrs) {
-        await denops.cmd(`if buflisted(${bufnr}) | bwipeout! ${bufnr} | endif`);
+        await denops.cmd(
+          `if buflisted(${bufnr}) | silent bwipeout! ${bufnr} | endif`,
+        );
       }
     });
   }
@@ -145,7 +147,7 @@ export class PreviewUi {
     if (this.terminalBufnr > 0) {
       try {
         await denops.cmd(
-          `if buflisted(${this.terminalBufnr}) | bwipeout! ${this.terminalBufnr} | endif`,
+          `if buflisted(${this.terminalBufnr}) | silent bwipeout! ${this.terminalBufnr} | endif`,
         );
         this.terminalBufnr = -1;
       } catch (e) {
