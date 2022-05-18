@@ -445,7 +445,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const items = await this.getItems(args.denops, args.uiParams);
       if (items.length == 0) {
-        return Promise.resolve(ActionFlags.None);
+        return ActionFlags.None;
       }
 
       this.saveCursor = await fn.getcurpos(args.denops) as number[];
@@ -472,7 +472,7 @@ export class Ui extends BaseUi<Params> {
         ],
       });
 
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     },
     itemAction: async (args: {
       denops: Denops;
@@ -486,7 +486,7 @@ export class Ui extends BaseUi<Params> {
         args.uiParams,
       );
       if (items.length == 0) {
-        return Promise.resolve(ActionFlags.None);
+        return ActionFlags.None;
       }
 
       await args.denops.call(
@@ -497,7 +497,7 @@ export class Ui extends BaseUi<Params> {
         params.params ?? {},
       );
 
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     },
     openFilterWindow: async (args: {
       denops: Denops;
@@ -515,7 +515,7 @@ export class Ui extends BaseUi<Params> {
         args.uiParams,
       ) as number;
 
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     },
     preview: async (args: {
       denops: Denops;
@@ -527,7 +527,7 @@ export class Ui extends BaseUi<Params> {
       const idx = await this.getIndex(args.denops, args.uiParams);
       const item = this.items[idx];
       if (!item) {
-        return Promise.resolve(ActionFlags.None);
+        return ActionFlags.None;
       }
       return this.previewUi.preview(
         args.denops,
@@ -552,13 +552,13 @@ export class Ui extends BaseUi<Params> {
       });
       await args.denops.call("ddu#pop", args.options.name);
 
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     },
     // deno-lint-ignore require-await
     refreshItems: async (_: {
       denops: Denops;
     }) => {
-      return Promise.resolve(ActionFlags.RefreshItems);
+      return ActionFlags.RefreshItems;
     },
     toggleSelectItem: async (args: {
       denops: Denops;
@@ -566,7 +566,7 @@ export class Ui extends BaseUi<Params> {
       uiParams: Params;
     }) => {
       if (this.items.length == 0) {
-        return Promise.resolve(ActionFlags.None);
+        return ActionFlags.None;
       }
 
       const idx = await this.getIndex(args.denops, args.uiParams);
@@ -576,7 +576,7 @@ export class Ui extends BaseUi<Params> {
         this.selectedItems.add(idx);
       }
 
-      return Promise.resolve(ActionFlags.Redraw);
+      return ActionFlags.Redraw;
     },
     updateOptions: async (args: {
       denops: Denops;
@@ -586,7 +586,7 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("ddu#redraw", args.options.name, {
         updateOptions: args.actionParams,
       });
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     },
   };
 
@@ -626,7 +626,7 @@ export class Ui extends BaseUi<Params> {
     const bufnr = await fn.bufadd(denops, bufferName);
     await fn.bufload(denops, bufnr);
 
-    return Promise.resolve(bufnr);
+    return bufnr;
   }
 
   private async initOptions(

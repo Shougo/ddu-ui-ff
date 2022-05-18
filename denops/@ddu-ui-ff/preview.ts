@@ -68,7 +68,7 @@ export class PreviewUi {
       JSON.stringify(action) == JSON.stringify(this.previewedTarget)
     ) {
       await this.close(denops);
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     }
 
     const previewContext: PreviewContext = {
@@ -86,7 +86,7 @@ export class PreviewUi {
     ) as Previewer | undefined;
 
     if (!previewer) {
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     }
 
     let flag: ActionFlags;
@@ -116,7 +116,7 @@ export class PreviewUi {
     }
     await fn.win_gotoid(denops, prevId);
 
-    return Promise.resolve(ActionFlags.Persist);
+    return ActionFlags.Persist;
   }
 
   private async previewTerminal(
@@ -169,7 +169,7 @@ export class PreviewUi {
       previewer.kind == "nofile" && !previewer.contents?.length ||
       previewer.kind == "buffer" && !previewer.expr && !previewer.path
     ) {
-      return Promise.resolve(ActionFlags.None);
+      return ActionFlags.None;
     }
 
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
