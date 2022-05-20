@@ -238,7 +238,10 @@ export class PreviewUi {
           1,
           "$",
         );
-      } else if (previewer.path) {
+      } else if (
+        previewer.path && (await exists(previewer.path)) &&
+        !(await isDirectory(previewer.path))
+      ) {
         const data = Deno.readFileSync(previewer.path);
         return new TextDecoder().decode(data).split("\n");
       } else {
@@ -320,3 +323,29 @@ export class PreviewUi {
     });
   }
 }
+
+const exists = async (path: string) => {
+  // Note: Deno.stat() may be failed
+  try {
+    if (await Deno.stat(path)) {
+      return true;
+    }
+  } catch (_e: unknown) {
+    // Ignore
+  }
+
+  return false;
+};
+
+const isDirectory = async (path: string) => {
+  // Note: Deno.stat() may be failed
+  try {
+    if ((await Deno.stat(path)).isDirectory) {
+      return true;
+    }
+  } catch (_e: unknown) {
+    // Ignore
+  }
+
+  return false;
+};
