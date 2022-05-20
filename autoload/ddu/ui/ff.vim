@@ -18,14 +18,18 @@ function! ddu#ui#ff#execute(command) abort
 
   call win_execute(winid, a:command . ' | redraw')
 
-  if s:getcurpos(winid) != prev_curpos
+  if s:getcurpos(winid) != prev_curpos && !empty(s:auto_action)
     " Note: CursorMoved autocmd does not work when cursor()
-    call win_execute(winid, 'silent! doautocmd CursorMoved | redraw')
+    call win_execute(winid, 'silent! doautocmd CursorMoved')
   endif
 endfunction
 
-function! ddu#ui#ff#_update_buffer(
-      \ params, bufnr, selected_items, highlight_items, lines, refreshed, pos) abort
+function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
+  if a:refreshed && !empty(s:auto_action)
+    let prev_cursor_line = getbufline(
+          \ a:bufnr, s:getcurpos(bufwinid(a:bufnr))[1])[0]
+  endif
+
   let max_lines = len(a:lines)
   call setbufvar(a:bufnr, '&modifiable', 1)
 
@@ -35,24 +39,35 @@ function! ddu#ui#ff#_update_buffer(
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
 
-  if a:refreshed
-    " Init the cursor
-    let winid = bufwinid(a:bufnr)
-    let curpos = s:getcurpos(winid)
-    let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
-    if curpos[1] != lnum
-      call win_execute(winid,
-            \ printf('call cursor(%d, 0) | normal! zb', lnum))
-    elseif a:params.reversed
-      call win_execute(winid, 'normal! zb')
-    endif
+  if !a:refreshed
+    return
   endif
 
+  " Init the cursor
+  let winid = bufwinid(a:bufnr)
+  let curpos = s:getcurpos(winid)
+  let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
+  if curpos[1] != lnum
+    call win_execute(winid,
+          \ printf('call cursor(%d, 0) | normal! zb', lnum))
+  elseif a:params.reversed
+    call win_execute(winid, 'normal! zb')
+  endif
+
+  let cursor_line = getbufline(a:bufnr, s:getcurpos(winid)[1])[0]
+  if !empty(s:auto_action) && prev_cursor_line !=# cursor_line
+    " Execute autoAction
+    call win_execute(winid, 'silent! doautocmd CursorMoved')
+  endif
+endfunction
+
+function! ddu#ui#ff#_highlight_items(
+      \ params, bufnr, max_lines, highlight_items, selected_items) abort
   " Clear all highlights
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
   else
-    call prop_clear(1, max_lines + 1, { 'bufnr': a:bufnr })
+    call prop_clear(1, a:max_lines + 1, { 'bufnr': a:bufnr })
   endif
 
   " Highlights items
@@ -61,7 +76,7 @@ function! ddu#ui#ff#_update_buffer(
       call ddu#ui#ff#_highlight(
             \ hl.hl_group, hl.name, 1,
             \ s:namespace, a:bufnr,
-            \ a:params.reversed ? max_lines - item.row + 1 : item.row,
+            \ a:params.reversed ? a:max_lines - item.row + 1 : item.row,
             \ hl.col + strwidth(item.prefix), hl.width)
     endfor
   endfor
@@ -170,7 +185,7 @@ function! ddu#ui#ff#_open_preview_window(params) abort
   endif
 endfunction
 
-function! s:getcurpos(winid)
+function! s:getcurpos(winid) abort
   if has('nvim-0.7') || !has('nvim')
     return getcurpos(a:winid)
   endif
@@ -185,7 +200,7 @@ endfunction
 
 let s:cursor_row = -1
 let s:auto_action = {}
-function! s:do_auto_action() abort
+function! ddu#ui#ff#_do_auto_action() abort
   let line = line('.')
   if line != s:cursor_row
     call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
@@ -201,5 +216,6 @@ function! ddu#ui#ff#_reset_auto_action() abort
 endfunction
 function! ddu#ui#ff#_set_auto_action(auto_action) abort
   let s:auto_action = a:auto_action
-  autocmd ddu-ui-auto_action CursorMoved <buffer> call s:do_auto_action()
+  autocmd ddu-ui-auto_action CursorMoved <buffer>
+        \ call ddu#ui#ff#_do_auto_action()
 endfunction

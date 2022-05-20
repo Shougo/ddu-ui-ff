@@ -104,6 +104,11 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
+    if (this.items.length == 0) {
+      // Close preview window when empty items
+      await this.previewUi.close(args.denops);
+    }
+
     if (
       this.prevLength < 0 && args.uiParams.ignoreEmpty &&
       args.context.maxItems == 0
@@ -240,11 +245,27 @@ export class Ui extends BaseUi<Params> {
     const cursorPos = args.uiParams.cursorPos >= 0
       ? args.uiParams.cursorPos
       : 0;
+    const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
+        (this.prevLength > 0 && this.items.length < this.prevLength) ||
+      (args.uiParams.reversed && this.items.length != this.prevLength));
     await args.denops.call(
       "ddu#ui#ff#_update_buffer",
       args.uiParams,
       bufnr,
-      [...this.selectedItems],
+      this.items.map((c) =>
+        promptPrefix +
+        `${getSourceName(c.__sourceName)}` +
+        (c.display ?? c.word)
+      ),
+      refreshed,
+      cursorPos,
+    );
+
+    await args.denops.call(
+      "ddu#ui#ff#_highlight_items",
+      args.uiParams,
+      bufnr,
+      this.items.length,
       this.items.map((c, i) => {
         return {
           highlights: c.highlights ?? [],
@@ -252,15 +273,7 @@ export class Ui extends BaseUi<Params> {
           prefix: promptPrefix + `${getSourceName(c.__sourceName)}`,
         };
       }).filter((c) => c.highlights),
-      this.items.map((c) =>
-        promptPrefix +
-        `${getSourceName(c.__sourceName)}` +
-        (c.display ?? c.word)
-      ),
-      args.uiParams.cursorPos >= 0 || (this.refreshed &&
-          (this.prevLength > 0 && this.items.length < this.prevLength) ||
-        (args.uiParams.reversed && this.items.length != this.prevLength)),
-      cursorPos,
+      [...this.selectedItems],
     );
 
     if (winid < 0) {
@@ -353,11 +366,15 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#event", args.options.name, "close");
   }
 
+  private async getItem(denops: Denops, uiParams: Params): Promise<DduItem> {
+    const idx = await this.getIndex(denops, uiParams);
+    return this.items[idx];
+  }
+
   private async getItems(denops: Denops, uiParams: Params): Promise<DduItem[]> {
     let items: DduItem[];
     if (this.selectedItems.size == 0) {
-      const idx = await this.getIndex(denops, uiParams);
-      items = [this.items[idx]];
+      items = [await this.getItem(denops, uiParams)];
     } else {
       items = [...this.selectedItems].map((i) => this.items[i]);
     }
