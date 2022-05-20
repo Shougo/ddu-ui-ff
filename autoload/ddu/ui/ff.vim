@@ -13,8 +13,15 @@ function! ddu#ui#ff#execute(command) abort
     return
   endif
 
-  call win_execute(g:ddu#ui#ff#_filter_parent_winid,
-        \ a:command . ' | redraw')
+  let winid = g:ddu#ui#ff#_filter_parent_winid
+  let prev_curpos = s:getcurpos(winid)
+
+  call win_execute(winid, a:command . ' | redraw')
+
+  if s:getcurpos(winid) != prev_curpos
+    " Note: CursorMoved autocmd does not work when cursor()
+    call win_execute(winid, 'silent! doautocmd CursorMoved | redraw')
+  endif
 endfunction
 
 function! ddu#ui#ff#_update_buffer(
