@@ -5,6 +5,7 @@ function! ddu#ui#ff#do_action(name, ...) abort
     return
   endif
 
+  let b:ddu_ui_ff_cursor = getcurpos()
   call ddu#ui_action(b:ddu_ui_name, a:name, get(a:000, 0, {}))
 endfunction
 
@@ -26,8 +27,8 @@ endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   if a:refreshed && !empty(s:auto_action)
-    let prev_cursor_line = getbufline(
-          \ a:bufnr, s:getcurpos(bufwinid(a:bufnr))[1])[0]
+    let prev_cursor_line = get(getbufline(
+          \ a:bufnr, s:getcurpos(bufwinid(a:bufnr))[1]), 0, '')
   endif
 
   let max_lines = len(a:lines)
@@ -54,7 +55,7 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
     call win_execute(winid, 'normal! zb')
   endif
 
-  let cursor_line = getbufline(a:bufnr, s:getcurpos(winid)[1])[0]
+  let cursor_line = get(getbufline(a:bufnr, s:getcurpos(winid)[1]), 0, '')
   if !empty(s:auto_action) && prev_cursor_line !=# cursor_line
     " Execute autoAction
     call win_execute(winid, 'silent! doautocmd CursorMoved')

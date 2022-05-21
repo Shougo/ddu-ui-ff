@@ -71,7 +71,6 @@ export class Ui extends BaseUi<Params> {
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
-  private saveCursor: number[] = [];
   private saveMode = "";
   private checkEnd = false;
   private refreshed = false;
@@ -290,15 +289,17 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
+    const saveCursor = await vars.b.get(args.denops, "ddu_ui_ff_cursor", []);
     if (
       !args.uiParams.startFilter && (args.options.resume || !refreshed) &&
-      this.saveCursor.length != 0 && this.items.length != 0
+      saveCursor.length != 0 && this.items.length != 0
     ) {
-      await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
+      await fn.cursor(args.denops, saveCursor[1], saveCursor[2]);
     }
 
-    if (this.items.length != 0 && this.saveCursor.length == 0) {
-      this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    if (cursorPos > 0) {
+      await vars.b.set(args.denops, "ddu_ui_ff_cursor",
+                       await fn.getcurpos(args.denops) as number[])
     }
 
     this.buffers[args.options.name] = bufnr;
@@ -326,7 +327,8 @@ export class Ui extends BaseUi<Params> {
 
     await this.previewUi.close(args.denops);
 
-    this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    await vars.b.set(args.denops, "ddu_ui_ff_cursor",
+                     await fn.getcurpos(args.denops) as number[])
 
     if (
       args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
@@ -467,7 +469,8 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      this.saveCursor = await fn.getcurpos(args.denops) as number[];
+      await vars.b.set(args.denops, "ddu_ui_ff_cursor",
+                       await fn.getcurpos(args.denops) as number[])
 
       const actions = await args.denops.call(
         "ddu#get_item_actions",
@@ -578,6 +581,25 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
     }) => {
       return ActionFlags.RefreshItems;
+    },
+    toggleAllItems: async (_: {
+      denops: Denops;
+      options: DduOptions;
+      uiParams: Params;
+    }) => {
+      if (this.items.length == 0) {
+        return ActionFlags.None;
+      }
+
+      this.items.forEach((_, idx) => {
+        if (this.selectedItems.has(idx)) {
+          this.selectedItems.delete(idx);
+        } else {
+          this.selectedItems.add(idx);
+        }
+      });
+
+      return ActionFlags.Redraw;
     },
     toggleSelectItem: async (args: {
       denops: Denops;

@@ -96,9 +96,13 @@ quit
 refreshItems
 		Refresh the items.
 
+					*ddu-ui-ff-action-toggleAllItems*
+toggleAllItems
+		Toggle selected state for the all items.
+
 					*ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
-		Toggle selected item.
+		Toggle selected state for cursor item.
 
 					*ddu-ui-ff-action-updateOptions*
 updateOptions
