@@ -291,14 +291,16 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (
-      !args.uiParams.startFilter && args.options.resume &&
-      this.saveCursor.length != 0
+      !args.uiParams.startFilter && (args.options.resume || !refreshed) &&
+      this.saveCursor.length != 0 && this.items.length != 0
     ) {
       await fn.cursor(args.denops, this.saveCursor[1], this.saveCursor[2]);
-      this.saveCursor = [];
     }
 
-    this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    if (this.items.length != 0 && this.saveCursor.length == 0) {
+      this.saveCursor = await fn.getcurpos(args.denops) as number[];
+    }
+
     this.buffers[args.options.name] = bufnr;
 
     this.refreshed = false;
