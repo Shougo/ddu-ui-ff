@@ -56,6 +56,14 @@ export type Params = {
   previewRow: number;
   previewVertical: boolean;
   previewWidth: number;
+  previewFloatingBorder:
+    | "none"
+    | "single"
+    | "double"
+    | "rounded"
+    | "solid"
+    | "shadow"
+    | string[];
   prompt: string;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
@@ -662,6 +670,7 @@ export class Ui extends BaseUi<Params> {
       previewRow: 0,
       previewVertical: false,
       previewWidth: 40,
+      previewFloatingBorder: "none",
       prompt: "",
       reversed: false,
       split: "horizontal",

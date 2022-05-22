@@ -183,6 +183,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
             \ 'col': win_col,
             \ 'width': preview_width,
             \ 'height': preview_height,
+            \ 'border': a:params.previewFloatingBorder,
             \ })
     else
       execute 'resize ' . preview_height
