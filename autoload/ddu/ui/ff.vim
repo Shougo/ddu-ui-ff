@@ -138,8 +138,10 @@ function! ddu#ui#ff#_open_preview_window(params) abort
 
     if a:params.previewFloating && exists('*nvim_win_set_config')
       if a:params.split ==# 'floating'
-        let win_row = a:params['winRow']
-        let win_col = a:params['winCol']
+        let win_row = a:params.previewRow > 0 ?
+              \ a:params.previewRow : a:params.winRow
+        let win_col = a:params.previewCol > 0 ?
+              \ a:params.previewCol : a:params.winCol
       else
         let win_row = pos[0] - 1
         let win_col = pos[1] - 1
@@ -163,9 +165,11 @@ function! ddu#ui#ff#_open_preview_window(params) abort
     silent aboveleft new
 
     if a:params.previewFloating && exists('*nvim_win_set_config')
-      let win_row = pos[0] - 1
-      let win_col = pos[1] + 1
-      if win_row <= preview_height
+      let win_row = a:params.previewRow > 0 ?
+              \ a:params.previewRow : pos[0] - 1
+      let win_col = a:params.previewCol > 0 ?
+              \ a:params.previewCol : pos[1] + 1
+      if a:params.previewRow <= 0 && win_row <= preview_height
         let win_row += win_height + 1
         let anchor = 'NW'
       else

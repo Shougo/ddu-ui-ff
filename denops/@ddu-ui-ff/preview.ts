@@ -8,13 +8,13 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v1.6.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.2/types.ts";
 import {
   batch,
   Denops,
   ensureObject,
   fn,
-} from "https://deno.land/x/ddu_vim@v1.6.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.2/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v3.3.1/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
@@ -72,6 +72,8 @@ export class PreviewUi {
     }
 
     const previewContext: PreviewContext = {
+      col: uiParams.previewCol,
+      row: uiParams.previewRow,
       width: uiParams.previewWidth,
       height: uiParams.previewHeight,
       isFloating: uiParams.previewFloating,
@@ -92,7 +94,11 @@ export class PreviewUi {
     let flag: ActionFlags;
     // Render the preview
     if (previewer.kind == "terminal") {
-      flag = await this.previewTerminal(denops, previewer, uiParams);
+      flag = await this.previewTerminal(
+        denops,
+        previewer,
+        uiParams,
+      );
     } else {
       flag = await this.previewBuffer(
         denops,

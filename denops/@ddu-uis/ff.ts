@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.6.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.2/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.6.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.6.2/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -50,8 +50,10 @@ export type Params = {
   filterUpdateTime: number;
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
+  previewCol: number;
   previewFloating: boolean;
   previewHeight: number;
+  previewRow: number;
   previewVertical: boolean;
   previewWidth: number;
   prompt: string;
@@ -298,8 +300,11 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (cursorPos > 0) {
-      await vars.b.set(args.denops, "ddu_ui_ff_cursor",
-                       await fn.getcurpos(args.denops) as number[])
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor",
+        await fn.getcurpos(args.denops) as number[],
+      );
     }
 
     this.buffers[args.options.name] = bufnr;
@@ -327,8 +332,11 @@ export class Ui extends BaseUi<Params> {
 
     await this.previewUi.close(args.denops);
 
-    await vars.b.set(args.denops, "ddu_ui_ff_cursor",
-                     await fn.getcurpos(args.denops) as number[])
+    await vars.b.set(
+      args.denops,
+      "ddu_ui_ff_cursor",
+      await fn.getcurpos(args.denops) as number[],
+    );
 
     if (
       args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
@@ -469,8 +477,11 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await vars.b.set(args.denops, "ddu_ui_ff_cursor",
-                       await fn.getcurpos(args.denops) as number[])
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor",
+        await fn.getcurpos(args.denops) as number[],
+      );
 
       const actions = await args.denops.call(
         "ddu#get_item_actions",
@@ -582,6 +593,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       return ActionFlags.RefreshItems;
     },
+    // deno-lint-ignore require-await
     toggleAllItems: async (_: {
       denops: Denops;
       options: DduOptions;
@@ -637,14 +649,16 @@ export class Ui extends BaseUi<Params> {
       autoResize: false,
       cursorPos: -1,
       displaySourceName: "no",
-      floatingBorder: "none",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
       filterUpdateTime: 0,
+      floatingBorder: "none",
       highlights: {},
       ignoreEmpty: false,
+      previewCol: 0,
       previewFloating: false,
       previewHeight: 10,
+      previewRow: 0,
       previewVertical: false,
       previewWidth: 40,
       prompt: "",

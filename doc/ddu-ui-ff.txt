@@ -215,6 +215,13 @@ ignoreEmpty	(boolean)
 
 		Default: v:false
 
+						*ddu-ui-ff-param-previewCol*
+previewCol	(number)
+		Set the column position of the preview window if
+		|ddu-ui-ff-param-previewFloating| is v:true.
+
+		Default: 0
+
 					*ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.
@@ -229,6 +236,13 @@ previewHeight	(number)
 		floating window.
 
 		Default: 10
+
+						*ddu-ui-ff-param-previewRow*
+previewRow	(number)
+		Set the row position of the preview window if
+		|ddu-ui-ff-param-previewFloating| is v:true.
+
+		Default: 0
 
 					*ddu-ui-ff-param-previewVertical*
 previewVertical	(boolean)
