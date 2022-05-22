@@ -228,6 +228,15 @@ previewFloating	(boolean)
 
 		Default: v:false
 
+			    	*ddu-ui-ff-param-previewFloatingBorder*
+previewFloatingBorder		(string | list)
+		Specify the style of the preview window border if
+		|ddu-ui-ff-param-previewFloating| is v:true.
+		See |nvim_open_win()| for the detail.
+		Note: It is neovim only.
+
+		Default: "none"
+
 					*ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in
