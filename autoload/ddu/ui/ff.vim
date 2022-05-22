@@ -126,10 +126,10 @@ function! ddu#ui#ff#_highlight(
   endif
 endfunction
 
-function! ddu#ui#ff#_open_preview_window(params) abort
+function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
-  let pos = win_screenpos(win_getid())
+  let pos = win_screenpos(bufwinid(a:bufnr))
   let win_width = winwidth(0)
   let win_height = winheight(0)
 
@@ -168,7 +168,7 @@ function! ddu#ui#ff#_open_preview_window(params) abort
       let win_row = a:params.previewRow > 0 ?
               \ a:params.previewRow : pos[0] - 1
       let win_col = a:params.previewCol > 0 ?
-              \ a:params.previewCol : pos[1] + 1
+              \ a:params.previewCol : pos[1] - 1
       if a:params.previewRow <= 0 && win_row <= preview_height
         let win_row += win_height + 1
         let anchor = 'NW'

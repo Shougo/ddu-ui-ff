@@ -56,6 +56,7 @@ export class PreviewUi {
     options: DduOptions,
     uiParams: Params,
     actionParams: unknown,
+    bufnr: number,
     item: DduItem,
   ): Promise<ActionFlags> {
     const action = item.action as ActionData;
@@ -98,6 +99,7 @@ export class PreviewUi {
         denops,
         previewer,
         uiParams,
+        bufnr,
       );
     } else {
       flag = await this.previewBuffer(
@@ -105,6 +107,7 @@ export class PreviewUi {
         previewer,
         uiParams,
         previewParams,
+        bufnr,
         item,
       );
     }
@@ -114,8 +117,8 @@ export class PreviewUi {
 
     await this.jump(denops, previewer);
 
-    const bufnr = await fn.bufnr(denops);
-    this.previewBufnrs.add(bufnr);
+    const previewBufnr = await fn.bufnr(denops);
+    this.previewBufnrs.add(previewBufnr);
     this.previewedTarget = action;
     if (previewer.kind == "terminal") {
       this.terminalBufnr = bufnr;
@@ -129,9 +132,12 @@ export class PreviewUi {
     denops: Denops,
     previewer: TerminalPreviewer,
     uiParams: Params,
+    bufnr: number,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
-      await denops.call("ddu#ui#ff#_open_preview_window", uiParams);
+      await denops.call(
+        "ddu#ui#ff#_open_preview_window",
+        uiParams, bufnr);
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await batch(denops, async (denops: Denops) => {
@@ -169,6 +175,7 @@ export class PreviewUi {
     previewer: BufferPreviewer | NoFilePreviewer,
     uiParams: Params,
     actionParams: PreviewParams,
+    bufnr: number,
     item: DduItem,
   ): Promise<ActionFlags> {
     if (
@@ -181,7 +188,9 @@ export class PreviewUi {
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.buflisted(denops, bufname);
     if (this.previewWinId < 0) {
-      await denops.call("ddu#ui#ff#_open_preview_window", uiParams);
+      await denops.call(
+        "ddu#ui#ff#_open_preview_window",
+        uiParams, bufnr);
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await fn.win_gotoid(denops, this.previewWinId);
@@ -206,8 +215,8 @@ export class PreviewUi {
       await denops.cmd(`buffer ${bufname}`);
     }
 
-    const bufnr = await fn.bufnr(denops) as number;
-    await this.highlight(denops, previewer, bufnr);
+    const previewBufnr = await fn.bufnr(denops) as number;
+    await this.highlight(denops, previewer, previewBufnr);
     return ActionFlags.Persist;
   }
 

@@ -568,6 +568,7 @@ export class Ui extends BaseUi<Params> {
         args.options,
         args.uiParams,
         args.actionParams,
+        this.buffers[args.options.name],
         item,
       );
     },
