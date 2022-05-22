@@ -32,19 +32,21 @@ type AutoAction = {
   params?: unknown;
 };
 
+type FloatingBorder =
+  | "none"
+  | "single"
+  | "double"
+  | "rounded"
+  | "solid"
+  | "shadow"
+  | string[];
+
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
-  floatingBorder:
-    | "none"
-    | "single"
-    | "double"
-    | "rounded"
-    | "solid"
-    | "shadow"
-    | string[];
+  floatingBorder: FloatingBorder;
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
@@ -56,14 +58,7 @@ export type Params = {
   previewRow: number;
   previewVertical: boolean;
   previewWidth: number;
-  previewFloatingBorder:
-    | "none"
-    | "single"
-    | "double"
-    | "rounded"
-    | "solid"
-    | "shadow"
-    | string[];
+  previewFloatingBorder: FloatingBorder;
   prompt: string;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";

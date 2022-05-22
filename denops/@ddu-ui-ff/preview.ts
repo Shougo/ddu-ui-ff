@@ -137,7 +137,9 @@ export class PreviewUi {
     if (this.previewWinId < 0) {
       await denops.call(
         "ddu#ui#ff#_open_preview_window",
-        uiParams, bufnr);
+        uiParams,
+        bufnr,
+      );
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await batch(denops, async (denops: Denops) => {
@@ -190,7 +192,9 @@ export class PreviewUi {
     if (this.previewWinId < 0) {
       await denops.call(
         "ddu#ui#ff#_open_preview_window",
-        uiParams, bufnr);
+        uiParams,
+        bufnr,
+      );
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await fn.win_gotoid(denops, this.previewWinId);
