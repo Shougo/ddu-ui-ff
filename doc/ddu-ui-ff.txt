@@ -207,6 +207,10 @@ highlights	(dictionary)
 		Specify narrowing text highlight.
 		Default: "Special"
 
+		selected			(string)
+		Specify selected item highlight.
+		Default: "Special"
+
 		Default: {}
 
 				    		*ddu-ui-ff-param-ignoreEmpty*

@@ -5,7 +5,8 @@ function! ddu#ui#ff#do_action(name, ...) abort
     return
   endif
 
-  let b:ddu_ui_ff_cursor = getcurpos()
+  let b:ddu_ui_ff_cursor_pos = getcurpos()
+  let b:ddu_ui_ff_cursor_text = getline('.')
   call ddu#ui_action(b:ddu_ui_name, a:name, get(a:000, 0, {}))
 endfunction
 
@@ -83,9 +84,10 @@ function! ddu#ui#ff#_highlight_items(
   endfor
 
   " Selected items highlights
+  let selected_highlight = get(a:params.highlights, 'selected', 'Statement')
   for item_nr in a:selected_items
     call ddu#ui#ff#_highlight(
-          \ 'Statement', 'ddu-ui-selected', 10000,
+          \ selected_highlight, 'ddu-ui-selected', 10000,
           \ s:namespace, a:bufnr, item_nr + 1, 1, 1000)
   endfor
 

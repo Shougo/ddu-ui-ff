@@ -25,6 +25,7 @@ type DoActionParams = {
 type HighlightGroup = {
   floating?: string;
   prompt?: string;
+  selected?: string;
 };
 
 type AutoAction = {
@@ -294,10 +295,16 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    const saveCursor = await vars.b.get(args.denops, "ddu_ui_ff_cursor", []);
+    const saveCursor = await vars.b.get(
+      args.denops, "ddu_ui_ff_cursor_pos", []);
+    const saveText = await vars.b.get(
+      args.denops, "ddu_ui_ff_cursor_text", "");
+    const currentText = saveCursor.length != 0 ?
+      await fn.getline(args.denops, saveCursor[1]) : "";
     if (
       !args.uiParams.startFilter && (args.options.resume || !refreshed) &&
-      saveCursor.length != 0 && this.items.length != 0
+      saveCursor.length != 0 && this.items.length != 0 &&
+      currentText == saveText
     ) {
       await fn.cursor(args.denops, saveCursor[1], saveCursor[2]);
     }
@@ -305,8 +312,13 @@ export class Ui extends BaseUi<Params> {
     if (cursorPos > 0) {
       await vars.b.set(
         args.denops,
-        "ddu_ui_ff_cursor",
-        await fn.getcurpos(args.denops) as number[],
+        "ddu_ui_ff_cursor_pos",
+        await fn.getcurpos(args.denops),
+      );
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor_text",
+        await fn.getline(args.denops, "."),
       );
     }
 
@@ -337,8 +349,13 @@ export class Ui extends BaseUi<Params> {
 
     await vars.b.set(
       args.denops,
-      "ddu_ui_ff_cursor",
-      await fn.getcurpos(args.denops) as number[],
+      "ddu_ui_ff_cursor_pos",
+      await fn.getcurpos(args.denops),
+    );
+    await vars.b.set(
+      args.denops,
+      "ddu_ui_ff_cursor_text",
+      await fn.getline(args.denops, "."),
     );
 
     if (
@@ -482,8 +499,13 @@ export class Ui extends BaseUi<Params> {
 
       await vars.b.set(
         args.denops,
-        "ddu_ui_ff_cursor",
-        await fn.getcurpos(args.denops) as number[],
+        "ddu_ui_ff_cursor_pos",
+        await fn.getcurpos(args.denops),
+      );
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor_text",
+        await fn.getline(args.denops, "."),
       );
 
       const actions = await args.denops.call(
