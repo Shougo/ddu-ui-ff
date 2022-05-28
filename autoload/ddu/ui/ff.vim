@@ -235,7 +235,7 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
 endfunction
 
 function! ddu#ui#ff#_cursor(line, col) abort
-  if &filetype ==# 'ddu-ui-ff'
+  if &filetype ==# 'ddu-ui-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     call cursor(a:line, a:col)
   else
     let winid = g:ddu#ui#ff#_filter_parent_winid
