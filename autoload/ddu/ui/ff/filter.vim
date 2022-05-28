@@ -102,7 +102,7 @@ function! s:init_buffer(name, params) abort
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
   else
     let direction = is_floating ? 'botright' : a:params.filterSplitDirection
-    silent execute direction 'split' bufnr
+    silent execute direction 'sbuffer' bufnr
   endif
 
   if has('nvim') && is_floating && has_key(a:params.highlights, 'floating')
