@@ -468,6 +468,11 @@ Q: I want to custom the statusline.
 A: You can disable the original statusline by |ddu-ui-ff-param-statusline|.
 And you can get the status line information by "w:ddu_ui_ff_status" variable.
 
+Q: I want to move to line quickly like denite.nvim's "quick-move" feature.
+
+A: Please use qselect.vim for it.
+https://github.com/Shougo/qselect.vim
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
