@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.6.2/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.7.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.6.2/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.7.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -295,28 +295,47 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    const saveCursor = await vars.b.get(
-      args.denops, "ddu_ui_ff_cursor_pos", []);
-    const saveText = await vars.b.get(
-      args.denops, "ddu_ui_ff_cursor_text", "");
-    const currentText = saveCursor.length != 0 ?
-      await fn.getline(args.denops, saveCursor[1]) : "";
+    const saveCursor = await fn.getbufvar(
+      args.denops,
+      bufnr,
+      "ddu_ui_ff_cursor_pos",
+      [],
+    ) as number[];
+    const saveText = await fn.getbufvar(
+      args.denops,
+      bufnr,
+      "ddu_ui_ff_cursor_text",
+      "",
+    ) as string;
+    let currentText = "";
+    if (saveCursor.length != 0) {
+      const buflines = await fn.getbufline(args.denops, bufnr, saveCursor[1]);
+      if (buflines.length != 0) {
+        currentText = buflines[0];
+      }
+    }
     if (
-      !args.uiParams.startFilter && (args.options.resume || !refreshed) &&
+      (args.options.resume || !refreshed) &&
       saveCursor.length != 0 && this.items.length != 0 &&
       currentText == saveText
     ) {
-      await fn.cursor(args.denops, saveCursor[1], saveCursor[2]);
+      await args.denops.call(
+        "ddu#ui#ff#_cursor",
+        saveCursor[1],
+        saveCursor[2],
+      );
     }
 
     if (cursorPos > 0) {
-      await vars.b.set(
+      await fn.setbufvar(
         args.denops,
+        bufnr,
         "ddu_ui_ff_cursor_pos",
         await fn.getcurpos(args.denops),
       );
-      await vars.b.set(
+      await fn.setbufvar(
         args.denops,
+        bufnr,
         "ddu_ui_ff_cursor_text",
         await fn.getline(args.denops, "."),
       );
@@ -496,17 +515,6 @@ export class Ui extends BaseUi<Params> {
       if (items.length == 0) {
         return ActionFlags.None;
       }
-
-      await vars.b.set(
-        args.denops,
-        "ddu_ui_ff_cursor_pos",
-        await fn.getcurpos(args.denops),
-      );
-      await vars.b.set(
-        args.denops,
-        "ddu_ui_ff_cursor_text",
-        await fn.getline(args.denops, "."),
-      );
 
       const actions = await args.denops.call(
         "ddu#get_item_actions",

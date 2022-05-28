@@ -5,8 +5,14 @@ function! ddu#ui#ff#do_action(name, ...) abort
     return
   endif
 
-  let b:ddu_ui_ff_cursor_pos = getcurpos()
-  let b:ddu_ui_ff_cursor_text = getline('.')
+  if &filetype ==# 'ddu-ui-ff'
+    let b:ddu_ui_ff_cursor_pos = getcurpos()
+    let b:ddu_ui_ff_cursor_text = getline('.')
+  else
+    let winid = g:ddu#ui#ff#_filter_parent_winid
+    call win_execute(winid, 'let b:ddu_ui_ff_cursor_pos = getcurpos()')
+    call win_execute(winid, 'let b:ddu_ui_ff_cursor_text = getline(".")')
+  endif
   call ddu#ui_action(b:ddu_ui_name, a:name, get(a:000, 0, {}))
 endfunction
 
@@ -226,4 +232,14 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
   let s:auto_action = a:auto_action
   autocmd ddu-ui-auto_action CursorMoved <buffer>
         \ call ddu#ui#ff#_do_auto_action()
+endfunction
+
+function! ddu#ui#ff#_cursor(line, col) abort
+  if &filetype ==# 'ddu-ui-ff'
+    call cursor(a:line, a:col)
+  else
+    let winid = g:ddu#ui#ff#_filter_parent_winid
+    call win_execute(winid, printf('call cursor(%d, %d) | redraw',
+          \ a:line, a:col))
+  endif
 endfunction
