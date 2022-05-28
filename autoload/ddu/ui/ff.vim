@@ -5,7 +5,7 @@ function! ddu#ui#ff#do_action(name, ...) abort
     return
   endif
 
-  if &filetype ==# 'ddu-ui-ff'
+  if &filetype ==# 'ddu-ui-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     let b:ddu_ui_ff_cursor_pos = getcurpos()
     let b:ddu_ui_ff_cursor_text = getline('.')
   else
