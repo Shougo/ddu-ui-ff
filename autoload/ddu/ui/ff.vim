@@ -5,7 +5,7 @@ function! ddu#ui#ff#do_action(name, ...) abort
     return
   endif
 
-  if &filetype ==# 'ddu-ui-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
+  if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     let b:ddu_ui_ff_cursor_pos = getcurpos()
     let b:ddu_ui_ff_cursor_text = getline('.')
   else
@@ -235,7 +235,7 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
 endfunction
 
 function! ddu#ui#ff#_cursor(line, col) abort
-  if &filetype ==# 'ddu-ui-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
+  if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     call cursor(a:line, a:col)
   else
     let winid = g:ddu#ui#ff#_filter_parent_winid

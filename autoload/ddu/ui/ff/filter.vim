@@ -169,7 +169,7 @@ function! s:check_redraw() abort
 
   let input = getline('.')
 
-  if &filetype !=# 'ddu-ff-filter'
+  if &l:filetype !=# 'ddu-ff-filter'
         \ || input ==# s:filter_prev_input
     return
   endif
