@@ -480,7 +480,9 @@ export class Ui extends BaseUi<Params> {
         await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
       }
 
-      const augroupName = `${await op.filetype.getLocal(denops)}-${options.name}`
+      const augroupName = `${await op.filetype.getLocal(
+        denops,
+      )}-${options.name}`;
       await denops.cmd(`augroup ${augroupName}`);
       await denops.cmd(`autocmd! ${augroupName}`);
       if (await fn.exists(denops, "##WinClosed")) {
