@@ -209,7 +209,7 @@ highlights	(dictionary)
 
 		selected			(string)
 		Specify selected item highlight.
-		Default: "Special"
+		Default: "Statement"
 
 		Default: {}
 
