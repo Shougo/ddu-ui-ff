@@ -377,6 +377,12 @@ export class Ui extends BaseUi<Params> {
       await fn.getline(args.denops, "."),
     );
 
+    if (this.filterBufnr > 0) {
+      const filterWinNr = await fn.bufwinnr(args.denops, this.filterBufnr);
+      if (filterWinNr > 0) {
+        await args.denops.cmd(`close! ${filterWinNr}`);
+      }
+    }
     if (
       args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
     ) {
