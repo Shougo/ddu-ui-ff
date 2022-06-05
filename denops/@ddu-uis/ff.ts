@@ -474,9 +474,12 @@ export class Ui extends BaseUi<Params> {
         await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
       }
 
+      const augroupName = `${await op.filetype.getLocal(denops)}-${options.name}`
+      await denops.cmd(`augroup ${augroupName}`);
+      await denops.cmd(`autocmd! ${augroupName}`);
       if (await fn.exists(denops, "##WinClosed")) {
         await denops.cmd(
-          "autocmd WinClosed,BufLeave <buffer> " +
+          `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
             " let &titlestring=g:ddu#ui#ff#_save_title",
         );
       }
@@ -489,9 +492,8 @@ export class Ui extends BaseUi<Params> {
         "titlestring",
         titleString,
       );
-
       await denops.cmd(
-        "autocmd WinEnter,BufEnter <buffer> " +
+        `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
           " let &titlestring=b:ddu_ui_ff_title",
       );
     } else {
