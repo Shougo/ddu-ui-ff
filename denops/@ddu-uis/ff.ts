@@ -281,7 +281,7 @@ export class Ui extends BaseUi<Params> {
       [...this.selectedItems],
     );
 
-    if (winid < 0) {
+    if (this.filterBufnr < 0) {
       if (args.uiParams.startFilter) {
         this.filterBufnr = await args.denops.call(
           "ddu#ui#ff#filter#_open",
@@ -377,12 +377,8 @@ export class Ui extends BaseUi<Params> {
       await fn.getline(args.denops, "."),
     );
 
-    if (this.filterBufnr > 0) {
-      const filterWinNr = await fn.bufwinnr(args.denops, this.filterBufnr);
-      if (filterWinNr > 0) {
-        await args.denops.cmd(`close! ${filterWinNr}`);
-      }
-    }
+    await this.closeFilterWindow(args.denops);
+
     if (
       args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
     ) {
@@ -514,6 +510,15 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
+  private async closeFilterWindow(denops: Denops): Promise<void> {
+    if (this.filterBufnr > 0) {
+      const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
+      if (filterWinNr > 0) {
+        await denops.cmd(`close! ${filterWinNr}`);
+      }
+    }
+  }
+
   actions: UiActions<Params> = {
     chooseAction: async (args: {
       denops: Denops;
@@ -521,6 +526,8 @@ export class Ui extends BaseUi<Params> {
       uiParams: Params;
       actionParams: unknown;
     }) => {
+      await this.closeFilterWindow(args.denops);
+
       const items = await this.getItems(args.denops, args.uiParams);
       if (items.length == 0) {
         return ActionFlags.None;
