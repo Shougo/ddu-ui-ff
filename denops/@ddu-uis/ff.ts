@@ -218,7 +218,7 @@ export class Ui extends BaseUi<Params> {
 
     // Note: buffers may be restored
     if (!this.buffers[args.options.name] || winid < 0) {
-      await this.initOptions(args.denops, args.options, bufnr);
+      await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
     await this.setStatusline(
@@ -739,6 +739,7 @@ export class Ui extends BaseUi<Params> {
   private async initOptions(
     denops: Denops,
     options: DduOptions,
+    uiParams: Params,
     bufnr: number,
   ): Promise<void> {
     const winid = await fn.bufwinid(denops, bufnr);
@@ -763,6 +764,12 @@ export class Ui extends BaseUi<Params> {
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);
+
+      if (uiParams.split == "horizontal") {
+        await fn.setbufvar(denops, bufnr, "&winfixheight", 1);
+      } else if (uiParams.split == "vertical") {
+        await fn.setbufvar(denops, bufnr, "&winfixwidth", 1);
+      }
     });
   }
 
