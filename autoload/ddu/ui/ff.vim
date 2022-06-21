@@ -32,6 +32,15 @@ function! ddu#ui#ff#execute(command) abort
   endif
 endfunction
 
+function! ddu#ui#ff#close() abort
+  close
+
+  if exists('g:ddu#ui#ff#_filter_parent_winid')
+    " Move to parent window
+    call win_gotoid(g:ddu#ui#ff#_filter_parent_winid)
+  endif
+endfunction
+
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   if a:refreshed && !empty(s:auto_action)
     let prev_cursor_line = get(getbufline(

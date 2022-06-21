@@ -38,6 +38,10 @@ INTERFACE					*ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS					*ddu-ui-ff-functions*
 
+						*ddu#ui#ff#close()*
+ddu#ui#ff#close()
+		Close the current window and move to parent UI window.
+
 						*ddu#ui#ff#do_action()*
 ddu#ui#ff#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
@@ -374,9 +378,9 @@ EXAMPLES					*ddu-ui-ff-examples*
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
-	  \ <Esc><Cmd>close<CR>
+	  \ <Esc><Cmd>call ddu#ui#ff#close()<CR>
 	  nnoremap <buffer> <CR>
-	  \ <Cmd>close<CR>
+	  \ <Cmd><Cmd>call ddu#ui#ff#close()<CR>
 	endfunction
 <
 
