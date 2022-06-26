@@ -24,6 +24,11 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
           \ <buffer> call s:check_update()
   augroup END
 
+  if index(split(&backspace, ','), 'eol') >= 0
+    set backspace-=eol
+    autocmd BufLeave <buffer> ++once set backspace+=eol
+  endif
+
   " Note: prompt must set after cursor move
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
