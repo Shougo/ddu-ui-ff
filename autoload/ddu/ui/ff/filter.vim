@@ -24,10 +24,17 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
           \ <buffer> call s:check_update()
   augroup END
 
-  if index(split(&backspace, ','), 'eol') >= 0
-    set backspace-=eol
-    autocmd BufLeave <buffer> ++once set backspace+=eol
-  endif
+  " Disable backspace eol.
+  let s:save_backspace = &backspace
+  set backspace-=eol
+  autocmd ddu-ff-filter BufLeave <buffer> ++once
+        \ let &backspace = s:save_backspace
+
+  " Disable whichwrap.
+  let s:save_whichwrap = &whichwrap
+  set whichwrap=
+  autocmd ddu-ff-filter BufLeave <buffer> ++once
+        \ let &whichwrap = s:save_whichwrap
 
   " Note: prompt must set after cursor move
   if a:params.prompt !=# ''
