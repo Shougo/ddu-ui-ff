@@ -477,6 +477,15 @@ Q: I want to move to line quickly like denite.nvim's "quick-move" feature.
 A: Please use qselect.vim for it.
 https://github.com/Shougo/qselect.vim
 
+Q: Why ddu-ui-ff does not support Vim's popup window feature instead of
+neovim's floating window feature?
+https://github.com/Shougo/ddu-ui-ff/issues/48
+
+A: Because Vim's popup window feature is not focusable.
+ddu-ui-ff implementation depends on the feature.  So the support is not
+acceptable.
+
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
