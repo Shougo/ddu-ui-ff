@@ -485,6 +485,10 @@ A: Because Vim's popup window feature is not focusable.
 ddu-ui-ff implementation depends on the feature.  So the support is not
 acceptable.
 
+Q: |:close| does not move to the ddu-ui-ff window sometimes.
+
+A: Please use |ddu#ui#ff#close()| instead.
+
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
