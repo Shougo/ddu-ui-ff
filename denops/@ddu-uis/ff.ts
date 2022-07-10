@@ -382,7 +382,11 @@ export class Ui extends BaseUi<Params> {
     if (
       args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
     ) {
-      await args.denops.cmd(`buffer ${args.context.bufNr}`);
+      await args.denops.cmd(
+        args.context.bufNr == this.buffers[args.options.name]
+          ? "enew"
+          : `buffer ${args.context.bufNr}`,
+      );
     } else {
       await args.denops.cmd("close!");
       await fn.win_gotoid(args.denops, args.context.winId);
