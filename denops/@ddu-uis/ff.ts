@@ -281,7 +281,7 @@ export class Ui extends BaseUi<Params> {
       [...this.selectedItems],
     );
 
-    if (this.filterBufnr < 0) {
+    if (this.filterBufnr < 0 || winid < 0) {
       if (args.uiParams.startFilter) {
         this.filterBufnr = await args.denops.call(
           "ddu#ui#ff#filter#_open",
