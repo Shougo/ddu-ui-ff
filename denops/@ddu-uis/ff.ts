@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.8.5/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.7/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.8.5/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.7/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -247,8 +247,16 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const cursorPos = args.uiParams.cursorPos >= 0
+    const saveCursor = await fn.getbufvar(
+      args.denops,
+      bufnr,
+      "ddu_ui_ff_cursor_pos",
+      [],
+    ) as number[];
+    const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
       ? args.uiParams.cursorPos
+      : saveCursor.length != 0
+      ? saveCursor[1] - 1
       : 0;
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
@@ -295,12 +303,6 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    const saveCursor = await fn.getbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_ff_cursor_pos",
-      [],
-    ) as number[];
     const saveText = await fn.getbufvar(
       args.denops,
       bufnr,
