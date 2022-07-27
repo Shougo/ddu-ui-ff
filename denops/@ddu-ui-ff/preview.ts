@@ -8,14 +8,14 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v1.8.7/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.8/types.ts";
 import {
   batch,
   Denops,
   ensureObject,
   fn,
-} from "https://deno.land/x/ddu_vim@v1.8.7/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v3.3.2/buffer/mod.ts";
+} from "https://deno.land/x/ddu_vim@v1.8.8/deps.ts";
+import { replace } from "https://deno.land/x/denops_std@v3.5.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 type PreviewParams = {
