@@ -92,9 +92,10 @@ export class Ui extends BaseUi<Params> {
     this.filterBufnr = -1;
   }
 
-  refreshItems(args: {
+  // deno-lint-ignore require-await
+  async refreshItems(args: {
     items: DduItem[];
-  }): void {
+  }): Promise<void> {
     // Note: Use only 1000 items
     this.prevLength = this.items.length;
     this.items = args.items.slice(0, 1000);
@@ -561,6 +562,13 @@ export class Ui extends BaseUi<Params> {
       });
 
       return ActionFlags.None;
+    },
+    // deno-lint-ignore require-await
+    clearSelectAllItems: async (_: {
+      denops: Denops;
+    }) => {
+      this.selectedItems.clear();
+      return ActionFlags.Redraw;
     },
     itemAction: async (args: {
       denops: Denops;

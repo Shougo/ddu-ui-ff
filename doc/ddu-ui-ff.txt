@@ -49,6 +49,18 @@ ddu#ui#ff#do_action({action-name}[, {params}])
 		{args} behavior depends on {action-name}.
 		Note: It can be called in the filter window or UI window.
 
+						*ddu#ui#ff#multi_actions()*
+ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
+		Fire multiple actions.
+
+		Example: >
+
+		nnoremap <buffer> c
+		\ <Cmd>call ddu#ui#ff#multi_actions([
+		\ ['itemAction', {'name': 'copy'}],
+		\ ['clearSelectAllItems'],
+		\ ])<CR>
+<
 						*ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
@@ -62,6 +74,10 @@ chooseAction
 
 		Note: "ddu-source-action" is required.
 		https://github.com/Shougo/ddu-source-action
+
+					*ddu-ui-ff-action-clearSelectAllItems*
+clearSelectAllItems
+		Clear all selected items.
 
 						*ddu-ui-ff-action-itemAction*
 itemAction
