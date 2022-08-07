@@ -355,19 +355,15 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions;
     uiParams: Params;
   }): Promise<void> {
-    const ft = await op.filetype.getLocal(args.denops);
-    if (ft == "ddu-ff-filter") {
-      // Close filter window and move to the UI window.
-      await args.denops.cmd("close!");
-      const parentId = await vars.g.get(
-        args.denops,
-        "ddu#ui#ff#_filter_parent_winid",
-        -1,
-      );
-      await fn.win_gotoid(args.denops, parentId);
-    }
-
     await this.previewUi.close(args.denops);
+    await this.closeFilterWindow(args.denops);
+
+    // Move to the UI window.
+    const bufnr = this.buffers[args.options.name];
+    await fn.win_gotoid(
+      args.denops,
+      await fn.bufwinid(args.denops, bufnr)
+    );
 
     await vars.b.set(
       args.denops,
