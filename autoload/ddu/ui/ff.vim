@@ -232,17 +232,27 @@ function! s:getcurpos(winid) abort
   return cursor
 endfunction
 
-let s:cursor_row = -1
+let s:cursor_text = ''
 let s:auto_action = {}
 function! ddu#ui#ff#_do_auto_action() abort
-  let line = line('.')
-  if line != s:cursor_row
+  if empty(s:auto_action)
+    return
+  endif
+
+  let winid =
+        \ (&l:filetype ==# 'ddu-ff'
+        \  || !exists('g:ddu#ui#ff#_filter_parent_winid')) ?
+        \ win_getid() : g:ddu#ui#ff#_filter_parent_winid
+  let bufnr = winbufnr(winid)
+
+  let text = getbufline(bufnr, s:getcurpos(winid)[1])[0]
+  if text != s:cursor_text
     call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
-    let s:cursor_row = line
+    let s:cursor_text = text
   endif
 endfunction
 function! ddu#ui#ff#_reset_auto_action() abort
-  let s:cursor_row = -1
+  let s:cursor_text = ''
   let s:auto_action = {}
   augroup ddu-ui-auto_action
     autocmd!

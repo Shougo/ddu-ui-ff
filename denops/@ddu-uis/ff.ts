@@ -344,6 +344,8 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
+    await args.denops.call("ddu#ui#ff#_do_auto_action");
+
     this.buffers[args.options.name] = bufnr;
 
     this.refreshed = false;

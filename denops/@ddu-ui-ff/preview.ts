@@ -32,7 +32,7 @@ export class PreviewUi {
   private previewBufnrs: Set<number> = new Set();
 
   async close(denops: Denops) {
-    if (this.previewWinId > 0) {
+    if (this.previewWinId > 0 && (await fn.winnr(denops, "$")) != 1) {
       const saveId = await fn.win_getid(denops);
       await batch(denops, async (denops) => {
         await fn.win_gotoid(denops, this.previewWinId);
