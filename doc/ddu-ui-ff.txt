@@ -505,6 +505,11 @@ Q: |:close| does not move to the ddu-ui-ff window sometimes.
 
 A: Please use |ddu#ui#ff#close()| instead.
 
+Q: I want to toggle selected items in visual mode.
+
+A: >
+	xnoremap <silent><buffer> <Space>
+	\ :call ddu#ui#ff#do_action('toggleSelectItem')<CR>
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
