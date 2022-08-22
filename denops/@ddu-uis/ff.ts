@@ -110,6 +110,11 @@ export class Ui extends BaseUi<Params> {
     uiOptions: UiOptions;
     uiParams: Params;
   }): Promise<void> {
+    if (args.options.sync && !args.context.done) {
+      // Skip redraw if all items are not done
+      return;
+    }
+
     if (this.items.length == 0) {
       // Close preview window when empty items
       await this.previewUi.close(args.denops);
