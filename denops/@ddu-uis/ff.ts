@@ -522,7 +522,8 @@ export class Ui extends BaseUi<Params> {
       );
       await denops.cmd(
         `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
-          " let &titlestring=b:ddu_ui_ff_title",
+          " let &titlestring = " +
+          "getbufvar(str2nr(expand('<abuf>')), 'ddu_ui_ff_title')",
       );
     } else {
       await fn.setwinvar(
