@@ -76,6 +76,7 @@ export class Ui extends BaseUi<Params> {
   private buffers: Record<string, number> = {};
   private filterBufnr = -1;
   private items: DduItem[] = [];
+  private viewItems: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
   private saveMode = "";
   private checkEnd = false;
@@ -280,6 +281,11 @@ export class Ui extends BaseUi<Params> {
       cursorPos,
     );
 
+    this.viewItems = Array.from(this.items);
+    if (args.uiParams.reversed) {
+      this.viewItems = this.viewItems.reverse();
+    }
+
     await args.denops.call(
       "ddu#ui#ff#_highlight_items",
       args.uiParams,
@@ -369,7 +375,7 @@ export class Ui extends BaseUi<Params> {
     const bufnr = this.buffers[args.options.name];
     await fn.win_gotoid(
       args.denops,
-      await fn.bufwinid(args.denops, bufnr)
+      await fn.bufwinid(args.denops, bufnr),
     );
 
     await vars.b.set(
@@ -429,15 +435,23 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#event", args.options.name, "close");
   }
 
-  private async getItem(denops: Denops, uiParams: Params): Promise<DduItem> {
+  private async getItem(
+    denops: Denops,
+    uiParams: Params,
+  ): null | Promise<DduItem> {
     const idx = await this.getIndex(denops, uiParams);
-    return this.items[idx];
+    return idx >= 0 ? this.items[idx] : null;
   }
 
   private async getItems(denops: Denops, uiParams: Params): Promise<DduItem[]> {
     let items: DduItem[];
     if (this.selectedItems.size == 0) {
-      items = [await this.getItem(denops, uiParams)];
+      const item = await this.getItem(denops, uiParams);
+      if (!item) {
+        return [];
+      }
+
+      items = [item];
     } else {
       items = [...this.selectedItems].map((i) => this.items[i]);
     }
@@ -624,10 +638,15 @@ export class Ui extends BaseUi<Params> {
       actionParams: unknown;
     }) => {
       const idx = await this.getIndex(args.denops, args.uiParams);
+      if (idx < 0) {
+        return ActionFlags.None;
+      }
+
       const item = this.items[idx];
       if (!item) {
         return ActionFlags.None;
       }
+
       return this.previewUi.preview(
         args.denops,
         args.context,
@@ -685,11 +704,11 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      if (this.items.length == 0) {
+      const idx = await this.getIndex(args.denops, args.uiParams);
+      if (idx < 0) {
         return ActionFlags.None;
       }
 
-      const idx = await this.getIndex(args.denops, args.uiParams);
       if (this.selectedItems.has(idx)) {
         this.selectedItems.delete(idx);
       } else {
@@ -815,9 +834,14 @@ export class Ui extends BaseUi<Params> {
       "ddu#ui#ff#_filter_parent_winid",
       -1,
     );
+
     const idx = ft == "ddu-ff"
       ? (await fn.line(denops, ".")) - 1
       : (await denops.call("line", ".", parentId) as number) - 1;
-    return uiParams.reversed ? this.items.length - 1 - idx : idx;
+
+    const viewItem = this.viewItems[idx];
+    return this.items.findIndex(
+      (item: DduItem) => item == viewItem,
+    );
   }
 }
