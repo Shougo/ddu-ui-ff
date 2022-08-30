@@ -438,7 +438,7 @@ export class Ui extends BaseUi<Params> {
   private async getItem(
     denops: Denops,
     uiParams: Params,
-  ): null | Promise<DduItem> {
+  ): Promise<DduItem | null> {
     const idx = await this.getIndex(denops, uiParams);
     return idx >= 0 ? this.items[idx] : null;
   }
@@ -734,7 +734,7 @@ export class Ui extends BaseUi<Params> {
     return {
       autoAction: {},
       autoResize: false,
-      cursorPos: -1,
+      cursorPos: 0,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
