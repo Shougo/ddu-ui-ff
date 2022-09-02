@@ -344,7 +344,7 @@ export class PreviewUi {
 }
 
 const exists = async (path: string) => {
-  // Note: Deno.stat() may be failed
+  // NOTE: Deno.stat() may be failed
   try {
     if (await Deno.stat(path)) {
       return true;
@@ -357,7 +357,7 @@ const exists = async (path: string) => {
 };
 
 const isDirectory = async (path: string) => {
-  // Note: Deno.stat() may be failed
+  // NOTE: Deno.stat() may be failed
   try {
     if ((await Deno.stat(path)).isDirectory) {
       return true;

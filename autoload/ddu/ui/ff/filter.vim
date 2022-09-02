@@ -36,7 +36,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   autocmd ddu-ff-filter BufLeave <buffer> ++once
         \ let &whichwrap = s:save_whichwrap
 
-  " Note: prompt must set after cursor move
+  " NOTE: prompt must set after cursor move
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt,
@@ -48,7 +48,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   if has('nvim')
     startinsert!
   else
-    " Note: startinsert! does not work in Vim
+    " NOTE: startinsert! does not work in Vim
     call feedkeys('A', 'n')
   endif
 
@@ -84,7 +84,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     let col = winpos[1] - 1
   endif
 
-  " Note: relative: win does not work for resume feature
+  " NOTE: relative: win does not work for resume feature
   let params = {
         \ 'relative': 'editor',
         \ 'row': row,

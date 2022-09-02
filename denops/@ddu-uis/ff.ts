@@ -97,7 +97,7 @@ export class Ui extends BaseUi<Params> {
   async refreshItems(args: {
     items: DduItem[];
   }): Promise<void> {
-    // Note: Use only 1000 items
+    // NOTE: Use only 1000 items
     this.prevLength = this.items.length;
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
@@ -223,7 +223,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    // Note: buffers may be restored
+    // NOTE: buffers may be restored
     if (!this.buffers[args.options.name] || winid < 0) {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }

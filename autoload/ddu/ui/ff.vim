@@ -34,10 +34,11 @@ function! ddu#ui#ff#execute(command) abort
   let winid = g:ddu#ui#ff#_filter_parent_winid
   let prev_curpos = s:getcurpos(winid)
 
-  call win_execute(winid, a:command . ' | redraw')
+  " NOTE: redraw! is needed
+  call win_execute(winid, a:command . ' | redraw!')
 
   if s:getcurpos(winid) != prev_curpos && !empty(s:auto_action)
-    " Note: CursorMoved autocmd does not work when cursor()
+    " NOTE: CursorMoved autocmd does not work when cursor()
     call win_execute(winid, 'silent! doautocmd CursorMoved')
   endif
 endfunction
@@ -117,7 +118,7 @@ function! ddu#ui#ff#_highlight_items(
   endfor
 
   if !has('nvim')
-    " Note: :redraw is needed for Vim
+    " NOTE: :redraw is needed for Vim
     redraw
   endif
 endfunction
@@ -224,7 +225,7 @@ function! s:getcurpos(winid) abort
     return getcurpos(a:winid)
   endif
 
-  " Note: Old neovim does not support getcurpos({winid})
+  " NOTE: Old neovim does not support getcurpos({winid})
   let prev_winid = win_getid()
   call win_gotoid(a:winid)
   let cursor = getcurpos()

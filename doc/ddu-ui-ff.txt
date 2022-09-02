@@ -47,7 +47,7 @@ ddu#ui#ff#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
 		actions list in |ddu-ui-ff-actions|.
 		{args} behavior depends on {action-name}.
-		Note: It can be called in the filter window or UI window.
+		NOTE: It can be called in the filter window or UI window.
 
 						*ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
@@ -72,7 +72,7 @@ ACTIONS						*ddu-ui-ff-actions*
 chooseAction
 		Choose and fire the action.
 
-		Note: "ddu-source-action" is required.
+		NOTE: "ddu-source-action" is required.
 		https://github.com/Shougo/ddu-source-action
 
 					*ddu-ui-ff-action-clearSelectAllItems*
@@ -89,7 +89,7 @@ itemAction
 		You can find the actions list in item's kind documentation.
 		If {name} is empty, "default" will be used.
 
-		Note: You cannot mix multiple kinds/sources.
+		NOTE: You cannot mix multiple kinds/sources.
 
 					*ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
@@ -176,7 +176,7 @@ floatingBorder		(string | list)
 		Specify the style of window border if |ddu-ui-ff-param-split|
 		is "floating".
 		See |nvim_open_win()| for the detail.
-		Note: It is neovim only.
+		NOTE: It is neovim only.
 
 		Default: "none"
 
@@ -189,7 +189,7 @@ filterFloatingPosition	(string)
 		If {position} is "top", the filter will be displayed at the
 		top.
 
-		Note: To use it, you need to use neovim and
+		NOTE: To use it, you need to use neovim and
 		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
 
 		Default: "bottom"
@@ -203,7 +203,7 @@ filterSplitDirection	(string)
 		overwrites statusline. Otherwise, it is located one line below
 		statusline.
 
-		Note: To use "floating", you need to use neovim.
+		NOTE: To use "floating", you need to use neovim.
 
 		Default: "botright"
 
@@ -257,7 +257,7 @@ previewFloatingBorder		(string | list)
 		Specify the style of the preview window border if
 		|ddu-ui-ff-param-previewFloating| is v:true.
 		See |nvim_open_win()| for the detail.
-		Note: It is neovim only.
+		NOTE: It is neovim only.
 
 		Default: "none"
 
@@ -296,14 +296,14 @@ previewWidth	(number)
 				    		*ddu-ui-ff-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
-		Note: It must be one or two width characters.
+		NOTE: It must be one or two width characters.
 
 		Default: ""
 
 				    		*ddu-ui-ff-param-reversed*
 reversed	(boolean)
 		Display the items in reversed order.
-		Note: It may increase screen flicker.  Because the cursor must
+		NOTE: It may increase screen flicker.  Because the cursor must
 		be moved if you narrowing text.
 
 		Default: v:false
