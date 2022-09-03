@@ -81,12 +81,6 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   elseif a:params.reversed
     call win_execute(winid, 'normal! zb')
   endif
-
-  let cursor_line = get(getbufline(a:bufnr, s:getcurpos(winid)[1]), 0, '')
-  if !empty(s:auto_action) && prev_cursor_line !=# cursor_line
-    " Execute autoAction
-    call win_execute(winid, 'silent! doautocmd CursorMoved')
-  endif
 endfunction
 
 function! ddu#ui#ff#_highlight_items(
@@ -268,9 +262,17 @@ endfunction
 function! ddu#ui#ff#_cursor(line, col) abort
   if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     call cursor(a:line, a:col)
+    normal! zb
   else
     let winid = g:ddu#ui#ff#_filter_parent_winid
-    call win_execute(winid, printf('call cursor(%d, %d) | redraw',
+    call win_execute(winid, printf('call cursor(%d, %d) | normal! zb',
           \ a:line, a:col))
   endif
+endfunction
+
+function! ddu#ui#ff#_save_cursor() abort
+  let b:ddu_ui_ff_save_cursor = {
+        \ 'pos': getcurpos(),
+        \ 'text': getline('.'),
+        \ }
 endfunction

@@ -158,7 +158,7 @@ autoResize	(boolean)
 cursorPos	(number)
 		Select {number} candidate.
 
-		Default: 0
+		Default: -1
 
 				    	*ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)

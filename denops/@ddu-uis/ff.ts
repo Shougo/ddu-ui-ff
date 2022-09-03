@@ -42,6 +42,11 @@ type FloatingBorder =
   | "shadow"
   | string[];
 
+type SaveCursor = {
+  pos: number[];
+  text: string;
+};
+
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
@@ -228,6 +233,12 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
+    const augroupName = `${await op.filetype.getLocal(
+      args.denops,
+    )}-${args.options.name}`;
+    await args.denops.cmd(`augroup ${augroupName}`);
+    await args.denops.cmd(`autocmd! ${augroupName}`);
+
     await this.setStatusline(
       args.denops,
       args.context,
@@ -236,6 +247,7 @@ export class Ui extends BaseUi<Params> {
       bufnr,
       hasNvim,
       floating,
+      augroupName,
     );
 
     // Update main buffer
@@ -257,13 +269,13 @@ export class Ui extends BaseUi<Params> {
     const saveCursor = await fn.getbufvar(
       args.denops,
       bufnr,
-      "ddu_ui_ff_cursor_pos",
-      [],
-    ) as number[];
+      "ddu_ui_ff_save_cursor",
+      { pos: [], text: "" },
+    ) as SaveCursor;
     const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
       ? args.uiParams.cursorPos
-      : saveCursor.length != 0
-      ? saveCursor[1] - 1
+      : saveCursor.pos.length != 0
+      ? saveCursor.pos[1] - 1
       : 0;
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
@@ -301,6 +313,12 @@ export class Ui extends BaseUi<Params> {
       [...this.selectedItems],
     );
 
+    // Save cursor when cursor moved
+    await args.denops.cmd(
+      `autocmd ${augroupName} CursorMoved <buffer>` +
+        " call ddu#ui#ff#_save_cursor()",
+    );
+
     if (this.filterBufnr < 0 || winid < 0) {
       if (args.uiParams.startFilter) {
         this.filterBufnr = await args.denops.call(
@@ -315,43 +333,25 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    const saveText = await fn.getbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_ff_cursor_text",
-      "",
-    ) as string;
     let currentText = "";
-    if (saveCursor.length != 0) {
-      const buflines = await fn.getbufline(args.denops, bufnr, saveCursor[1]);
+    if (saveCursor.pos.length != 0) {
+      const buflines = await fn.getbufline(
+        args.denops,
+        bufnr,
+        saveCursor.pos[1],
+      );
       if (buflines.length != 0) {
         currentText = buflines[0];
       }
     }
     if (
-      (args.options.resume || !refreshed) &&
-      saveCursor.length != 0 && this.items.length != 0 &&
-      currentText == saveText
+      saveCursor.pos.length != 0 && this.items.length != 0 &&
+      currentText == saveCursor.text
     ) {
       await args.denops.call(
         "ddu#ui#ff#_cursor",
-        saveCursor[1],
-        saveCursor[2],
-      );
-    }
-
-    if (cursorPos > 0) {
-      await fn.setbufvar(
-        args.denops,
-        bufnr,
-        "ddu_ui_ff_cursor_pos",
-        await fn.getcurpos(args.denops),
-      );
-      await fn.setbufvar(
-        args.denops,
-        bufnr,
-        "ddu_ui_ff_cursor_text",
-        await fn.getline(args.denops, "."),
+        saveCursor.pos[1],
+        saveCursor.pos[2],
       );
     }
 
@@ -376,17 +376,6 @@ export class Ui extends BaseUi<Params> {
     await fn.win_gotoid(
       args.denops,
       await fn.bufwinid(args.denops, bufnr),
-    );
-
-    await vars.b.set(
-      args.denops,
-      "ddu_ui_ff_cursor_pos",
-      await fn.getcurpos(args.denops),
-    );
-    await vars.b.set(
-      args.denops,
-      "ddu_ui_ff_cursor_text",
-      await fn.getline(args.denops, "."),
     );
 
     await this.closeFilterWindow(args.denops);
@@ -437,16 +426,15 @@ export class Ui extends BaseUi<Params> {
 
   private async getItem(
     denops: Denops,
-    uiParams: Params,
   ): Promise<DduItem | null> {
-    const idx = await this.getIndex(denops, uiParams);
+    const idx = await this.getIndex(denops);
     return idx >= 0 ? this.items[idx] : null;
   }
 
-  private async getItems(denops: Denops, uiParams: Params): Promise<DduItem[]> {
+  private async getItems(denops: Denops): Promise<DduItem[]> {
     let items: DduItem[];
     if (this.selectedItems.size == 0) {
-      const item = await this.getItem(denops, uiParams);
+      const item = await this.getItem(denops);
       if (!item) {
         return [];
       }
@@ -467,6 +455,7 @@ export class Ui extends BaseUi<Params> {
     bufnr: number,
     hasNvim: boolean,
     floating: boolean,
+    augroupName: string,
   ): Promise<void> {
     const statusState = {
       done: context.done,
@@ -500,11 +489,6 @@ export class Ui extends BaseUi<Params> {
         await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
       }
 
-      const augroupName = `${await op.filetype.getLocal(
-        denops,
-      )}-${options.name}`;
-      await denops.cmd(`augroup ${augroupName}`);
-      await denops.cmd(`autocmd! ${augroupName}`);
       if (await fn.exists(denops, "##WinClosed")) {
         await denops.cmd(
           `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
@@ -552,7 +536,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       await this.closeFilterWindow(args.denops);
 
-      const items = await this.getItems(args.denops, args.uiParams);
+      const items = await this.getItems(args.denops);
       if (items.length == 0) {
         return ActionFlags.None;
       }
@@ -595,10 +579,7 @@ export class Ui extends BaseUi<Params> {
       actionParams: unknown;
     }) => {
       const params = args.actionParams as DoActionParams;
-      const items = params.items ?? await this.getItems(
-        args.denops,
-        args.uiParams,
-      );
+      const items = params.items ?? await this.getItems(args.denops);
       if (items.length == 0) {
         return ActionFlags.None;
       }
@@ -638,7 +619,7 @@ export class Ui extends BaseUi<Params> {
       uiParams: Params;
       actionParams: unknown;
     }) => {
-      const idx = await this.getIndex(args.denops, args.uiParams);
+      const idx = await this.getIndex(args.denops);
       if (idx < 0) {
         return ActionFlags.None;
       }
@@ -705,7 +686,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      const idx = await this.getIndex(args.denops, args.uiParams);
+      const idx = await this.getIndex(args.denops);
       if (idx < 0) {
         return ActionFlags.None;
       }
@@ -734,7 +715,7 @@ export class Ui extends BaseUi<Params> {
     return {
       autoAction: {},
       autoResize: false,
-      cursorPos: 0,
+      cursorPos: -1,
       displaySourceName: "no",
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
@@ -827,7 +808,6 @@ export class Ui extends BaseUi<Params> {
 
   private async getIndex(
     denops: Denops,
-    uiParams: Params,
   ): Promise<number> {
     const ft = await op.filetype.getLocal(denops);
     const parentId = await vars.g.get(
