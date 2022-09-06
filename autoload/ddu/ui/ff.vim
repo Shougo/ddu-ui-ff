@@ -34,8 +34,7 @@ function! ddu#ui#ff#execute(command) abort
   let winid = g:ddu#ui#ff#_filter_parent_winid
   let prev_curpos = s:getcurpos(winid)
 
-  " NOTE: redraw! is needed
-  call win_execute(winid, a:command . ' | redraw!')
+  call win_execute(winid, a:command)
 
   if s:getcurpos(winid) != prev_curpos && !empty(s:auto_action)
     " NOTE: CursorMoved autocmd does not work when cursor()

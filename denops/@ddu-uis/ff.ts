@@ -389,7 +389,7 @@ export class Ui extends BaseUi<Params> {
           : `buffer ${args.context.bufNr}`,
       );
     } else {
-      await args.denops.cmd("close!");
+      await args.denops.cmd("silent! close!");
       await fn.win_gotoid(args.denops, args.context.winId);
     }
 
@@ -523,7 +523,7 @@ export class Ui extends BaseUi<Params> {
     if (this.filterBufnr > 0) {
       const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
       if (filterWinNr > 0) {
-        await denops.cmd(`close! ${filterWinNr}`);
+        await denops.cmd(`silent! close! ${filterWinNr}`);
       }
     }
   }
