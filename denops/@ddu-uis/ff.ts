@@ -266,16 +266,8 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const saveCursor = await fn.getbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_ff_save_cursor",
-      { pos: [], text: "" },
-    ) as SaveCursor;
     const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
       ? args.uiParams.cursorPos
-      : saveCursor.pos.length != 0
-      ? saveCursor.pos[1] - 1
       : 0;
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
@@ -333,6 +325,12 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
+    const saveCursor = await fn.getbufvar(
+      args.denops,
+      bufnr,
+      "ddu_ui_ff_save_cursor",
+      { pos: [], text: "" },
+    ) as SaveCursor;
     let currentText = "";
     if (saveCursor.pos.length != 0) {
       const buflines = await fn.getbufline(
