@@ -64,6 +64,8 @@ ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 						*ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
+		Note: It does not execute |:redraw| automatically.
+		You need to execute |:redraw| if needed.
 
 ------------------------------------------------------------------------------
 ACTIONS						*ddu-ui-ff-actions*
@@ -430,9 +432,11 @@ must force this behaviour.
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <C-j>
-	  \ <Cmd>call ddu#ui#ff#execute("call cursor(line('.')+1,0)")<CR>
+	  \ <Cmd>call ddu#ui#ff#execute(
+	  \ "call cursor(line('.')+1,0) | redraw")<CR>
 	  inoremap <buffer> <C-k>
-	  \ <Cmd>call ddu#ui#ff#execute("call cursor(line('.')-1,0)")<CR>
+	  \ <Cmd>call ddu#ui#ff#execute(
+	  \ "call cursor(line('.')-1,0) | redraw")<CR>
 	endfunction
 <
 Q: I want to define |ddu-option-name| depend key mappings.
@@ -511,8 +515,16 @@ A: >
 	xnoremap <silent><buffer> <Space>
 	\ :call ddu#ui#ff#do_action('toggleSelectItem')<CR>
 
+Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
+
+A: It is feature.  Because it increases screen flicker.
+You need to add |:redraw| command manually if needed.
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2022.09.06
+* "ddu#ui#ff#execute()" does not execute ":redraw" automatically.
 
 2022.02.07
 * Rename to "ff".
@@ -521,7 +533,7 @@ COMPATIBILITY					*ddu-ui-ff-compatibility*
 * Rename "filterPosition" to "filterFloatingPosition".
 
 2022.01.29
-* Rename ddu#ui#ff#do_map() to ddu#ui#ff#do_action().
+* Rename "ddu#ui#ff#do_map()" to "ddu#ui#ff#do_action()".
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:noet:fen:noet:
