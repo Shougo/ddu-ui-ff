@@ -353,8 +353,6 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    await args.denops.call("ddu#ui#ff#_do_auto_action");
-
     this.buffers[args.options.name] = bufnr;
 
     this.refreshed = false;
@@ -814,13 +812,12 @@ export class Ui extends BaseUi<Params> {
       -1,
     );
 
-    const idx = ft == "ddu-ff"
+    const idx = ft == "ddu-ff" || parentId >= 0
       ? (await fn.line(denops, ".")) - 1
       : (await denops.call("line", ".", parentId) as number) - 1;
-
-    const viewItem = this.viewItems[idx];
-    return this.items.findIndex(
-      (item: DduItem) => item == viewItem,
-    );
+      const viewItem = this.viewItems[idx];
+      return this.items.findIndex(
+        (item: DduItem) => item == viewItem,
+      );
   }
 }
