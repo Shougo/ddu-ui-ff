@@ -812,12 +812,12 @@ export class Ui extends BaseUi<Params> {
       -1,
     );
 
-    const idx = ft == "ddu-ff" || parentId >= 0
+    const idx = ft == "ddu-ff"
       ? (await fn.line(denops, ".")) - 1
       : (await denops.call("line", ".", parentId) as number) - 1;
-      const viewItem = this.viewItems[idx];
-      return this.items.findIndex(
-        (item: DduItem) => item == viewItem,
-      );
+    const viewItem = this.viewItems[idx];
+    return this.items.findIndex(
+      (item: DduItem) => item == viewItem,
+    );
   }
 }
