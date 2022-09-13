@@ -14,6 +14,7 @@ import {
   Denops,
   ensureObject,
   fn,
+  op,
 } from "https://deno.land/x/ddu_vim@v1.8.8/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v3.8.1/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
@@ -218,6 +219,9 @@ export class PreviewUi {
     } else {
       await denops.cmd(`buffer ${bufname}`);
     }
+
+    // Set previewwindow option.
+    await op.previewwindow.setLocal(denops, true);
 
     const previewBufnr = await fn.bufnr(denops) as number;
     await this.highlight(denops, previewer, previewBufnr);
