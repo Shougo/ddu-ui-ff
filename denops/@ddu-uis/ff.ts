@@ -272,18 +272,29 @@ export class Ui extends BaseUi<Params> {
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
       (args.uiParams.reversed && this.items.length != this.prevLength));
-    await args.denops.call(
-      "ddu#ui#ff#_update_buffer",
-      args.uiParams,
-      bufnr,
-      this.items.map((c) =>
-        promptPrefix +
-        `${getSourceName(c.__sourceName)}` +
-        (c.display ?? c.word)
-      ),
-      refreshed,
-      cursorPos,
-    );
+
+    // Update main buffer
+    try {
+      await args.denops.call(
+        "ddu#ui#ff#_update_buffer",
+        args.uiParams,
+        bufnr,
+        this.items.map(
+          (c) =>
+            promptPrefix + `${getSourceName(c.__sourceName)}` +
+            (c.display ?? c.word),
+        ),
+        refreshed,
+        cursorPos,
+      );
+    } catch (e) {
+      await errorException(
+        args.denops,
+        e,
+        "[ddu-ui-ff] update buffer failed",
+      );
+      return;
+    }
 
     this.viewItems = Array.from(this.items);
     if (args.uiParams.reversed) {
@@ -819,5 +830,24 @@ export class Ui extends BaseUi<Params> {
     return this.items.findIndex(
       (item: DduItem) => item == viewItem,
     );
+  }
+}
+
+async function errorException(denops: Denops, e: unknown, message: string) {
+  await denops.call(
+    "ddu#util#print_error",
+    message,
+  );
+  if (e instanceof Error) {
+    await denops.call(
+      "ddu#util#print_error",
+      e.message,
+    );
+    if (e.stack) {
+      await denops.call(
+        "ddu#util#print_error",
+        e.stack,
+      );
+    }
   }
 }
