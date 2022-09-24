@@ -38,7 +38,7 @@ function! ddu#ui#ff#execute(command) abort
 
   if s:getcurpos(winid) != prev_curpos
     " NOTE: CursorMoved autocmd does not work when cursor()
-    call win_execute(winid, 'doautocmd CursorMoved', 'silent')
+    call win_execute(winid, 'doautocmd CursorMoved')
   endif
 endfunction
 
