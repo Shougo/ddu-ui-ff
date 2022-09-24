@@ -322,20 +322,6 @@ export class Ui extends BaseUi<Params> {
         " call ddu#ui#ff#_save_cursor()",
     );
 
-    if (this.filterBufnr < 0 || winid < 0) {
-      if (args.uiParams.startFilter) {
-        this.filterBufnr = await args.denops.call(
-          "ddu#ui#ff#filter#_open",
-          args.options.name,
-          args.context.input,
-          this.filterBufnr,
-          args.uiParams,
-        ) as number;
-      } else {
-        await args.denops.cmd("stopinsert");
-      }
-    }
-
     const saveCursor = await fn.getbufvar(
       args.denops,
       bufnr,
@@ -362,6 +348,20 @@ export class Ui extends BaseUi<Params> {
         saveCursor.pos[1],
         saveCursor.pos[2],
       );
+    }
+
+    if (this.filterBufnr < 0 || winid < 0) {
+      if (args.uiParams.startFilter) {
+        this.filterBufnr = await args.denops.call(
+          "ddu#ui#ff#filter#_open",
+          args.options.name,
+          args.context.input,
+          this.filterBufnr,
+          args.uiParams,
+        ) as number;
+      } else {
+        await args.denops.cmd("stopinsert");
+      }
     }
 
     this.buffers[args.options.name] = bufnr;
