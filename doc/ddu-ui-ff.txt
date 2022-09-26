@@ -433,10 +433,10 @@ must force this behaviour.
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <C-j>
 	  \ <Cmd>call ddu#ui#ff#execute(
-	  \ "call cursor(line('.')+1,0) | redraw")<CR>
+	  \ "call cursor(line('.')+1,0)<Bar>redraw")<CR>
 	  inoremap <buffer> <C-k>
 	  \ <Cmd>call ddu#ui#ff#execute(
-	  \ "call cursor(line('.')-1,0) | redraw")<CR>
+	  \ "call cursor(line('.')-1,0)<Bar>redraw")<CR>
 	endfunction
 <
 Q: I want to define |ddu-option-name| depend key mappings.
