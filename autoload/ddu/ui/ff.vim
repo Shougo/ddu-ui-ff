@@ -173,13 +173,14 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
       endif
 
       call nvim_win_set_config(win_getid(), {
-           \ 'relative': 'editor',
-           \ 'row': win_row,
-           \ 'col': win_col,
-           \ 'width': preview_width,
-           \ 'height': preview_height,
-           \ 'border': a:params.previewFloatingBorder,
-           \ })
+            \ 'relative': 'editor',
+            \ 'row': win_row,
+            \ 'col': win_col,
+            \ 'width': preview_width,
+            \ 'height': preview_height,
+            \ 'border': a:params.previewFloatingBorder,
+            \ 'zindex': a:params.previewFloatingZindex,
+            \ })
     else
       execute 'vert resize ' . preview_width
     endif
@@ -206,6 +207,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
             \ 'width': preview_width,
             \ 'height': preview_height,
             \ 'border': a:params.previewFloatingBorder,
+            \ 'zindex': a:params.previewFloatingZindex,
             \ })
     else
       execute 'resize ' . preview_height

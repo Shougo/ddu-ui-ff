@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.8.8/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.11.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.8.8/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.11.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -65,6 +65,7 @@ export type Params = {
   previewVertical: boolean;
   previewWidth: number;
   previewFloatingBorder: FloatingBorder;
+  previewFloatingZindex: number;
   prompt: string;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
@@ -737,6 +738,7 @@ export class Ui extends BaseUi<Params> {
       previewVertical: false,
       previewWidth: 40,
       previewFloatingBorder: "none",
+      previewFloatingZindex: 50,
       prompt: "",
       reversed: false,
       split: "horizontal",

@@ -175,8 +175,8 @@ displaySourceName	(string)
 
 			    	*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
-		Specify the style of window border if |ddu-ui-ff-param-split|
-		is "floating".
+		Specify the style of the window border if
+		|ddu-ui-ff-param-split| is "floating".
 		See |nvim_open_win()| for the detail.
 		NOTE: It is neovim only.
 
@@ -263,6 +263,15 @@ previewFloatingBorder		(string | list)
 
 		Default: "none"
 
+			    	*ddu-ui-ff-param-previewFloatingZindex*
+previewFloatingZindex		(number)
+		Specify the style of the preview window zindex if
+		|ddu-ui-ff-param-split| is "floating".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: 50
+
 					*ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in
@@ -335,7 +344,7 @@ startFilter	(boolean)
 
 				    		*ddu-ui-ff-param-statusline*
 statusline	(boolean)
-		If it is true, the original |statusline| value is set on the
+		If it is true, the original 'statusline' value is set on the
 		buffer.
 
 		Default: v:true
