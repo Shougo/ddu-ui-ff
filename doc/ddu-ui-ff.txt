@@ -110,6 +110,11 @@ preview
 
 		Preview the item in preview window.
 
+					*ddu-ui-ff-action-previewPath*
+previewPath
+
+		Preview the item path in preview window.
+
 						*ddu-ui-ff-action-quit*
 quit
 		Quit the UI window.

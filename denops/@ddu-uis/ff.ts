@@ -637,12 +637,37 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      return this.previewUi.preview(
+      return this.previewUi.previewContents(
         args.denops,
         args.context,
         args.options,
         args.uiParams,
         args.actionParams,
+        this.buffers[args.options.name],
+        item,
+      );
+    },
+    previewPath: async (args: {
+      denops: Denops;
+      context: Context;
+      options: DduOptions;
+      uiParams: Params;
+      actionParams: unknown;
+    }) => {
+      const idx = await this.getIndex(args.denops);
+      if (idx < 0) {
+        return ActionFlags.None;
+      }
+
+      const item = this.items[idx];
+      if (!item) {
+        return ActionFlags.None;
+      }
+
+      return this.previewUi.previewPath(
+        args.denops,
+        args.context,
+        args.uiParams,
         this.buffers[args.options.name],
         item,
       );
