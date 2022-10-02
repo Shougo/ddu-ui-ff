@@ -191,11 +191,17 @@ export class PreviewUi {
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.buflisted(denops, bufname);
     if (this.previewWinId < 0) {
-      await denops.call(
-        "ddu#ui#ff#_open_preview_window",
-        uiParams,
-        bufnr,
-      );
+      try {
+        await denops.call(
+          "ddu#ui#ff#_open_preview_window",
+          uiParams,
+          bufnr,
+        );
+      } catch (_) {
+        // Failed to open preview window
+        return ActionFlags.None;
+      }
+
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
       await fn.win_gotoid(denops, this.previewWinId);
