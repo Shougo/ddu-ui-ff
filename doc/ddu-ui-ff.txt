@@ -113,7 +113,7 @@ preview
 					*ddu-ui-ff-action-previewPath*
 previewPath
 
-		Preview the item path in preview window.
+		Preview the item path in echo area.
 
 						*ddu-ui-ff-action-quit*
 quit

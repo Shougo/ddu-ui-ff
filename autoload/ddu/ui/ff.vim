@@ -277,3 +277,7 @@ function! ddu#ui#ff#_save_cursor() abort
         \ 'text': getline('.'),
         \ }
 endfunction
+
+function! ddu#ui#ff#_echo(msg) abort
+  echo a:msg
+endfunction

@@ -129,47 +129,6 @@ export class PreviewUi {
     return ActionFlags.Persist;
   }
 
-  async previewPath(
-    denops: Denops,
-    _context: Context,
-    uiParams: Params,
-    bufnr: number,
-    item: DduItem,
-  ): Promise<ActionFlags> {
-    const action = item.action as ActionData;
-    const prevId = await fn.win_getid(denops);
-
-    // Close if the target is the same as the previous one
-    if (
-      this.previewWinId > 0 &&
-      JSON.stringify(action) == JSON.stringify(this.previewedTarget)
-    ) {
-      await this.close(denops);
-      return ActionFlags.None;
-    }
-
-    const flag = await this.previewPathBuffer(
-      denops,
-      Object.assign(uiParams, {
-        previewHeight: 1,
-        previewWidth: uiParams.previewWidth * 3,
-        previewFloating: true,
-      }),
-      bufnr,
-      item,
-    );
-    if (flag == ActionFlags.None) {
-      return flag;
-    }
-
-    const previewBufnr = await fn.bufnr(denops);
-    this.previewBufnrs.add(previewBufnr);
-    this.previewedTarget = action;
-    await fn.win_gotoid(denops, prevId);
-
-    return ActionFlags.Persist;
-  }
-
   private async previewContentsTerminal(
     denops: Denops,
     previewer: TerminalPreviewer,
@@ -272,44 +231,6 @@ export class PreviewUi {
 
     const previewBufnr = await fn.bufnr(denops) as number;
     await this.highlight(denops, previewer, previewBufnr);
-    return ActionFlags.Persist;
-  }
-
-  private async previewPathBuffer(
-    denops: Denops,
-    uiParams: Params,
-    bufnr: number,
-    item: DduItem,
-  ): Promise<ActionFlags> {
-    if (this.previewWinId < 0) {
-      try {
-        await denops.call(
-          "ddu#ui#ff#_open_preview_window",
-          uiParams,
-          bufnr,
-        );
-      } catch (_) {
-        // Failed to open preview window
-        return ActionFlags.None;
-      }
-
-      this.previewWinId = await fn.win_getid(denops) as number;
-    } else {
-      await fn.win_gotoid(denops, this.previewWinId);
-    }
-
-    const path = item.display ?? item.word;
-    const bufname = `ddu-ff:path`;
-    await denops.cmd(`edit ${bufname}`);
-    const previewBufnr = await fn.bufnr(denops) as number;
-    await batch(denops, async (denops: Denops) => {
-      await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
-      await replace(denops, previewBufnr, [path]);
-    });
-
-    // Set previewwindow option.
-    await op.previewwindow.setLocal(denops, true);
-
     return ActionFlags.Persist;
   }
 

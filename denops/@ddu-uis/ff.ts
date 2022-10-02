@@ -664,13 +664,9 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      return this.previewUi.previewPath(
-        args.denops,
-        args.context,
-        args.uiParams,
-        this.buffers[args.options.name],
-        item,
-      );
+      await args.denops.call('ddu#ui#ff#_echo', item.display ?? item.word);
+
+      return ActionFlags.Persist;
     },
     quit: async (args: {
       denops: Denops;
