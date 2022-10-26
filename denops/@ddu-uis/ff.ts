@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.11.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.12.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.11.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.12.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -45,6 +45,11 @@ type FloatingBorder =
 type SaveCursor = {
   pos: number[];
   text: string;
+};
+
+export type ActionData = {
+  isDirectory?: boolean;
+  path?: string;
 };
 
 export type Params = {
@@ -108,6 +113,32 @@ export class Ui extends BaseUi<Params> {
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
     this.refreshed = true;
+  }
+
+  async searchItem(args: {
+    denops: Denops;
+    item: DduItem;
+  }) {
+    const pos = this.items.findIndex((item) => item == args.item);
+
+    if (pos > 0) {
+      await fn.cursor(args.denops, pos + 1, 0);
+      await args.denops.cmd("normal! zz");
+    }
+  }
+
+  async searchPath(args: {
+    denops: Denops;
+    path: string;
+  }) {
+    const pos = this.items.findIndex(
+      (item) => args.path == (item?.action as ActionData).path ?? item.word,
+    );
+
+    if (pos > 0) {
+      await fn.cursor(args.denops, pos + 1, 0);
+      await args.denops.cmd("normal! zz");
+    }
   }
 
   async redraw(args: {
@@ -664,7 +695,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await args.denops.call('ddu#ui#ff#_echo', item.display ?? item.word);
+      await args.denops.call("ddu#ui#ff#_echo", item.display ?? item.word);
 
       return ActionFlags.Persist;
     },
