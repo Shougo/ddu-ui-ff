@@ -320,7 +320,12 @@ export class Ui extends BaseUi<Params> {
         this.items.map(
           (c) =>
             promptPrefix + `${getSourceName(c.__sourceName)}` +
-            (c.display ?? c.word),
+            (c.display ?? c.word) + (
+              (c.action as ActionData)?.isDirectory &&
+                !(c.display ?? c.word).endsWith("/")
+                ? "/"
+                : ""
+            ),
         ),
         refreshed,
         cursorPos,
