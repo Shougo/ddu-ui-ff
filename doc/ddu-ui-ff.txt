@@ -81,11 +81,19 @@ chooseAction
 clearSelectAllItems
 		Clear all selected items.
 
+					*ddu-ui-ff-action-collapseItem*
+collapseItem
+		Collapse the item tree.
+
 					*ddu-ui-ff-action-expandItem*
 expandItem
 		Expand the item tree.
 		mode:
 			{mode}: The supported values are:
+
+			"toggle":
+				Close the item tree if the directory is
+				opened.
 
 		maxLevel:
 			Maximum expand recursive level.

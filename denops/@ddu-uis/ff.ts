@@ -4,6 +4,7 @@ import {
   Context,
   DduItem,
   DduOptions,
+  ExpandItem,
   UiActions,
   UiOptions,
 } from "https://deno.land/x/ddu_vim@v1.12.0/types.ts";
@@ -15,6 +16,7 @@ import {
   vars,
 } from "https://deno.land/x/ddu_vim@v1.12.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
+import { dirname } from "https://deno.land/std@0.160.0/path/mod.ts";
 
 type DoActionParams = {
   name?: string;
@@ -169,6 +171,30 @@ export class Ui extends BaseUi<Params> {
       args.context.maxItems == 0
     ) {
       // Disable redraw when empty items
+      return;
+    }
+
+    let expandItems: ExpandItem[] = [];
+
+    for (const path of this.expandedPaths) {
+      const expand = this.expandPath(path);
+
+      if (expand) {
+        // Remove dup items
+        expandItems = expandItems.filter((item) => item.item != expand.item);
+        expandItems.push(expand);
+      }
+    }
+
+    if (expandItems.length != 0) {
+      // Need expand redraw
+      await args.denops.call(
+        "ddu#redraw_tree",
+        args.options.name,
+        "expand",
+        expandItems,
+      );
+
       return;
     }
 
@@ -504,6 +530,46 @@ export class Ui extends BaseUi<Params> {
     this.selectedItems.clear();
   }
 
+  // deno-lint-ignore require-await
+  async collapseItem(args: {
+    item: DduItem;
+  }) {
+    // Search index.
+    const startIndex = this.items.findIndex(
+      (item: DduItem) =>
+        (item.action as ActionData).path ==
+          (args.item.action as ActionData).path &&
+        item.__sourceIndex == args.item.__sourceIndex,
+    );
+    if (startIndex < 0) {
+      return;
+    }
+
+    const endIndex = startIndex + this.items.slice(startIndex + 1).findIndex(
+      (item: DduItem) => item.__level <= args.item.__level,
+    );
+
+    // Remove from expandedPaths
+    for (const item of this.items.slice(startIndex + 1, endIndex)) {
+      const path = (item.action as ActionData).path ?? item.word;
+      this.expandedPaths.delete(path);
+    }
+
+    if (endIndex < 0) {
+      this.items = this.items.slice(0, startIndex + 1);
+    } else {
+      this.items = this.items.slice(0, startIndex + 1).concat(
+        this.items.slice(endIndex + 1),
+      );
+    }
+
+    this.items[startIndex] = args.item;
+    const path = (args.item.action as ActionData).path ?? args.item.word;
+    this.expandedPaths.delete(path);
+
+    this.selectedItems.clear();
+  }
+
   private async getItem(
     denops: Denops,
   ): Promise<DduItem | null> {
@@ -608,6 +674,28 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
+  private async collapseItemAction(denops: Denops, options: DduOptions) {
+    const index = await this.getIndex(denops);
+    if (index < 0) {
+      return ActionFlags.None;
+    }
+
+    const closeItem = this.items[index];
+
+    if (!(closeItem.action as ActionData).isDirectory) {
+      return ActionFlags.None;
+    }
+
+    await denops.call(
+      "ddu#redraw_tree",
+      options.name,
+      "collapse",
+      [{ item: closeItem }],
+    );
+
+    return ActionFlags.None;
+  }
+
   actions: UiActions<Params> = {
     chooseAction: async (args: {
       denops: Denops;
@@ -666,6 +754,9 @@ export class Ui extends BaseUi<Params> {
       const params = args.actionParams as ExpandItemParams;
 
       if (item.__expanded) {
+        if (params.mode == "toggle") {
+          return await this.collapseItemAction(args.denops, args.options);
+        }
         return ActionFlags.None;
       }
 
@@ -951,6 +1042,29 @@ export class Ui extends BaseUi<Params> {
     return this.items.findIndex(
       (item: DduItem) => item == viewItem,
     );
+  }
+
+  private expandPath(
+    path: string,
+  ): ExpandItem | undefined {
+    let parent = path;
+    let item = undefined;
+    let maxLevel = 0;
+    while (1) {
+      item = this.items.find(
+        (item) => parent == (item?.action as ActionData).path ?? item.word,
+      );
+
+      if (parent == dirname(parent) || item) {
+        break;
+      }
+
+      parent = dirname(parent);
+      maxLevel++;
+    }
+    if (item && !item.__expanded) {
+      return { item, search: path, maxLevel };
+    }
   }
 }
 
