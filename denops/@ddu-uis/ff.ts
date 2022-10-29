@@ -52,6 +52,11 @@ export type ActionData = {
   path?: string;
 };
 
+type ExpandItemParams = {
+  mode?: "toggle";
+  maxLevel?: number;
+};
+
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
@@ -89,6 +94,7 @@ export class Ui extends BaseUi<Params> {
   private items: DduItem[] = [];
   private viewItems: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
+  private expandedPaths: Set<string> = new Set();
   private saveMode = "";
   private checkEnd = false;
   private refreshed = false;
@@ -463,6 +469,36 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#event", args.options.name, "close");
   }
 
+  // deno-lint-ignore require-await
+  async expandItem(args: {
+    uiParams: Params;
+    parent: DduItem;
+    children: DduItem[];
+  }) {
+    // Search index.
+    const index = this.items.findIndex(
+      (item: DduItem) =>
+        (item.action as ActionData).path ==
+          (args.parent.action as ActionData).path &&
+        item.__sourceIndex == args.parent.__sourceIndex,
+    );
+
+    const insertItems = args.children;
+
+    if (index >= 0) {
+      this.items = this.items.slice(0, index + 1).concat(insertItems).concat(
+        this.items.slice(index + 1),
+      );
+      this.items[index] = args.parent;
+      const path = (args.parent.action as ActionData).path ?? args.parent.word;
+      this.expandedPaths.add(path);
+    } else {
+      this.items = this.items.concat(insertItems);
+    }
+
+    this.selectedItems.clear();
+  }
+
   private async getItem(
     denops: Denops,
   ): Promise<DduItem | null> {
@@ -610,6 +646,32 @@ export class Ui extends BaseUi<Params> {
     }) => {
       this.selectedItems.clear();
       return ActionFlags.Redraw;
+    },
+    expandItem: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      const idx = await this.getIndex(args.denops);
+      if (idx < 0) {
+        return ActionFlags.None;
+      }
+
+      const item = this.items[idx];
+      const params = args.actionParams as ExpandItemParams;
+
+      if (item.__expanded) {
+        return ActionFlags.None;
+      }
+
+      await args.denops.call(
+        "ddu#redraw_tree",
+        args.options.name,
+        "expand",
+        [{ item, maxLevel: params.maxLevel ?? 0 }],
+      );
+
+      return ActionFlags.None;
     },
     itemAction: async (args: {
       denops: Denops;

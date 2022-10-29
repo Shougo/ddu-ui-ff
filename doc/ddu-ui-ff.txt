@@ -81,6 +81,16 @@ chooseAction
 clearSelectAllItems
 		Clear all selected items.
 
+					*ddu-ui-ff-action-expandItem*
+expandItem
+		Expand the item tree.
+		mode:
+			{mode}: The supported values are:
+
+		maxLevel:
+			Maximum expand recursive level.
+			If it is less than 0, infinite recursive.
+
 						*ddu-ui-ff-action-itemAction*
 itemAction
 		params:
