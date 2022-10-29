@@ -174,30 +174,6 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    let expandItems: ExpandItem[] = [];
-
-    for (const path of this.expandedPaths) {
-      const expand = this.expandPath(path);
-
-      if (expand) {
-        // Remove dup items
-        expandItems = expandItems.filter((item) => item.item != expand.item);
-        expandItems.push(expand);
-      }
-    }
-
-    if (expandItems.length != 0) {
-      // Need expand redraw
-      await args.denops.call(
-        "ddu#redraw_tree",
-        args.options.name,
-        "expand",
-        expandItems,
-      );
-
-      return;
-    }
-
     const bufferName = `ddu-ff-${args.options.name}`;
     const initialized = this.buffers[args.options.name] ||
       (await fn.bufexists(args.denops, bufferName) &&
