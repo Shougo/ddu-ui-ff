@@ -4,19 +4,17 @@ import {
   Context,
   DduItem,
   DduOptions,
-  ExpandItem,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v1.12.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v.1.13.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v1.12.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v.1.13.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
-import { dirname } from "https://deno.land/std@0.160.0/path/mod.ts";
 
 type DoActionParams = {
   name?: string;
@@ -47,11 +45,6 @@ type FloatingBorder =
 type SaveCursor = {
   pos: number[];
   text: string;
-};
-
-export type ActionData = {
-  isDirectory?: boolean;
-  path?: string;
 };
 
 type ExpandItemParams = {
@@ -140,7 +133,7 @@ export class Ui extends BaseUi<Params> {
     path: string;
   }) {
     const pos = this.items.findIndex(
-      (item) => args.path == (item?.action as ActionData).path ?? item.word,
+      (item) => args.path == item.treePath ?? item.word,
     );
 
     if (pos > 0) {
@@ -323,10 +316,7 @@ export class Ui extends BaseUi<Params> {
           (c) =>
             promptPrefix + `${getSourceName(c.__sourceName)}` +
             (c.display ?? c.word) + (
-              (c.action as ActionData)?.isDirectory &&
-                !(c.display ?? c.word).endsWith("/")
-                ? "/"
-                : ""
+              c.isTree && !(c.display ?? c.word).endsWith("/") ? "/" : ""
             ),
         ),
         refreshed,
@@ -485,8 +475,7 @@ export class Ui extends BaseUi<Params> {
     // Search index.
     const index = this.items.findIndex(
       (item: DduItem) =>
-        (item.action as ActionData).path ==
-          (args.parent.action as ActionData).path &&
+        item.treePath == args.parent.treePath &&
         item.__sourceIndex == args.parent.__sourceIndex,
     );
 
@@ -497,7 +486,7 @@ export class Ui extends BaseUi<Params> {
         this.items.slice(index + 1),
       );
       this.items[index] = args.parent;
-      const path = (args.parent.action as ActionData).path ?? args.parent.word;
+      const path = args.parent.treePath ?? args.parent.word;
       this.expandedPaths.add(path);
     } else {
       this.items = this.items.concat(insertItems);
@@ -513,8 +502,7 @@ export class Ui extends BaseUi<Params> {
     // Search index.
     const startIndex = this.items.findIndex(
       (item: DduItem) =>
-        (item.action as ActionData).path ==
-          (args.item.action as ActionData).path &&
+        item.treePath == args.item.treePath &&
         item.__sourceIndex == args.item.__sourceIndex,
     );
     if (startIndex < 0) {
@@ -527,7 +515,7 @@ export class Ui extends BaseUi<Params> {
 
     // Remove from expandedPaths
     for (const item of this.items.slice(startIndex + 1, endIndex)) {
-      const path = (item.action as ActionData).path ?? item.word;
+      const path = item.treePath ?? item.word;
       this.expandedPaths.delete(path);
     }
 
@@ -540,7 +528,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.items[startIndex] = args.item;
-    const path = (args.item.action as ActionData).path ?? args.item.word;
+    const path = args.item.treePath ?? args.item.word;
     this.expandedPaths.delete(path);
 
     this.selectedItems.clear();
@@ -658,7 +646,7 @@ export class Ui extends BaseUi<Params> {
 
     const closeItem = this.items[index];
 
-    if (!(closeItem.action as ActionData).isDirectory) {
+    if (!closeItem.isTree) {
       return ActionFlags.None;
     }
 
@@ -1018,29 +1006,6 @@ export class Ui extends BaseUi<Params> {
     return this.items.findIndex(
       (item: DduItem) => item == viewItem,
     );
-  }
-
-  private expandPath(
-    path: string,
-  ): ExpandItem | undefined {
-    let parent = path;
-    let item = undefined;
-    let maxLevel = 0;
-    while (1) {
-      item = this.items.find(
-        (item) => parent == (item?.action as ActionData).path ?? item.word,
-      );
-
-      if (parent == dirname(parent) || item) {
-        break;
-      }
-
-      parent = dirname(parent);
-      maxLevel++;
-    }
-    if (item && !item.__expanded) {
-      return { item, search: path, maxLevel };
-    }
   }
 }
 
