@@ -155,9 +155,9 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
   let win_height = winheight(0)
 
   if a:params.previewVertical
-    silent rightbelow vnew
-
     if a:params.previewFloating && exists('*nvim_win_set_config')
+      let buf = nvim_create_buf(v:true, v:false)
+
       if a:params.split ==# 'floating'
         let win_row = a:params.previewRow > 0 ?
               \ a:params.previewRow : a:params.winRow
@@ -172,7 +172,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
         let win_col -= preview_width
       endif
 
-      call nvim_win_set_config(win_getid(), {
+      call nvim_open_win(buf, v:true, {
             \ 'relative': 'editor',
             \ 'row': win_row,
             \ 'col': win_col,
@@ -182,12 +182,13 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
             \ 'zindex': a:params.previewFloatingZindex,
             \ })
     else
+      silent rightbelow vnew
       execute 'vert resize ' . preview_width
     endif
   else
-    silent aboveleft new
-
     if a:params.previewFloating && exists('*nvim_win_set_config')
+      let buf = nvim_create_buf(v:true, v:false)
+
       let win_row = a:params.previewRow > 0 ?
               \ a:params.previewRow : pos[0] - 1
       let win_col = a:params.previewCol > 0 ?
@@ -199,7 +200,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
         let anchor = 'SW'
       endif
 
-      call nvim_win_set_config(0, {
+      call nvim_open_win(buf, v:true, {
             \ 'relative': 'editor',
             \ 'anchor': anchor,
             \ 'row': win_row,
@@ -210,6 +211,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
             \ 'zindex': a:params.previewFloatingZindex,
             \ })
     else
+      silent aboveleft new
       execute 'resize ' . preview_height
     endif
   endif
