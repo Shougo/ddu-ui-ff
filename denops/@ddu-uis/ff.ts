@@ -232,7 +232,7 @@ export class Ui extends BaseUi<Params> {
         );
         return;
       }
-      await batch(args.denops, async (denops) => {
+      await batch(args.denops, async (denops: Denops) => {
         await denops.call("ddu#ui#ff#_reset_auto_action");
         const autoAction = args.uiParams.autoAction;
         if ("name" in autoAction) {
@@ -515,16 +515,12 @@ export class Ui extends BaseUi<Params> {
       (item: DduItem) => item.__level <= args.item.__level,
     );
 
+    let removedItems: DduItem[] = [];
     if (endIndex < 0) {
+      removedItems = this.items.slice(startIndex + 1);
       this.items = this.items.slice(0, startIndex + 1);
     } else {
-      // Remove from expandedPaths
-      for (const item of this.items.slice(startIndex + 1,
-                                          startIndex + endIndex)) {
-        const path = item.treePath ?? item.word;
-        this.expandedPaths.delete(path);
-      }
-
+      removedItems = this.items.slice(startIndex + 1, startIndex + endIndex);
       this.items = this.items.slice(0, startIndex + 1).concat(
         this.items.slice(startIndex + endIndex + 1),
       );
@@ -532,7 +528,13 @@ export class Ui extends BaseUi<Params> {
 
     this.items[startIndex] = args.item;
     const path = args.item.treePath ?? args.item.word;
+
+    // Remove from expandedPaths
     this.expandedPaths.delete(path);
+    for (const item of removedItems) {
+      const path = item.treePath ?? item.word;
+      this.expandedPaths.delete(path);
+    }
 
     this.selectedItems.clear();
   }
