@@ -520,7 +520,8 @@ export class Ui extends BaseUi<Params> {
       removedItems = this.items.slice(startIndex + 1);
       this.items = this.items.slice(0, startIndex + 1);
     } else {
-      removedItems = this.items.slice(startIndex + 1, startIndex + endIndex);
+      removedItems = this.items.slice(startIndex + 1,
+                                      startIndex + endIndex + 1);
       this.items = this.items.slice(0, startIndex + 1).concat(
         this.items.slice(startIndex + endIndex + 1),
       );
