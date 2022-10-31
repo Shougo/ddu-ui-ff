@@ -196,6 +196,12 @@ displaySourceName	(string)
 
 		Default: "no"
 
+				    	*ddu-ui-ff-param-displayTree*
+displayTree	(boolean)
+		Display tree structure.
+
+		Default: v:false
+
 			    	*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if

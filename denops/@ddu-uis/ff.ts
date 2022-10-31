@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v.1.13.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v1.13.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v.1.13.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v1.13.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -57,20 +57,21 @@ export type Params = {
   autoResize: boolean;
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
-  floatingBorder: FloatingBorder;
+  displayTree: boolean;
   filterFloatingPosition: "top" | "bottom";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
+  floatingBorder: FloatingBorder;
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   previewCol: number;
   previewFloating: boolean;
+  previewFloatingBorder: FloatingBorder;
+  previewFloatingZindex: number;
   previewHeight: number;
   previewRow: number;
   previewVertical: boolean;
   previewWidth: number;
-  previewFloatingBorder: FloatingBorder;
-  previewFloatingZindex: number;
   prompt: string;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
@@ -306,19 +307,20 @@ export class Ui extends BaseUi<Params> {
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
       (args.uiParams.reversed && this.items.length != this.prevLength));
 
+    const getPrefix = (item: DduItem) => {
+      return promptPrefix + `${getSourceName(item.__sourceName)}` +
+            (args.uiParams.displayTree ?
+             " ".repeat(item.__level) +
+             (!item.isTree ? "  " : item.__expanded ? "- " : "+ ") : "");
+    }
+
     // Update main buffer
     try {
       await args.denops.call(
         "ddu#ui#ff#_update_buffer",
         args.uiParams,
         bufnr,
-        this.items.map(
-          (c) =>
-            promptPrefix + `${getSourceName(c.__sourceName)}` +
-            (c.display ?? c.word) + (
-              c.isTree && !(c.display ?? c.word).endsWith("/") ? "/" : ""
-            ),
-        ),
+        this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
         refreshed,
         cursorPos,
       );
@@ -341,13 +343,13 @@ export class Ui extends BaseUi<Params> {
       args.uiParams,
       bufnr,
       this.items.length,
-      this.items.map((c, i) => {
+      this.items.map((item, index) => {
         return {
-          highlights: c.highlights ?? [],
-          row: i + 1,
-          prefix: promptPrefix + `${getSourceName(c.__sourceName)}`,
+          highlights: item.highlights ?? [],
+          row: index + 1,
+          prefix: getPrefix(item),
         };
-      }).filter((c) => c.highlights),
+      }).filter((item) => item.highlights),
       [...this.selectedItems],
     );
 
@@ -900,6 +902,7 @@ export class Ui extends BaseUi<Params> {
       autoResize: false,
       cursorPos: -1,
       displaySourceName: "no",
+      displayTree: false,
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
       filterUpdateTime: 0,
@@ -908,12 +911,12 @@ export class Ui extends BaseUi<Params> {
       ignoreEmpty: false,
       previewCol: 0,
       previewFloating: false,
+      previewFloatingBorder: "none",
+      previewFloatingZindex: 50,
       previewHeight: 10,
       previewRow: 0,
       previewVertical: false,
       previewWidth: 40,
-      previewFloatingBorder: "none",
-      previewFloatingZindex: 50,
       prompt: "",
       reversed: false,
       split: "horizontal",
