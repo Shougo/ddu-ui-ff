@@ -509,21 +509,22 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    const endIndex = startIndex + this.items.slice(startIndex + 1).findIndex(
+    const endIndex = this.items.slice(startIndex + 1).findIndex(
       (item: DduItem) => item.__level <= args.item.__level,
     );
-
-    // Remove from expandedPaths
-    for (const item of this.items.slice(startIndex + 1, endIndex)) {
-      const path = item.treePath ?? item.word;
-      this.expandedPaths.delete(path);
-    }
 
     if (endIndex < 0) {
       this.items = this.items.slice(0, startIndex + 1);
     } else {
+      // Remove from expandedPaths
+      for (const item of this.items.slice(startIndex + 1,
+                                          startIndex + endIndex)) {
+        const path = item.treePath ?? item.word;
+        this.expandedPaths.delete(path);
+      }
+
       this.items = this.items.slice(0, startIndex + 1).concat(
-        this.items.slice(endIndex + 1),
+        this.items.slice(startIndex + endIndex + 1),
       );
     }
 
