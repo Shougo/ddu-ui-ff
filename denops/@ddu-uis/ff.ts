@@ -309,10 +309,11 @@ export class Ui extends BaseUi<Params> {
 
     const getPrefix = (item: DduItem) => {
       return promptPrefix + `${getSourceName(item.__sourceName)}` +
-            (args.uiParams.displayTree ?
-             " ".repeat(item.__level) +
-             (!item.isTree ? "  " : item.__expanded ? "- " : "+ ") : "");
-    }
+        (args.uiParams.displayTree
+          ? " ".repeat(item.__level) +
+            (!item.isTree ? "  " : item.__expanded ? "- " : "+ ")
+          : "");
+    };
 
     // Update main buffer
     try {
@@ -424,9 +425,8 @@ export class Ui extends BaseUi<Params> {
 
     await this.closeFilterWindow(args.denops);
 
-    if (
-      args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
-    ) {
+    const winnr = await fn.winnr(args.denops, "$");
+    if (args.uiParams.split == "no" || winnr == 1) {
       await args.denops.cmd(
         args.context.bufNr == this.buffers[args.options.name]
           ? "enew"
@@ -520,8 +520,10 @@ export class Ui extends BaseUi<Params> {
       removedItems = this.items.slice(startIndex + 1);
       this.items = this.items.slice(0, startIndex + 1);
     } else {
-      removedItems = this.items.slice(startIndex + 1,
-                                      startIndex + endIndex + 1);
+      removedItems = this.items.slice(
+        startIndex + 1,
+        startIndex + endIndex + 1,
+      );
       this.items = this.items.slice(0, startIndex + 1).concat(
         this.items.slice(startIndex + endIndex + 1),
       );
