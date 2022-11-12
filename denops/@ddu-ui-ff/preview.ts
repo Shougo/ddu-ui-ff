@@ -116,6 +116,15 @@ export class PreviewUi {
       return flag;
     }
 
+    if (uiParams.previewFloating && uiParams.highlights.floating != null) {
+      await fn.setwinvar(
+        denops,
+        this.previewWinId,
+        "&winhighlight",
+        uiParams.highlights.floating,
+      );
+    }
+
     await this.jump(denops, previewer);
 
     const previewBufnr = await fn.bufnr(denops);
