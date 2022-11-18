@@ -88,7 +88,7 @@ function! ddu#ui#ff#_highlight_items(
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
   else
-    call prop_clear(1, a:max_lines + 1, { 'bufnr': a:bufnr })
+    call prop_clear(1, a:max_lines + 1, #{ bufnr: a:bufnr })
   endif
 
   " Highlights items
@@ -121,9 +121,9 @@ function! ddu#ui#ff#_highlight(
   if !has('nvim')
     " Add prop_type
     if empty(prop_type_get(a:prop_type))
-      call prop_type_add(a:prop_type, {
-            \ 'highlight': a:highlight,
-            \ 'priority': a:priority,
+      call prop_type_add(a:prop_type, #{
+            \   highlight: a:highlight,
+            \   priority: a:priority,
             \ })
     endif
   endif
@@ -138,11 +138,11 @@ function! ddu#ui#ff#_highlight(
           \ a:col - 1 + a:length
           \ )
   else
-    call prop_add(a:row, a:col, {
-          \ 'length': a:length,
-          \ 'type': a:prop_type,
-          \ 'bufnr': a:bufnr,
-          \ 'id': a:id,
+    call prop_add(a:row, a:col, #{
+          \   length: a:length,
+          \   type: a:prop_type,
+          \   bufnr: a:bufnr,
+          \   id: a:id,
           \ })
   endif
 endfunction
@@ -172,14 +172,14 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
         let win_col -= preview_width
       endif
 
-      call nvim_open_win(buf, v:true, {
-            \ 'relative': 'editor',
-            \ 'row': win_row,
-            \ 'col': win_col,
-            \ 'width': preview_width,
-            \ 'height': preview_height,
-            \ 'border': a:params.previewFloatingBorder,
-            \ 'zindex': a:params.previewFloatingZindex,
+      call nvim_open_win(buf, v:true, #{
+            \   relative: 'editor',
+            \   row: win_row,
+            \   col: win_col,
+            \   width: preview_width,
+            \   height: preview_height,
+            \   border: a:params.previewFloatingBorder,
+            \   zindex: a:params.previewFloatingZindex,
             \ })
     else
       silent rightbelow vnew
@@ -200,15 +200,15 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
         let anchor = 'SW'
       endif
 
-      call nvim_open_win(buf, v:true, {
-            \ 'relative': 'editor',
-            \ 'anchor': anchor,
-            \ 'row': win_row,
-            \ 'col': win_col,
-            \ 'width': preview_width,
-            \ 'height': preview_height,
-            \ 'border': a:params.previewFloatingBorder,
-            \ 'zindex': a:params.previewFloatingZindex,
+      call nvim_open_win(buf, v:true, #{
+            \   relative: 'editor',
+            \   anchor: anchor,
+            \   row: win_row,
+            \   col: win_col,
+            \   width: preview_width,
+            \   height: preview_height,
+            \   border: a:params.previewFloatingBorder,
+            \   zindex: a:params.previewFloatingZindex,
             \ })
     else
       silent aboveleft new
@@ -274,9 +274,9 @@ function! ddu#ui#ff#_cursor(line, col) abort
 endfunction
 
 function! ddu#ui#ff#_save_cursor() abort
-  let b:ddu_ui_ff_save_cursor = {
-        \ 'pos': getcurpos(),
-        \ 'text': getline('.'),
+  let b:ddu_ui_ff_save_cursor = #{
+        \   pos: getcurpos(),
+        \   text: getline('.'),
         \ }
 endfunction
 

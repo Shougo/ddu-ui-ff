@@ -85,13 +85,13 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   endif
 
   " NOTE: relative: win does not work for resume feature
-  let params = {
-        \ 'relative': 'editor',
-        \ 'row': row,
-        \ 'col': col,
-        \ 'width': a:params.winWidth,
-        \ 'height': 1,
-        \ 'border': a:params.floatingBorder,
+  let params = #{
+        \   relative: 'editor',
+        \   row: row,
+        \   col: col,
+        \   width: a:params.winWidth,
+        \   height: 1,
+        \   border: a:params.floatingBorder,
         \}
   if bufwinid(a:bufnr) > 0
     call nvim_win_set_config(bufwinid(a:bufnr), params)
@@ -146,9 +146,9 @@ endfunction
 
 let s:prompt_name = 'ddu_ui_ff_filter_prompt'
 function! s:init_prompt(prompt, highlight_prompt) abort
-  call sign_define(s:prompt_name, {
-        \ 'text': strwidth(a:prompt) > 2 ? '>' : a:prompt,
-        \ 'texthl': a:highlight_prompt,
+  call sign_define(s:prompt_name, #{
+        \   text: strwidth(a:prompt) > 2 ? '>' : a:prompt,
+        \   texthl: a:highlight_prompt,
         \ })
 
   call s:update_prompt()
@@ -160,8 +160,8 @@ function! s:init_prompt(prompt, highlight_prompt) abort
 endfunction
 function! s:update_prompt() abort
   let id = 2000
-  call sign_unplace('', {'id': id, 'buffer': bufnr('%')})
-  call sign_place(id, '', s:prompt_name, bufnr('%'), {'lnum': line('.')})
+  call sign_unplace('', #{ id: id, buffer: bufnr('%') })
+  call sign_place(id, '', s:prompt_name, bufnr('%'), #{ lnum: line('.') })
   let s:prev_lnum = line('$')
 endfunction
 
@@ -171,7 +171,7 @@ function! s:check_update() abort
       call timer_stop(s:update_timer)
     endif
     let s:update_timer = timer_start(
-          \ s:filter_updatetime, {-> s:check_redraw()})
+          \ s:filter_updatetime, { -> s:check_redraw() })
   else
     call s:check_redraw()
   endif
@@ -181,12 +181,11 @@ function! s:check_redraw() abort
 
   let input = getline('.')
 
-  if &l:filetype !=# 'ddu-ff-filter'
-        \ || input ==# s:filter_prev_input
+  if &l:filetype !=# 'ddu-ff-filter' || input ==# s:filter_prev_input
     return
   endif
 
   let s:filter_prev_input = input
 
-  call ddu#redraw(b:ddu_ui_name, { 'input': input })
+  call ddu#redraw(b:ddu_ui_name, #{ input: input })
 endfunction
