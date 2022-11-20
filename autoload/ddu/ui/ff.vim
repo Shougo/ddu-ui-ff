@@ -283,3 +283,8 @@ endfunction
 function! ddu#ui#ff#_echo(msg) abort
   echo a:msg
 endfunction
+
+function! ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
+  call feedkeys(':' . a:cmdline .
+        \ repeat("\<Left>", strchars(a:cmdline) - a:cmdpos + 1))
+endfunction
