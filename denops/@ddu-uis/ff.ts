@@ -91,11 +91,9 @@ export class Ui extends BaseUi<Params> {
   private viewItems: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
   private expandedPaths: Set<string> = new Set();
-  private saveCol = 0;
   private saveMode = "";
   private saveCmdline = "";
   private saveCmdpos = 0;
-  private checkEnd = false;
   private refreshed = false;
   private prevLength = -1;
   private previewUi = new PreviewUi();
@@ -104,9 +102,6 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
-    const col = await fn.col(args.denops, ".");
-    this.saveCol = col;
-    this.checkEnd = await fn.col(args.denops, "$") == col;
     if (this.saveMode == "c") {
       // Save command line state
       this.saveCmdline = await fn.getcmdline(args.denops) as string;
@@ -462,12 +457,7 @@ export class Ui extends BaseUi<Params> {
 
     // Restore mode
     if (this.saveMode == "i") {
-      if (this.checkEnd) {
-        await fn.feedkeys(args.denops, "A", "n");
-      } else {
-        await fn.cursor(args.denops, 0, this.saveCol);
-        await args.denops.cmd("startinsert");
-      }
+      await fn.feedkeys(args.denops, "a", "n");
     } else if (this.saveMode == "c") {
       await args.denops.call("ddu#ui#ff#_restore_cmdline",
                              this.saveCmdline, this.saveCmdpos);
