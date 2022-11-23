@@ -340,6 +340,14 @@ prompt		(string)
 
 		Default: ""
 
+						*ddu-ui-ff-param-replaceCol*
+replaceCol	(number)
+		Set the column position of the replace current text after
+		actions.
+		It is useful for insert/command mode.
+
+		Default: 0
+
 				    		*ddu-ui-ff-param-reversed*
 reversed	(boolean)
 		Display the items in reversed order.
@@ -558,6 +566,44 @@ Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 A: It is feature.  Because it increases screen flicker.
 You need to add |:redraw| command manually if needed.
 
+Q: I want to use "ddu-ui-ff" in insert mode.
+NOTE: It is experimental feature.
+
+A: >
+  inoremap <C-q> <Cmd>call ddu#start(#{
+  \   name: 'file',
+  \   ui: 'ff',
+  \   input: matchstr(getline('.')[: col('.') - 1], '\f*$'),
+  \   sources: [
+  \     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
+  \   ],
+  \   uiParams: #{
+  \     ff: #{
+  \       startFilter: v:true,
+  \       replaceCol: match(getline('.')[: col('.') - 1], '\f*$') + 1,
+  \     },
+  \   },
+  \ })<CR>
+>
+Q: I want to use "ddu-ui-ff" in command line mode.
+NOTE: It is experimental feature.
+
+A: >
+  cnoremap <C-q> <Cmd>call ddu#start(#{
+  \   name: 'file',
+  \   ui: 'ff',
+  \   input: matchstr(getcmdline()[: getcmdpos() - 2], '\f*$'),
+  \   sources: [
+  \     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
+  \   ],
+  \   uiParams: #{
+  \     ff: #{
+  \       startFilter: v:true,
+  \       replaceCol: match(getcmdline()[: getcmdpos() - 2], '\f*$') + 1,
+  \     },
+  \   },
+  \ })<CR><Cmd>call setcmdline('')<CR><CR>
+<
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 

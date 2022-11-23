@@ -73,6 +73,7 @@ export type Params = {
   previewVertical: boolean;
   previewWidth: number;
   prompt: string;
+  replaceCol: number;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "botright" | "topleft";
@@ -94,6 +95,7 @@ export class Ui extends BaseUi<Params> {
   private saveMode = "";
   private saveCmdline = "";
   private saveCmdpos = 0;
+  private saveCol = 0;
   private refreshed = false;
   private prevLength = -1;
   private previewUi = new PreviewUi();
@@ -106,6 +108,8 @@ export class Ui extends BaseUi<Params> {
       // Save command line state
       this.saveCmdline = await fn.getcmdline(args.denops) as string;
       this.saveCmdpos = await fn.getcmdpos(args.denops) as number;
+    } else {
+      this.saveCol = await fn.col(args.denops, ".") as number;
     }
     this.filterBufnr = -1;
   }
@@ -457,10 +461,35 @@ export class Ui extends BaseUi<Params> {
 
     // Restore mode
     if (this.saveMode == "i") {
-      await fn.feedkeys(args.denops, "a", "n");
+      if (args.uiParams.replaceCol > 0) {
+        const currentLine = await fn.getline(args.denops, ".");
+        const replaceLine = currentLine.slice(
+          0,
+          args.uiParams.replaceCol - 1,
+        ) + currentLine.slice(this.saveCol - 1);
+        await fn.setline(args.denops, ".", replaceLine);
+        await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
+      }
+
+      await fn.feedkeys(
+        args.denops,
+        args.uiParams.replaceCol > 1 ? "a" : "I",
+        "n",
+      );
     } else if (this.saveMode == "c") {
-      await args.denops.call("ddu#ui#ff#_restore_cmdline",
-                             this.saveCmdline, this.saveCmdpos);
+      const cmdline = (args.uiParams.replaceCol > 0)
+        ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
+          this.saveCmdline.slice(this.saveCmdpos - 1)
+        : this.saveCmdline;
+      const cmdpos = (args.uiParams.replaceCol > 0)
+        ? args.uiParams.replaceCol
+        : this.saveCmdpos;
+
+      await args.denops.call(
+        "ddu#ui#ff#_restore_cmdline",
+        cmdline,
+        cmdpos,
+      );
     } else {
       await args.denops.cmd("stopinsert");
     }
@@ -927,6 +956,7 @@ export class Ui extends BaseUi<Params> {
       previewWidth: 40,
       prompt: "",
       reversed: false,
+      replaceCol: 0,
       split: "horizontal",
       splitDirection: "botright",
       startFilter: false,
