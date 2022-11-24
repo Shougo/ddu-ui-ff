@@ -421,6 +421,22 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions;
     uiParams: Params;
   }): Promise<void> {
+    await this.closeBuffer({
+      denops: args.denops,
+      context: args.context,
+      options: args.options,
+      uiParams: args.uiParams,
+      cancel: false,
+    });
+  }
+
+  async closeBuffer(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiParams: Params;
+    cancel: boolean;
+  }): Promise<void> {
     await this.previewUi.close(args.denops);
     await this.closeFilterWindow(args.denops);
 
@@ -461,7 +477,7 @@ export class Ui extends BaseUi<Params> {
 
     // Restore mode
     if (this.saveMode == "i") {
-      if (args.uiParams.replaceCol > 0) {
+      if (!args.cancel && args.uiParams.replaceCol > 0) {
         const currentLine = await fn.getline(args.denops, ".");
         const replaceLine = currentLine.slice(
           0,
@@ -473,15 +489,15 @@ export class Ui extends BaseUi<Params> {
 
       await fn.feedkeys(
         args.denops,
-        args.uiParams.replaceCol > 1 ? "a" : "I",
+        args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
         "n",
       );
     } else if (this.saveMode == "c") {
-      const cmdline = (args.uiParams.replaceCol > 0)
+      const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
         ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
           this.saveCmdline.slice(this.saveCmdpos - 1)
         : this.saveCmdline;
-      const cmdpos = (args.uiParams.replaceCol > 0)
+      const cmdpos = (!args.cancel && args.uiParams.replaceCol > 0)
         ? args.uiParams.replaceCol
         : this.saveCmdpos;
 
@@ -867,11 +883,12 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      await this.quit({
+      await this.closeBuffer({
         denops: args.denops,
         context: args.context,
         options: args.options,
         uiParams: args.uiParams,
+        cancel: true,
       });
       await args.denops.call("ddu#pop", args.options.name);
 
