@@ -100,7 +100,7 @@ export class Ui extends BaseUi<Params> {
   private prevLength = -1;
   private previewUi = new PreviewUi();
 
-  async onInit(args: {
+  override async onInit(args: {
     denops: Denops;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
@@ -125,7 +125,7 @@ export class Ui extends BaseUi<Params> {
     this.refreshed = true;
   }
 
-  async searchItem(args: {
+  override async searchItem(args: {
     denops: Denops;
     item: DduItem;
   }) {
@@ -137,7 +137,7 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  async searchPath(args: {
+  override async searchPath(args: {
     denops: Denops;
     path: string;
   }) {
@@ -151,7 +151,7 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  async redraw(args: {
+  override async redraw(args: {
     denops: Denops;
     context: Context;
     options: DduOptions;
@@ -415,7 +415,7 @@ export class Ui extends BaseUi<Params> {
     this.refreshed = false;
   }
 
-  async quit(args: {
+  override async quit(args: {
     denops: Denops;
     context: Context;
     options: DduOptions;
@@ -430,94 +430,8 @@ export class Ui extends BaseUi<Params> {
     });
   }
 
-  async closeBuffer(args: {
-    denops: Denops;
-    context: Context;
-    options: DduOptions;
-    uiParams: Params;
-    cancel: boolean;
-  }): Promise<void> {
-    await this.previewUi.close(args.denops);
-    await this.closeFilterWindow(args.denops);
-
-    // Move to the UI window.
-    const bufnr = this.buffers[args.options.name];
-    await fn.win_gotoid(
-      args.denops,
-      await fn.bufwinid(args.denops, bufnr),
-    );
-
-    await this.closeFilterWindow(args.denops);
-
-    const winnr = await fn.winnr(args.denops, "$");
-    if (args.uiParams.split == "no" || winnr == 1) {
-      await args.denops.cmd(
-        args.context.bufNr == this.buffers[args.options.name]
-          ? "enew"
-          : `buffer ${args.context.bufNr}`,
-      );
-    } else {
-      await args.denops.cmd("silent! close!");
-      await fn.win_gotoid(args.denops, args.context.winId);
-    }
-
-    // Restore options
-    const saveTitle = await vars.g.get(
-      args.denops,
-      "ddu#ui#ff#_save_title",
-      "",
-    );
-    if (saveTitle != "") {
-      args.denops.call(
-        "nvim_set_option",
-        "titlestring",
-        saveTitle,
-      );
-    }
-
-    // Restore mode
-    if (this.saveMode == "i") {
-      if (!args.cancel && args.uiParams.replaceCol > 0) {
-        const currentLine = await fn.getline(args.denops, ".");
-        const replaceLine = currentLine.slice(
-          0,
-          args.uiParams.replaceCol - 1,
-        ) + currentLine.slice(this.saveCol - 1);
-        await fn.setline(args.denops, ".", replaceLine);
-        await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
-      }
-
-      await fn.feedkeys(
-        args.denops,
-        args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
-        "n",
-      );
-    } else if (this.saveMode == "c") {
-      const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
-        ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
-          this.saveCmdline.slice(this.saveCmdpos - 1)
-        : this.saveCmdline;
-      const cmdpos = (!args.cancel && args.uiParams.replaceCol > 0)
-        ? args.uiParams.replaceCol
-        : this.saveCmdpos;
-
-      await args.denops.call(
-        "ddu#ui#ff#_restore_cmdline",
-        cmdline,
-        cmdpos,
-      );
-    } else {
-      await args.denops.cmd("stopinsert");
-    }
-
-    // Close preview window
-    await args.denops.cmd("pclose!");
-
-    await args.denops.call("ddu#event", args.options.name, "close");
-  }
-
   // deno-lint-ignore require-await
-  async expandItem(args: {
+  override async expandItem(args: {
     uiParams: Params;
     parent: DduItem;
     children: DduItem[];
@@ -590,133 +504,7 @@ export class Ui extends BaseUi<Params> {
     this.selectedItems.clear();
   }
 
-  private async getItem(
-    denops: Denops,
-  ): Promise<DduItem | null> {
-    const idx = await this.getIndex(denops);
-    return idx >= 0 ? this.items[idx] : null;
-  }
-
-  private async getItems(denops: Denops): Promise<DduItem[]> {
-    let items: DduItem[];
-    if (this.selectedItems.size == 0) {
-      const item = await this.getItem(denops);
-      if (!item) {
-        return [];
-      }
-
-      items = [item];
-    } else {
-      items = [...this.selectedItems].map((i) => this.items[i]);
-    }
-
-    return items.filter((item) => item);
-  }
-
-  private async setStatusline(
-    denops: Denops,
-    context: Context,
-    options: DduOptions,
-    uiParams: Params,
-    bufnr: number,
-    hasNvim: boolean,
-    floating: boolean,
-    augroupName: string,
-  ): Promise<void> {
-    const statusState = {
-      done: context.done,
-      input: context.input,
-      name: options.name,
-      maxItems: context.maxItems,
-    };
-    await fn.setwinvar(
-      denops,
-      await fn.bufwinnr(denops, bufnr),
-      "ddu_ui_ff_status",
-      statusState,
-    );
-
-    if (!uiParams.statusline) {
-      return;
-    }
-
-    const header =
-      `[ddu-${options.name}] ${this.items.length}/${context.maxItems}`;
-    const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
-    const async = `${context.done ? "" : "[async]"}`;
-    const laststatus = await op.laststatus.get(denops);
-
-    if (hasNvim && (floating || laststatus == 0)) {
-      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) == "") {
-        const saveTitle = await denops.call(
-          "nvim_get_option",
-          "titlestring",
-        ) as string;
-        await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
-      }
-
-      if (await fn.exists(denops, "##WinClosed")) {
-        await denops.cmd(
-          `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
-            " let &titlestring=g:ddu#ui#ff#_save_title",
-        );
-      }
-
-      const titleString = header + " %{" + linenr + "}%*" + async;
-      await vars.b.set(denops, "ddu_ui_ff_title", titleString);
-
-      await denops.call(
-        "nvim_set_option",
-        "titlestring",
-        titleString,
-      );
-      await denops.cmd(
-        `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
-          " let &titlestring = " +
-          "getbufvar(str2nr(expand('<abuf>')), 'ddu_ui_ff_title')",
-      );
-    } else {
-      await fn.setwinvar(
-        denops,
-        await fn.bufwinnr(denops, bufnr),
-        "&statusline",
-        header + " %#LineNR#%{" + linenr + "}%*" + async,
-      );
-    }
-  }
-
-  private async closeFilterWindow(denops: Denops): Promise<void> {
-    if (this.filterBufnr > 0) {
-      const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
-      if (filterWinNr > 0) {
-        await denops.cmd(`silent! close! ${filterWinNr}`);
-      }
-    }
-  }
-
-  private async collapseItemAction(denops: Denops, options: DduOptions) {
-    const index = await this.getIndex(denops);
-    if (index < 0) {
-      return ActionFlags.None;
-    }
-
-    const closeItem = this.items[index];
-
-    if (!closeItem.isTree) {
-      return ActionFlags.None;
-    }
-
-    await denops.call(
-      "ddu#redraw_tree",
-      options.name,
-      "collapse",
-      [{ item: closeItem }],
-    );
-
-    return ActionFlags.None;
-  }
-
-  actions: UiActions<Params> = {
+  override actions: UiActions<Params> = {
     chooseAction: async (args: {
       denops: Denops;
       options: DduOptions;
@@ -950,7 +738,7 @@ export class Ui extends BaseUi<Params> {
     },
   };
 
-  params(): Params {
+  override params(): Params {
     return {
       autoAction: {},
       autoResize: false,
@@ -985,6 +773,217 @@ export class Ui extends BaseUi<Params> {
     };
   }
 
+  private async closeBuffer(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiParams: Params;
+    cancel: boolean;
+  }): Promise<void> {
+    await this.previewUi.close(args.denops);
+    await this.closeFilterWindow(args.denops);
+
+    // Move to the UI window.
+    const bufnr = this.buffers[args.options.name];
+    await fn.win_gotoid(
+      args.denops,
+      await fn.bufwinid(args.denops, bufnr),
+    );
+
+    await this.closeFilterWindow(args.denops);
+
+    const winnr = await fn.winnr(args.denops, "$");
+    if (args.uiParams.split == "no" || winnr == 1) {
+      await args.denops.cmd(
+        args.context.bufNr == this.buffers[args.options.name]
+          ? "enew"
+          : `buffer ${args.context.bufNr}`,
+      );
+    } else {
+      await args.denops.cmd("silent! close!");
+      await fn.win_gotoid(args.denops, args.context.winId);
+    }
+
+    // Restore options
+    const saveTitle = await vars.g.get(
+      args.denops,
+      "ddu#ui#ff#_save_title",
+      "",
+    );
+    if (saveTitle != "") {
+      args.denops.call(
+        "nvim_set_option",
+        "titlestring",
+        saveTitle,
+      );
+    }
+
+    // Restore mode
+    if (this.saveMode == "i") {
+      if (!args.cancel && args.uiParams.replaceCol > 0) {
+        const currentLine = await fn.getline(args.denops, ".");
+        const replaceLine = currentLine.slice(
+          0,
+          args.uiParams.replaceCol - 1,
+        ) + currentLine.slice(this.saveCol - 1);
+        await fn.setline(args.denops, ".", replaceLine);
+        await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
+      }
+
+      await fn.feedkeys(
+        args.denops,
+        args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
+        "n",
+      );
+    } else if (this.saveMode == "c") {
+      const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
+        ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
+          this.saveCmdline.slice(this.saveCmdpos - 1)
+        : this.saveCmdline;
+      const cmdpos = (!args.cancel && args.uiParams.replaceCol > 0)
+        ? args.uiParams.replaceCol
+        : this.saveCmdpos;
+
+      await args.denops.call(
+        "ddu#ui#ff#_restore_cmdline",
+        cmdline,
+        cmdpos,
+      );
+    } else {
+      await args.denops.cmd("stopinsert");
+    }
+
+    // Close preview window
+    await args.denops.cmd("pclose!");
+
+    await args.denops.call("ddu#event", args.options.name, "close");
+  }
+
+  private async getItem(
+    denops: Denops,
+  ): Promise<DduItem | null> {
+    const idx = await this.getIndex(denops);
+    return idx >= 0 ? this.items[idx] : null;
+  }
+
+  private async getItems(denops: Denops): Promise<DduItem[]> {
+    let items: DduItem[];
+    if (this.selectedItems.size == 0) {
+      const item = await this.getItem(denops);
+      if (!item) {
+        return [];
+      }
+
+      items = [item];
+    } else {
+      items = [...this.selectedItems].map((i) => this.items[i]);
+    }
+
+    return items.filter((item) => item);
+  }
+
+  private async setStatusline(
+    denops: Denops,
+    context: Context,
+    options: DduOptions,
+    uiParams: Params,
+    bufnr: number,
+    hasNvim: boolean,
+    floating: boolean,
+    augroupName: string,
+  ): Promise<void> {
+    const statusState = {
+      done: context.done,
+      input: context.input,
+      name: options.name,
+      maxItems: context.maxItems,
+    };
+    await fn.setwinvar(
+      denops,
+      await fn.bufwinnr(denops, bufnr),
+      "ddu_ui_ff_status",
+      statusState,
+    );
+
+    if (!uiParams.statusline) {
+      return;
+    }
+
+    const header =
+      `[ddu-${options.name}] ${this.items.length}/${context.maxItems}`;
+    const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
+    const async = `${context.done ? "" : "[async]"}`;
+    const laststatus = await op.laststatus.get(denops);
+
+    if (hasNvim && (floating || laststatus == 0)) {
+      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) == "") {
+        const saveTitle = await denops.call(
+          "nvim_get_option",
+          "titlestring",
+        ) as string;
+        await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
+      }
+
+      if (await fn.exists(denops, "##WinClosed")) {
+        await denops.cmd(
+          `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
+            " let &titlestring=g:ddu#ui#ff#_save_title",
+        );
+      }
+
+      const titleString = header + " %{" + linenr + "}%*" + async;
+      await vars.b.set(denops, "ddu_ui_ff_title", titleString);
+
+      await denops.call(
+        "nvim_set_option",
+        "titlestring",
+        titleString,
+      );
+      await denops.cmd(
+        `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
+          " let &titlestring = " +
+          "getbufvar(str2nr(expand('<abuf>')), 'ddu_ui_ff_title')",
+      );
+    } else {
+      await fn.setwinvar(
+        denops,
+        await fn.bufwinnr(denops, bufnr),
+        "&statusline",
+        header + " %#LineNR#%{" + linenr + "}%*" + async,
+      );
+    }
+  }
+
+  private async closeFilterWindow(denops: Denops): Promise<void> {
+    if (this.filterBufnr > 0) {
+      const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
+      if (filterWinNr > 0) {
+        await denops.cmd(`silent! close! ${filterWinNr}`);
+      }
+    }
+  }
+
+  private async collapseItemAction(denops: Denops, options: DduOptions) {
+    const index = await this.getIndex(denops);
+    if (index < 0) {
+      return ActionFlags.None;
+    }
+
+    const closeItem = this.items[index];
+
+    if (!closeItem.isTree) {
+      return ActionFlags.None;
+    }
+
+    await denops.call(
+      "ddu#redraw_tree",
+      options.name,
+      "collapse",
+      [{ item: closeItem }],
+    );
+
+    return ActionFlags.None;
+  }
   private async initBuffer(
     denops: Denops,
     bufferName: string,
