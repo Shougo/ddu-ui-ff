@@ -464,7 +464,7 @@ Q: I want to call default action in the filter window.
 
 A:
 >
-	autocmd FileType ddu-filter call s:ddu_filter_my_settings()
+	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
