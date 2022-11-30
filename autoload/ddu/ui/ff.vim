@@ -84,6 +84,9 @@ endfunction
 
 function! ddu#ui#ff#_highlight_items(
       \ params, bufnr, max_lines, highlight_items, selected_items) abort
+  " Buffer must be loaded
+  call bufload(a:bufnr)
+
   " Clear all highlights
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
