@@ -325,14 +325,31 @@ export class Ui extends BaseUi<Params> {
 
     // Update main buffer
     try {
-      await args.denops.call(
-        "ddu#ui#ff#_update_buffer",
-        args.uiParams,
-        bufnr,
-        this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-        refreshed,
-        cursorPos,
-      );
+      // Note: Use batch for screen flicker when highlight items.
+      await batch(args.denops, async (denops: Denops) => {
+        await denops.call(
+          "ddu#ui#ff#_update_buffer",
+          args.uiParams,
+          bufnr,
+          this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+          refreshed,
+          cursorPos,
+        );
+        await denops.call(
+          "ddu#ui#ff#_highlight_items",
+          args.uiParams,
+          bufnr,
+          this.items.length,
+          this.items.map((item, index) => {
+            return {
+              highlights: item.highlights ?? [],
+              row: index + 1,
+              prefix: getPrefix(item),
+            };
+          }).filter((item) => item.highlights),
+          [...this.selectedItems],
+        );
+      });
     } catch (e) {
       await errorException(
         args.denops,
@@ -346,21 +363,6 @@ export class Ui extends BaseUi<Params> {
     if (args.uiParams.reversed) {
       this.viewItems = this.viewItems.reverse();
     }
-
-    await args.denops.call(
-      "ddu#ui#ff#_highlight_items",
-      args.uiParams,
-      bufnr,
-      this.items.length,
-      this.items.map((item, index) => {
-        return {
-          highlights: item.highlights ?? [],
-          row: index + 1,
-          prefix: getPrefix(item),
-        };
-      }).filter((item) => item.highlights),
-      [...this.selectedItems],
-    );
 
     // Save cursor when cursor moved
     await args.denops.cmd(
