@@ -275,9 +275,7 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
-    const augroupName = `${await op.filetype.getLocal(
-      args.denops,
-    )}-${args.options.name}`;
+    const augroupName = `${await op.filetype.getLocal(args.denops)}-${bufnr}`;
     await args.denops.cmd(`augroup ${augroupName}`);
     await args.denops.cmd(`autocmd! ${augroupName}`);
 
