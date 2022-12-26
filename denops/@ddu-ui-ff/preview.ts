@@ -239,7 +239,12 @@ export class PreviewUi {
     await op.previewwindow.setLocal(denops, true);
 
     const previewBufnr = await fn.bufnr(denops) as number;
-    await this.highlight(denops, previewer, previewBufnr);
+    await this.highlight(
+      denops,
+      previewer,
+      previewBufnr,
+      uiParams.highlights?.preview ?? "Search",
+    );
     return ActionFlags.Persist;
   }
 
@@ -307,6 +312,7 @@ export class PreviewUi {
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     bufnr: number,
+    hlName: string,
   ) {
     const ns = denops.meta.host == "nvim"
       ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
@@ -329,13 +335,13 @@ export class PreviewUi {
     }
 
     if (previewer?.lineNr) {
-      this.matchIds[winid] = await fn.matchaddpos(denops, "Search", [
+      this.matchIds[winid] = await fn.matchaddpos(denops, hlName, [
         previewer.lineNr,
       ]) as number;
     } else if (previewer?.pattern) {
       this.matchIds[winid] = await fn.matchadd(
         denops,
-        "Search",
+        hlName,
         previewer.pattern,
       ) as number;
     }

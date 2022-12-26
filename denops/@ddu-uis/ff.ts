@@ -24,6 +24,7 @@ type DoActionParams = {
 
 type HighlightGroup = {
   floating?: string;
+  preview?: string;
   prompt?: string;
   selected?: string;
 };

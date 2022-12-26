@@ -254,8 +254,12 @@ highlights	(dictionary)
 		Specify floating window background highlight.
 		Default: "NormalFloat"
 
+		preview				(string)
+		Specify preview window highlight.
+		Default: "Search"
+
 		prompt				(string)
-		Specify narrowing text highlight.
+		Specify prompt text highlight in filter window.
 		Default: "Special"
 
 		selected			(string)
