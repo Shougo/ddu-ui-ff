@@ -119,7 +119,7 @@ function! s:init_buffer(name, params) abort
 
   if has('nvim') && is_floating && has_key(a:params.highlights, 'floating')
     call setwinvar(bufwinnr(bufnr),
-          \ '&winhighlight', a:params.highlights.floating)
+          \ '&winhighlight', 'Normal:' . a:params.highlights.floating)
   endif
 
   let b:ddu_ui_name = a:name

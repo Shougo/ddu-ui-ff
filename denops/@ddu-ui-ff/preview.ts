@@ -116,12 +116,12 @@ export class PreviewUi {
       return flag;
     }
 
-    if (uiParams.previewFloating && uiParams.highlights.floating != null) {
+    if (uiParams.previewFloating) {
       await fn.setwinvar(
         denops,
         this.previewWinId,
         "&winhighlight",
-        uiParams.highlights.floating,
+        `Normal:${uiParams.highlights?.floating ?? "NormalFloat"}`,
       );
     }
 
