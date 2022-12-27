@@ -218,14 +218,13 @@ export class Ui extends BaseUi<Params> {
           "border": args.uiParams.floatingBorder,
         });
 
-        if (args.uiParams.highlights?.floating) {
-          await fn.setwinvar(
-            args.denops,
-            await fn.bufwinnr(args.denops, bufnr),
-            "&winhighlight",
-            args.uiParams.highlights.floating,
-          );
-        }
+        await fn.setwinvar(
+          args.denops,
+          await fn.bufwinnr(args.denops, bufnr),
+          "&winhighlight",
+          `Normal:${args.uiParams.highlights?.floating ?? "NormalFloat"}`,
+        );
+
         await fn.setwinvar(
           args.denops,
           await fn.bufwinnr(args.denops, bufnr),
