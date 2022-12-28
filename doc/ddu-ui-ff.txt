@@ -455,11 +455,6 @@ EXAMPLES					*ddu-ui-ff-examples*
 ==============================================================================
 FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
 
-Q: I want to change the cursor line color in the buffer.
-
-A: It uses 'cursorline' feature.
-So you can change the color by |hl-CursorLine| highlight.
-
 Q: I want to start narrowing in the first.
 
 A: Please set |ddu-ui-ff-param-startFilter|.
@@ -610,6 +605,9 @@ A: >
 <
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2022.12.28
+* Remove 'cursorline' set.
 
 2022.11.18
 * Require neovim 0.8.

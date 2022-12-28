@@ -1008,7 +1008,6 @@ export class Ui extends BaseUi<Params> {
       // Set options
       await fn.setwinvar(denops, winid, "&list", 0);
       await fn.setwinvar(denops, winid, "&colorcolumn", "");
-      await fn.setwinvar(denops, winid, "&cursorline", 1);
       await fn.setwinvar(denops, winid, "&foldcolumn", 0);
       await fn.setwinvar(denops, winid, "&foldenable", 0);
       await fn.setwinvar(denops, winid, "&number", 0);
