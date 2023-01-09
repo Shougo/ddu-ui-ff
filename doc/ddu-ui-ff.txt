@@ -603,6 +603,16 @@ A: >
   \   },
   \ })<CR><Cmd>call setcmdline('')<CR><CR>
 <
+Q: I want to switch sources without clear current filter input.
+
+A: >
+  nnoremap <buffer> ff
+  \ <Cmd>call ddu#ui#ff#do_action('updateOptions', #{
+  \   sources: [
+  \     #{ name: 'file' },
+  \   ],
+  \ })<CR>
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
