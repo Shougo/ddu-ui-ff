@@ -785,23 +785,27 @@ export class Ui extends BaseUi<Params> {
 
     // Move to the UI window.
     const bufnr = this.buffers[args.options.name];
-    await fn.win_gotoid(
-      args.denops,
-      await fn.bufwinid(args.denops, bufnr),
-    );
+    const winid = await fn.bufwinid(args.denops, bufnr);
 
-    await this.closeFilterWindow(args.denops);
-
-    const winnr = await fn.winnr(args.denops, "$");
-    if (args.uiParams.split == "no" || winnr == 1) {
-      await args.denops.cmd(
-        args.context.bufNr == this.buffers[args.options.name]
-          ? "enew"
-          : `buffer ${args.context.bufNr}`,
+    if (winid > 0) {
+      await fn.win_gotoid(
+        args.denops,
+        await fn.bufwinid(args.denops, bufnr),
       );
-    } else {
-      await args.denops.cmd("silent! close!");
-      await fn.win_gotoid(args.denops, args.context.winId);
+
+      await this.closeFilterWindow(args.denops);
+
+      const winnr = await fn.winnr(args.denops, "$");
+      if (args.uiParams.split == "no" || winnr == 1) {
+        await args.denops.cmd(
+          args.context.bufNr == this.buffers[args.options.name]
+            ? "enew"
+            : `buffer ${args.context.bufNr}`,
+        );
+      } else {
+        await args.denops.cmd("silent! close!");
+        await fn.win_gotoid(args.denops, args.context.winId);
+      }
     }
 
     // Restore options
