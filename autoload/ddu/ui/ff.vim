@@ -1,6 +1,6 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function! ddu#ui#ff#do_action(name, ...) abort
+function! ddu#ui#ff#do_action(name, options = {}) abort
   if !exists('b:ddu_ui_name')
     return
   endif
@@ -13,7 +13,7 @@ function! ddu#ui#ff#do_action(name, ...) abort
     call win_execute(winid, 'let b:ddu_ui_ff_cursor_pos = getcurpos()')
     call win_execute(winid, 'let b:ddu_ui_ff_cursor_text = getline(".")')
   endif
-  call ddu#ui_action(b:ddu_ui_name, a:name, get(a:000, 0, {}))
+  call ddu#ui_action(b:ddu_ui_name, a:name, a:options)
 endfunction
 
 function! ddu#ui#ff#multi_actions(actions) abort
