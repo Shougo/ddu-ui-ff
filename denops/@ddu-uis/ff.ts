@@ -786,7 +786,6 @@ export class Ui extends BaseUi<Params> {
     // Move to the UI window.
     const bufnr = this.buffers[args.options.name];
     const winid = await fn.bufwinid(args.denops, bufnr);
-
     if (winid > 0) {
       await fn.win_gotoid(
         args.denops,
