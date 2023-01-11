@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.1.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.2.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.1.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.2.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -131,20 +131,6 @@ export class Ui extends BaseUi<Params> {
     item: DduItem;
   }) {
     const pos = this.items.findIndex((item) => item == args.item);
-
-    if (pos > 0) {
-      await fn.cursor(args.denops, pos + 1, 0);
-      await args.denops.cmd("normal! zz");
-    }
-  }
-
-  override async searchPath(args: {
-    denops: Denops;
-    path: string;
-  }) {
-    const pos = this.items.findIndex(
-      (item) => args.path == item.treePath ?? item.word,
-    );
 
     if (pos > 0) {
       await fn.cursor(args.denops, pos + 1, 0);
