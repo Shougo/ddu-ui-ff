@@ -934,7 +934,7 @@ export class Ui extends BaseUi<Params> {
         );
       }
 
-      const titleString = header + " %{" + linenr + "}%*" + async;
+      const titleString = `${header} %{${linenr}}%*${async}`;
       await vars.b.set(denops, "ddu_ui_ff_title", titleString);
 
       await denops.call(
