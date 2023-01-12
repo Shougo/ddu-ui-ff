@@ -279,9 +279,17 @@ function! ddu#ui#ff#_cursor(line, col) abort
 endfunction
 
 function! ddu#ui#ff#_save_cursor() abort
+  let text = getline('.')
+
+  " NOTE: Skip save cursor if it is empty text.
+  " Because the items are empty
+  if text ==# '' && line('$') == 1
+    return
+  endif
+
   let b:ddu_ui_ff_save_cursor = #{
         \   pos: getcurpos(),
-        \   text: getline('.'),
+        \   text: text,
         \ }
 endfunction
 
