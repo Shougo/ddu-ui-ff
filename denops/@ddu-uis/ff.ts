@@ -92,7 +92,6 @@ export class Ui extends BaseUi<Params> {
   private items: DduItem[] = [];
   private viewItems: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
-  private expandedPaths: Set<string> = new Set();
   private saveMode = "";
   private saveCmdline = "";
   private saveCmdpos = 0;
@@ -436,8 +435,6 @@ export class Ui extends BaseUi<Params> {
         this.items.slice(index + 1),
       );
       this.items[index] = args.parent;
-      const path = args.parent.treePath ?? args.parent.word;
-      this.expandedPaths.add(path);
     } else {
       this.items = this.items.concat(insertItems);
     }
@@ -463,29 +460,15 @@ export class Ui extends BaseUi<Params> {
       (item: DduItem) => item.__level <= args.item.__level,
     );
 
-    let removedItems: DduItem[] = [];
     if (endIndex < 0) {
-      removedItems = this.items.slice(startIndex + 1);
       this.items = this.items.slice(0, startIndex + 1);
     } else {
-      removedItems = this.items.slice(
-        startIndex + 1,
-        startIndex + endIndex + 1,
-      );
       this.items = this.items.slice(0, startIndex + 1).concat(
         this.items.slice(startIndex + endIndex + 1),
       );
     }
 
     this.items[startIndex] = args.item;
-    const path = args.item.treePath ?? args.item.word;
-
-    // Remove from expandedPaths
-    this.expandedPaths.delete(path);
-    for (const item of removedItems) {
-      const path = item.treePath ?? item.word;
-      this.expandedPaths.delete(path);
-    }
 
     this.selectedItems.clear();
   }
