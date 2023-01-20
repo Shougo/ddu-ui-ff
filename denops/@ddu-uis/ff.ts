@@ -373,7 +373,8 @@ export class Ui extends BaseUi<Params> {
     }
     if (
       saveCursor.pos.length != 0 && this.items.length != 0 &&
-      currentText == saveCursor.text
+      currentText == saveCursor.text &&
+      args.uiParams.cursorPos < 0
     ) {
       await args.denops.call(
         "ddu#ui#ff#_cursor",
