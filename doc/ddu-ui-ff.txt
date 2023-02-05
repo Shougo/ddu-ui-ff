@@ -160,7 +160,7 @@ updateOptions
 ==============================================================================
 PARAMS						*ddu-ui-ff-params*
 
-				    	*ddu-ui-ff-param-autoAction*
+					    	*ddu-ui-ff-param-autoAction*
 autoAction	(dictionary)
 		Action executed when the cursor is moved.
 		It has the following keys.
@@ -173,7 +173,7 @@ autoAction	(dictionary)
 
 		Default: {}
 
-				    	*ddu-ui-ff-param-autoResize*
+					    	*ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
 		Auto resize the window height automatically.
 
@@ -196,13 +196,13 @@ displaySourceName	(string)
 
 		Default: "no"
 
-				    	*ddu-ui-ff-param-displayTree*
+					    	*ddu-ui-ff-param-displayTree*
 displayTree	(boolean)
 		Display tree structure.
 
 		Default: v:false
 
-			    	*ddu-ui-ff-param-floatingBorder*
+    				    	*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
 		|ddu-ui-ff-param-split| is "floating".
