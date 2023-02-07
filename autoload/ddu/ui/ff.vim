@@ -165,9 +165,10 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
 
       if a:params.split ==# 'floating'
         let win_row = a:params.previewRow > 0 ?
-              \ a:params.previewRow : a:params.winRow
+              \ a:params.previewRow : pos[0] - 1
         let win_col = a:params.previewCol > 0 ?
-              \ a:params.previewCol : a:params.winCol
+              \ a:params.previewCol : pos[1] - 1
+        let preview_height = win_height
       else
         let win_row = pos[0] - 1
         let win_col = pos[1] - 1
@@ -193,6 +194,10 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr) abort
   else
     if a:params.previewFloating && exists('*nvim_win_set_config')
       let buf = nvim_create_buf(v:true, v:false)
+
+      if a:params.split ==# 'floating'
+        let preview_width = win_width
+      endif
 
       let win_row = a:params.previewRow > 0 ?
               \ a:params.previewRow : pos[0] - 1
