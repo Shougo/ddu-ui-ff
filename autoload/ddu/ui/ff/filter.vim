@@ -45,12 +45,8 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
     setlocal signcolumn=no
   endif
 
-  if has('nvim')
-    startinsert!
-  else
-    " NOTE: startinsert! does not work in Vim
-    call feedkeys('A', 'n')
-  endif
+  " NOTE: startinsert! does not work in Vim or autoAction
+  call feedkeys('A', 'n')
 
   let s:filter_prev_input = getline('.')
   let s:filter_updatetime = a:params.filterUpdateTime

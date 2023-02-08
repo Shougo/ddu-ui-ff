@@ -52,11 +52,6 @@ function! ddu#ui#ff#close() abort
 endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
-  if a:refreshed && !empty(s:auto_action)
-    let prev_cursor_line = get(getbufline(
-          \ a:bufnr, s:getcurpos(bufwinid(a:bufnr))[1]), 0, '')
-  endif
-
   let max_lines = len(a:lines)
   call setbufvar(a:bufnr, '&modifiable', 1)
 
@@ -278,8 +273,9 @@ function! ddu#ui#ff#_cursor(line, col) abort
     normal! zb
   else
     let winid = g:ddu#ui#ff#_filter_parent_winid
-    call win_execute(winid, printf('call cursor(%d, %d) | normal! zb',
-          \ a:line, a:col))
+    call win_execute(winid,
+          \ printf('call cursor(%d, %d) | normal! zb',
+          \        a:line, a:col))
   endif
 endfunction
 
