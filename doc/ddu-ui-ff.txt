@@ -380,6 +380,8 @@ splitDirection	(string)
 				    		*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
+		Note: If it is enabled and |ddu-ui-ff-param-autoAction| is set,
+		The restore cursor feature is disabled.
 
 		Default: v:false
 
