@@ -622,6 +622,10 @@ A: >
   \   ],
   \ })<CR>
 
+Q: I want to use existing buffer to show preview.
+
+A: Please use "no" in |ddu-ui-filer-param-previewSplit|.
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
