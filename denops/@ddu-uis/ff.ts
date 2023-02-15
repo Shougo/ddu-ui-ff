@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.2.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.2.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -71,7 +71,7 @@ export type Params = {
   previewFloatingZindex: number;
   previewHeight: number;
   previewRow: number;
-  previewVertical: boolean;
+  previewSplit: "horizontal" | "vertical" | "no";
   previewWidth: number;
   prompt: string;
   replaceCol: number;
@@ -151,7 +151,7 @@ export class Ui extends BaseUi<Params> {
 
     if (this.items.length == 0) {
       // Close preview window when empty items
-      await this.previewUi.close(args.denops);
+      await this.previewUi.close(args.denops, args.context);
     }
 
     if (
@@ -730,7 +730,7 @@ export class Ui extends BaseUi<Params> {
       previewFloatingZindex: 50,
       previewHeight: 10,
       previewRow: 0,
-      previewVertical: false,
+      previewSplit: "horizontal",
       previewWidth: 40,
       prompt: "",
       reversed: false,
@@ -753,7 +753,7 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     cancel: boolean;
   }): Promise<void> {
-    await this.previewUi.close(args.denops);
+    await this.previewUi.close(args.denops, args.context);
     await this.closeFilterWindow(args.denops);
 
     // Move to the UI window.
@@ -773,9 +773,7 @@ export class Ui extends BaseUi<Params> {
       const winnr = await fn.winnr(args.denops, "$");
       if (args.uiParams.split == "no" || winnr == 1) {
         await args.denops.cmd(
-          args.context.bufNr == this.buffers[args.options.name]
-            ? "enew"
-            : `buffer ${args.context.bufNr}`,
+          args.context.bufName == "" ? "enew" : `buffer ${args.context.bufNr}`,
         );
       } else {
         await args.denops.cmd("silent! close!");
@@ -831,9 +829,6 @@ export class Ui extends BaseUi<Params> {
     } else {
       await args.denops.cmd("stopinsert");
     }
-
-    // Close preview window
-    await args.denops.cmd("pclose!");
 
     await args.denops.call("ddu#event", args.options.name, "close");
   }

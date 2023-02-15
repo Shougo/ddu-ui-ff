@@ -321,12 +321,17 @@ previewRow	(number)
 
 		Default: 0
 
-					*ddu-ui-ff-param-previewVertical*
-previewVertical	(boolean)
-		Use vertical preview instead of horizontal preview in
-		|ddu-ui-ff-action-preview|.
+					*ddu-ui-ff-param-previewSplit*
+previewSplit	(string)
+		Specify preview split mode in |ddu-ui-ff-action-preview|.
 
-		Default: v:false
+		Following values are available:
+
+		"horizontal": horizontal split
+		"vertical": vertical split
+		"no": no split
+
+		Default: "horizontal"
 
 						*ddu-ui-ff-param-previewWidth*
 previewWidth	(number)
@@ -362,7 +367,9 @@ reversed	(boolean)
 
 				    		*ddu-ui-ff-param-split*
 split		(string)
-		Specify split mode. Following values are available:
+		Specify split mode.
+
+		Following values are available:
 
 		"horizontal": horizontal split
 		"vertical": vertical split
@@ -617,6 +624,9 @@ A: >
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.02.15
+* Remove "previewVertical".  Please use "previewSplit" instead.
 
 2022.12.28
 * Remove 'cursorline' set.

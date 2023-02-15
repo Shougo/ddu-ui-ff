@@ -8,14 +8,14 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v2.2.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
 import {
   batch,
   Denops,
   ensureObject,
   fn,
   op,
-} from "https://deno.land/x/ddu_vim@v2.2.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.0/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v4.0.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
@@ -32,12 +32,20 @@ export class PreviewUi {
   private matchIds: Record<number, number> = {};
   private previewBufnrs: Set<number> = new Set();
 
-  async close(denops: Denops) {
+  async close(denops: Denops, context: Context) {
+    await this.clearHighlight(denops);
+
     if (this.previewWinId > 0 && (await fn.winnr(denops, "$")) != 1) {
       const saveId = await fn.win_getid(denops);
       await batch(denops, async (denops) => {
         await fn.win_gotoid(denops, this.previewWinId);
-        await denops.cmd("close!");
+        if (this.previewWinId == context.winId) {
+          await denops.cmd(
+            context.bufName == "" ? "enew" : `buffer ${context.bufNr}`,
+          );
+        } else {
+          await denops.cmd("close!");
+        }
         await fn.win_gotoid(denops, saveId);
       });
       this.previewWinId = -1;
@@ -53,7 +61,7 @@ export class PreviewUi {
 
   async previewContents(
     denops: Denops,
-    _context: Context,
+    context: Context,
     options: DduOptions,
     uiParams: Params,
     actionParams: unknown,
@@ -69,7 +77,7 @@ export class PreviewUi {
       this.previewWinId > 0 &&
       JSON.stringify(action) == JSON.stringify(this.previewedTarget)
     ) {
-      await this.close(denops);
+      await this.close(denops, context);
       return ActionFlags.None;
     }
 
@@ -79,7 +87,7 @@ export class PreviewUi {
       width: uiParams.previewWidth,
       height: uiParams.previewHeight,
       isFloating: uiParams.previewFloating,
-      isVertical: uiParams.previewVertical,
+      split: uiParams.previewSplit,
     };
     const previewer = await denops.call(
       "ddu#get_previewer",
@@ -101,6 +109,7 @@ export class PreviewUi {
         previewer,
         uiParams,
         bufnr,
+        context.winId,
       );
     } else {
       flag = await this.previewContentsBuffer(
@@ -109,6 +118,7 @@ export class PreviewUi {
         uiParams,
         previewParams,
         bufnr,
+        context.winId,
         item,
       );
     }
@@ -143,12 +153,14 @@ export class PreviewUi {
     previewer: TerminalPreviewer,
     uiParams: Params,
     bufnr: number,
+    previousWinId: number,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
       await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
         bufnr,
+        previousWinId,
       );
       this.previewWinId = await fn.win_getid(denops) as number;
     } else {
@@ -188,6 +200,7 @@ export class PreviewUi {
     uiParams: Params,
     actionParams: PreviewParams,
     bufnr: number,
+    previousWinId: number,
     item: DduItem,
   ): Promise<ActionFlags> {
     if (
@@ -205,6 +218,7 @@ export class PreviewUi {
           "ddu#ui#ff#_open_preview_window",
           uiParams,
           bufnr,
+          previousWinId,
         );
       } catch (_) {
         // Failed to open preview window
@@ -235,8 +249,10 @@ export class PreviewUi {
       await denops.cmd(`buffer ${bufname}`);
     }
 
-    // Set previewwindow option.
-    await op.previewwindow.setLocal(denops, true);
+    if (uiParams.previewSplit != "no") {
+      // Set previewwindow option.
+      await op.previewwindow.setLocal(denops, true);
+    }
 
     const previewBufnr = await fn.bufnr(denops) as number;
     await this.highlight(
@@ -314,26 +330,10 @@ export class PreviewUi {
     bufnr: number,
     hlName: string,
   ) {
-    const ns = denops.meta.host == "nvim"
-      ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
-      : 0;
-    const winid = this.previewWinId;
-
     // Clear the previous highlight
-    if (this.matchIds[winid] > 0) {
-      await fn.matchdelete(denops, this.matchIds[winid], winid);
-      this.matchIds[winid] = -1;
-    }
-    if (denops.meta.host == "nvim") {
-      await denops.call("nvim_buf_clear_namespace", 0, ns, 0, -1);
-    } else {
-      await denops.call(
-        "prop_clear",
-        1,
-        await denops.call("line", "$", winid),
-      );
-    }
+    await this.clearHighlight(denops);
 
+    const winid = this.previewWinId;
     if (previewer?.lineNr) {
       this.matchIds[winid] = await fn.matchaddpos(denops, hlName, [
         previewer.lineNr,
@@ -346,6 +346,9 @@ export class PreviewUi {
       ) as number;
     }
 
+    const ns = denops.meta.host == "nvim"
+      ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
+      : 0;
     await batch(denops, async (denops) => {
       if (!previewer.highlights) {
         return;
@@ -365,6 +368,28 @@ export class PreviewUi {
         );
       }
     });
+  }
+
+  async clearHighlight(denops: Denops) {
+    const winid = this.previewWinId;
+
+    if (this.matchIds[winid] > 0) {
+      await fn.matchdelete(denops, this.matchIds[winid], winid);
+      this.matchIds[winid] = -1;
+    }
+    if (denops.meta.host == "nvim") {
+      const ns = await denops.call(
+        "nvim_create_namespace",
+        "ddu-ui-ff-preview",
+      );
+      await denops.call("nvim_buf_clear_namespace", 0, ns, 0, -1);
+    } else {
+      await denops.call(
+        "prop_clear",
+        1,
+        await denops.call("line", "$", winid),
+      );
+    }
   }
 }
 
