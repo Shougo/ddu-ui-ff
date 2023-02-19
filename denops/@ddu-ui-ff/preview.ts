@@ -372,6 +372,9 @@ export class PreviewUi {
 
   async clearHighlight(denops: Denops) {
     const winid = this.previewWinId;
+    if (winid <= 0) {
+      return;
+    }
 
     if (this.matchIds[winid] > 0) {
       await fn.matchdelete(denops, this.matchIds[winid], winid);
