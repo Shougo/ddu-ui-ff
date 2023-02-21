@@ -265,7 +265,7 @@ function! ddu#ui#ff#_reset_auto_action() abort
 endfunction
 function! ddu#ui#ff#_set_auto_action(auto_action) abort
   let s:auto_action = a:auto_action
-  autocmd ddu-ui-auto_action CursorMoved <buffer>
+  autocmd ddu-ui-auto_action CursorMoved <buffer> ++nested
         \ call ddu#ui#ff#_do_auto_action()
 endfunction
 
