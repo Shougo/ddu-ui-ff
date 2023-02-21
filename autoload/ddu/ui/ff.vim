@@ -1,9 +1,11 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
+let s:in_action = v:false
 
 function! ddu#ui#ff#do_action(name, options = {}) abort
   if !exists('b:ddu_ui_name')
     return
   endif
+  let s:in_action = v:true
 
   if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
     let b:ddu_ui_ff_cursor_pos = getcurpos()
@@ -14,6 +16,7 @@ function! ddu#ui#ff#do_action(name, options = {}) abort
     call win_execute(winid, 'let b:ddu_ui_ff_cursor_text = getline(".")')
   endif
   call ddu#ui_action(b:ddu_ui_name, a:name, a:options)
+  let s:in_action = v:false
 endfunction
 
 function! ddu#ui#ff#multi_actions(actions) abort
@@ -265,8 +268,12 @@ function! ddu#ui#ff#_reset_auto_action() abort
 endfunction
 function! ddu#ui#ff#_set_auto_action(auto_action) abort
   let s:auto_action = a:auto_action
-  autocmd ddu-ui-auto_action CursorMoved <buffer> ++nested
-        \ call ddu#ui#ff#_do_auto_action()
+  augroup ddu-ui-auto_action
+    autocmd CursorMoved <buffer> ++nested
+          \ : if !s:in_action
+          \ |   call ddu#ui#ff#_do_auto_action()
+          \ | endif
+  augroup END
 endfunction
 
 function! ddu#ui#ff#_cursor(line, col) abort
