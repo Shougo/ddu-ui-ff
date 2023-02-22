@@ -5,6 +5,7 @@ function! ddu#ui#ff#do_action(name, options = {}) abort
   if !exists('b:ddu_ui_name')
     return
   endif
+
   let s:in_action = v:true
 
   if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
@@ -15,7 +16,9 @@ function! ddu#ui#ff#do_action(name, options = {}) abort
     call win_execute(winid, 'let b:ddu_ui_ff_cursor_pos = getcurpos()')
     call win_execute(winid, 'let b:ddu_ui_ff_cursor_text = getline(".")')
   endif
+
   call ddu#ui_action(b:ddu_ui_name, a:name, a:options)
+
   let s:in_action = v:false
 endfunction
 
@@ -268,6 +271,8 @@ function! ddu#ui#ff#_reset_auto_action() abort
 endfunction
 function! ddu#ui#ff#_set_auto_action(auto_action) abort
   let s:auto_action = a:auto_action
+
+  " NOTE: In action execution, auto action should be skipped
   augroup ddu-ui-auto_action
     autocmd CursorMoved <buffer> ++nested
           \ : if !s:in_action
