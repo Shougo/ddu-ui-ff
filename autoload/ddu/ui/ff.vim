@@ -239,7 +239,13 @@ endfunction
 
 let s:cursor_text = ''
 let s:auto_action = {}
+let s:debounce_timer = -1
 function! ddu#ui#ff#_do_auto_action() abort
+  silent! call timer_stop(s:debounce_timer)
+  let s:debounce_timer = 
+        \ timer_start(s:auto_action.delay, { -> s:do_auto_action() })
+endfunction
+function! s:do_auto_action() abort
   if empty(s:auto_action)
     return
   endif
@@ -257,6 +263,8 @@ function! ddu#ui#ff#_do_auto_action() abort
   endif
 endfunction
 function! ddu#ui#ff#_reset_auto_action() abort
+  silent! call timer_stop(s:debounce_timer)
+  let s:debounce_timer = -1
   let s:cursor_text = ''
   let s:auto_action = {}
   augroup ddu-ui-auto_action
