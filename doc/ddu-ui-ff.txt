@@ -173,6 +173,12 @@ autoAction	(dictionary)
 
 		Default: {}
 
+		delay				(number)	(Optional)
+		Time in milliseconds to delay the auto action.
+		If you feel slow, specify large value.
+		Set 0 to disable debouncing.
+		Default: 10
+
 					    	*ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
 		Auto resize the window height automatically.

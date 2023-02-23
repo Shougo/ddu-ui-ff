@@ -32,6 +32,7 @@ type HighlightGroup = {
 type AutoAction = {
   name?: string;
   params?: unknown;
+  delay?: number;
 };
 
 type FloatingBorder =
@@ -231,6 +232,9 @@ export class Ui extends BaseUi<Params> {
         if ("name" in autoAction) {
           if (!("params" in autoAction)) {
             autoAction.params = {};
+          }
+          if (!("delay" in autoAction)) {
+            autoAction.delay = 10;
           }
           await denops.call(
             "ddu#ui#ff#_set_auto_action",
@@ -755,6 +759,7 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     await this.previewUi.close(args.denops, args.context);
     await this.closeFilterWindow(args.denops);
+    await args.denops.call("ddu#ui#ff#_reset_auto_action");
 
     // Move to the UI window.
     const bufnr = this.buffers[args.options.name];
