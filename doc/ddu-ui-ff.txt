@@ -165,19 +165,20 @@ autoAction	(dictionary)
 		Action executed when the cursor is moved.
 		It has the following keys.
 
-		name				(string)
+		delay				(number)	(Optional)
+		Time in milliseconds to delay the auto action.
+		If you feel slow, specify large value.
+		Set 0 to disable debouncing.
+
+		Default: 10
+
+		name				(string)	(Required)
 		Action name
 
 		params				(dictionary)	(Optional)
 		Action params
 
 		Default: {}
-
-		delay				(number)	(Optional)
-		Time in milliseconds to delay the auto action.
-		If you feel slow, specify large value.
-		Set 0 to disable debouncing.
-		Default: 10
 
 					    	*ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
@@ -393,8 +394,8 @@ splitDirection	(string)
 				    		*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
-		Note: If it is enabled and |ddu-ui-ff-param-autoAction| is set,
-		The restore cursor feature is disabled.
+		Note: If it is enabled and |ddu-ui-ff-param-autoAction| is
+		set, The restore cursor feature is disabled.
 
 		Default: v:false
 
