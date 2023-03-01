@@ -377,8 +377,7 @@ export class Ui extends BaseUi<Params> {
     }
     if (
       saveCursor.pos.length != 0 && this.items.length != 0 &&
-      currentText == saveCursor.text &&
-      args.uiParams.cursorPos < 0 &&
+      currentText == saveCursor.text && initialized &&
       !(args.uiParams.startFilter && "name" in args.uiParams.autoAction)
     ) {
       // NOTE: startFilter with autoAction breaks cursor
