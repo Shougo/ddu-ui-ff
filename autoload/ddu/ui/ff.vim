@@ -156,9 +156,10 @@ endfunction
 function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
-  let pos = win_screenpos(bufwinid(a:bufnr))
-  let win_width = winwidth(0)
-  let win_height = winheight(0)
+  let winnr = bufwinid(a:bufnr)
+  let pos = win_screenpos(winnr)
+  let win_width = winwidth(winnr)
+  let win_height = winheight(winnr)
 
   if a:params.previewSplit ==# 'vertical'
     if a:params.previewFloating && exists('*nvim_win_set_config')
