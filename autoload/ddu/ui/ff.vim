@@ -2,13 +2,14 @@ let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 let s:in_action = v:false
 
 function! ddu#ui#ff#do_action(name, options = {}) abort
-  if !exists('b:ddu_ui_name')
+  if !('b:ddu_ui_name'->exists())
     return
   endif
 
   let s:in_action = v:true
 
-  if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
+  if &l:filetype ==# 'ddu-ff'
+        \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     let b:ddu_ui_ff_cursor_pos = getcurpos()
     let b:ddu_ui_ff_cursor_text = getline('.')
   else
@@ -23,7 +24,7 @@ function! ddu#ui#ff#do_action(name, options = {}) abort
 endfunction
 
 function! ddu#ui#ff#multi_actions(actions) abort
-  if !exists('b:ddu_ui_name')
+  if !('b:ddu_ui_name'->exists())
     return
   endif
 
@@ -33,7 +34,7 @@ function! ddu#ui#ff#multi_actions(actions) abort
 endfunction
 
 function! ddu#ui#ff#execute(command) abort
-  if !exists('g:ddu#ui#ff#_filter_parent_winid')
+  if !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     return
   endif
 
@@ -51,14 +52,14 @@ endfunction
 function! ddu#ui#ff#close() abort
   close
 
-  if exists('g:ddu#ui#ff#_filter_parent_winid')
+  if 'g:ddu#ui#ff#_filter_parent_winid'->exists()
     " Move to parent window
     call win_gotoid(g:ddu#ui#ff#_filter_parent_winid)
   endif
 endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
-  let max_lines = len(a:lines)
+  let max_lines = a:lines->len()
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:params.reversed ? reverse(a:lines) : a:lines)
@@ -72,7 +73,7 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   endif
 
   " Init the cursor
-  let winid = bufwinid(a:bufnr)
+  let winid = a:bufnr->bufwinid()
   let curpos = s:getcurpos(winid)
   let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
   if curpos[1] != lnum
@@ -86,7 +87,7 @@ endfunction
 function! ddu#ui#ff#_highlight_items(
       \ params, bufnr, max_lines, highlight_items, selected_items) abort
   " Buffer must be loaded
-  if !bufloaded(a:bufnr)
+  if !(a:bufnr->bufloaded())
     return
   endif
 
@@ -109,7 +110,7 @@ function! ddu#ui#ff#_highlight_items(
   endfor
 
   " Selected items highlights
-  let selected_highlight = get(a:params.highlights, 'selected', 'Statement')
+  let selected_highlight = a:params.highlights->get('selected', 'Statement')
   for item_nr in a:selected_items
     call ddu#ui#ff#_highlight(
           \ selected_highlight, 'ddu-ui-selected', 10000,
@@ -126,7 +127,7 @@ function! ddu#ui#ff#_highlight(
       \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
   if !has('nvim')
     " Add prop_type
-    if empty(prop_type_get(a:prop_type))
+    if a:prop_type->prop_type_get()->empty()
       call prop_type_add(a:prop_type, #{
             \   highlight: a:highlight,
             \   priority: a:priority,
@@ -156,13 +157,13 @@ endfunction
 function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
-  let winnr = bufwinid(a:bufnr)
-  let pos = win_screenpos(winnr)
-  let win_width = winwidth(winnr)
-  let win_height = winheight(winnr)
+  let winnr = a:bufnr->bufwinid()
+  let pos = winnr->win_screenpos()
+  let win_width = winnr->winwidth()
+  let win_height = winnr->winheight()
 
   if a:params.previewSplit ==# 'vertical'
-    if a:params.previewFloating && exists('*nvim_win_set_config')
+    if a:params.previewFloating && '*nvim_win_set_config'->exists()
       let buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
@@ -194,7 +195,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
       execute 'vert resize ' . preview_width
     endif
   elseif a:params.previewSplit ==# 'horizontal'
-    if a:params.previewFloating && exists('*nvim_win_set_config')
+    if a:params.previewFloating && '*nvim_win_set_config'->exists()
       let buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
@@ -249,7 +250,7 @@ let s:auto_action = {}
 let s:debounce_timer = -1
 function! ddu#ui#ff#_do_auto_action() abort
   silent! call timer_stop(s:debounce_timer)
-  let s:debounce_timer = 
+  let s:debounce_timer =
         \ timer_start(s:auto_action.delay, { -> s:do_auto_action() })
 endfunction
 function! s:do_auto_action() abort
@@ -259,11 +260,11 @@ function! s:do_auto_action() abort
 
   let winid =
         \ (&l:filetype ==# 'ddu-ff'
-        \  || !exists('g:ddu#ui#ff#_filter_parent_winid')) ?
+        \  || !('g:ddu#ui#ff#_filter_parent_winid'->exists())) ?
         \ win_getid() : g:ddu#ui#ff#_filter_parent_winid
-  let bufnr = winbufnr(winid)
+  let bufnr = winid->winbufnr()
 
-  let text = getbufline(bufnr, s:getcurpos(winid)[1])[0]
+  let text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
   if text != s:cursor_text
     call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
     let s:cursor_text = text
@@ -291,7 +292,8 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
 endfunction
 
 function! ddu#ui#ff#_cursor(line, col) abort
-  if &l:filetype ==# 'ddu-ff' || !exists('g:ddu#ui#ff#_filter_parent_winid')
+  if &l:filetype ==# 'ddu-ff'
+        \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     call cursor(a:line, a:col)
     normal! zb
   else
@@ -303,11 +305,11 @@ function! ddu#ui#ff#_cursor(line, col) abort
 endfunction
 
 function! ddu#ui#ff#_save_cursor() abort
-  let text = getline('.')
+  let text = '.'->getline()
 
   " NOTE: Skip save cursor if it is empty text.
   " Because the items are empty
-  if text ==# '' && line('$') == 1
+  if text ==# '' && '$'->line() == 1
     return
   endif
 
@@ -323,5 +325,5 @@ endfunction
 
 function! ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
   call feedkeys(':' . a:cmdline .
-        \ repeat("\<Left>", strchars(a:cmdline) - a:cmdpos + 1))
+        \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction

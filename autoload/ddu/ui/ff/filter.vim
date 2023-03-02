@@ -1,22 +1,22 @@
 function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   let parent_id = win_getid()
 
-  let ids = win_findbuf(a:bufnr)
+  let ids = a:bufnr->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
-    call cursor(line('$'), 0)
+    call cursor('$'->line(), 0)
   else
     call s:init_buffer(a:name, a:params)
 
     " Set the current input
-    if getline('$') ==# ''
+    if '$'->getline() ==# ''
       call setline('$', a:input)
     else
       call append('$', a:input)
     endif
   endif
 
-  call cursor(line('$'), 0)
+  call cursor('$'->line(), 0)
 
   augroup ddu-ff-filter
     autocmd!
@@ -48,10 +48,10 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   " NOTE: startinsert! does not work in Vim or autoAction
   call feedkeys('A', 'n')
 
-  let s:filter_prev_input = getline('.')
+  let s:filter_prev_input = '.'->getline()
   let s:filter_updatetime = a:params.filterUpdateTime
   let g:ddu#ui#ff#_filter_parent_winid = parent_id
-  return bufnr('%')
+  return '%'->bufnr()
 endfunction
 
 function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
@@ -64,7 +64,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   endif
 
   let row = a:params.filterFloatingPosition ==# 'bottom'
-        \ ? winheight(a:parent) : -1
+        \ ? a:parent->winheight() : -1
   if a:params.floatingBorder isnot# 'none'
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
@@ -75,7 +75,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     let row += a:params.winRow
     let col = a:params.winCol
   else
-    let winpos = win_screenpos(a:parent)
+    let winpos = a:parent->win_screenpos()
     let row += winpos[0] - 1
     let col = winpos[1] - 1
   endif
@@ -89,8 +89,8 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \   height: 1,
         \   border: a:params.floatingBorder,
         \}
-  if bufwinid(a:bufnr) > 0
-    call nvim_win_set_config(bufwinid(a:bufnr), params)
+  if a:bufnr->bufwinid() > 0
+    call nvim_win_set_config(a:bufnr->bufwinid(), params)
   else
     " statusline must be set for floating window
     let statusline = &l:statusline
@@ -104,7 +104,7 @@ function! s:init_buffer(name, params) abort
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
-  let bufnr = bufadd('ddu-ff-filter-' . a:name)
+  let bufnr = ('ddu-ff-filter-' . a:name)->bufadd()
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
@@ -113,8 +113,8 @@ function! s:init_buffer(name, params) abort
     silent execute direction 'sbuffer' bufnr
   endif
 
-  if has('nvim') && is_floating && has_key(a:params.highlights, 'floating')
-    call setwinvar(bufwinnr(bufnr),
+  if has('nvim') && is_floating && a:params.highlights->has_key('floating')
+    call setwinvar(bufnr->bufwinnr(),
           \ '&winhighlight', 'Normal:' . a:params.highlights.floating)
   endif
 
@@ -143,7 +143,7 @@ endfunction
 let s:prompt_name = 'ddu_ui_ff_filter_prompt'
 function! s:init_prompt(prompt, highlight_prompt) abort
   call sign_define(s:prompt_name, #{
-        \   text: strwidth(a:prompt) > 2 ? '>' : a:prompt,
+        \   text: a:prompt->strwidth() > 2 ? '>' : a:prompt,
         \   texthl: a:highlight_prompt,
         \ })
 
@@ -151,19 +151,19 @@ function! s:init_prompt(prompt, highlight_prompt) abort
 
   augroup ddu-ff-filter
     autocmd TextChangedI,TextChangedP,TextChanged <buffer>
-          \ if s:prev_lnum != line('$') | call s:update_prompt() | endif
+          \ if s:prev_lnum != '$'->line() | call s:update_prompt() | endif
   augroup END
 endfunction
 function! s:update_prompt() abort
   let id = 2000
-  call sign_unplace('', #{ id: id, buffer: bufnr('%') })
-  call sign_place(id, '', s:prompt_name, bufnr('%'), #{ lnum: line('.') })
-  let s:prev_lnum = line('$')
+  call sign_unplace('', #{ id: id, buffer: '%'->bufnr() })
+  call sign_place(id, '', s:prompt_name, '%'->bufnr(), #{ lnum: '.'->line() })
+  let s:prev_lnum = '$'->line()
 endfunction
 
 function! s:check_update() abort
   if s:filter_updatetime > 0
-    if exists('s:update_timer')
+    if 's:update_timer'->exists()
       call timer_stop(s:update_timer)
     endif
     let s:update_timer = timer_start(
@@ -175,7 +175,7 @@ endfunction
 function! s:check_redraw() abort
   unlet! s:update_timer
 
-  let input = getline('.')
+  let input = '.'->getline()
 
   if &l:filetype !=# 'ddu-ff-filter' || input ==# s:filter_prev_input
     return
