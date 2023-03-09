@@ -104,7 +104,7 @@ function! s:init_buffer(name, params) abort
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
-  let bufnr = ('ddu-ff-filter-' . a:name)->bufadd()
+  let bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
@@ -115,7 +115,7 @@ function! s:init_buffer(name, params) abort
 
   if has('nvim') && is_floating && a:params.highlights->has_key('floating')
     call setwinvar(bufnr->bufwinnr(),
-          \ '&winhighlight', 'Normal:' . a:params.highlights.floating)
+          \ '&winhighlight', 'Normal:' .. a:params.highlights.floating)
   endif
 
   let b:ddu_ui_name = a:name
