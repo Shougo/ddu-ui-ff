@@ -106,9 +106,12 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
     if (this.saveMode == "c") {
-      // Save command line state
-      this.saveCmdline = await fn.getcmdline(args.denops) as string;
-      this.saveCmdpos = await fn.getcmdpos(args.denops) as number;
+      this.saveMode = await fn.getcmdtype(args.denops) as string;
+      if (this.saveMode == ":") {
+        // Save command line state
+        this.saveCmdline = await fn.getcmdline(args.denops) as string;
+        this.saveCmdpos = await fn.getcmdpos(args.denops) as number;
+      }
     } else {
       this.saveCol = await fn.col(args.denops, ".") as number;
     }
@@ -813,7 +816,7 @@ export class Ui extends BaseUi<Params> {
         args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
         "n",
       );
-    } else if (this.saveMode == "c") {
+    } else if (this.saveMode == ":") {
       const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
         ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
           this.saveCmdline.slice(this.saveCmdpos - 1)
