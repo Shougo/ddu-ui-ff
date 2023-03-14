@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.3.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.1/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.3.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.3.1/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -993,7 +993,6 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&signcolumn", "no");
       await fn.setwinvar(denops, winid, "&spell", 0);
       await fn.setwinvar(denops, winid, "&wrap", 0);
-      await fn.setwinvar(denops, winid, "&signcolumn", "no");
 
       await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
