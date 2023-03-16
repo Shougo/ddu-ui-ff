@@ -68,7 +68,6 @@ export class PreviewUi {
     bufnr: number,
     item: DduItem,
   ): Promise<ActionFlags> {
-    const action = item.action as ActionData;
     const prevId = await fn.win_getid(denops);
     const previewParams = ensureObject(actionParams) as PreviewParams;
 

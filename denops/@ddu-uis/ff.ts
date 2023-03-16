@@ -175,6 +175,7 @@ export class Ui extends BaseUi<Params> {
     await this.setDefaultParams(args.denops, args.uiParams);
 
     const hasNvim = args.denops.meta.host == "nvim";
+    const hasAutoAction = "name" in args.uiParams.autoAction;
     const floating = args.uiParams.split == "floating" && hasNvim;
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
@@ -231,13 +232,13 @@ export class Ui extends BaseUi<Params> {
       }
       await batch(args.denops, async (denops: Denops) => {
         await denops.call("ddu#ui#ff#_reset_auto_action");
-        const autoAction = args.uiParams.autoAction;
-        if ("name" in autoAction) {
+        if (hasAutoAction) {
+          const autoAction = args.uiParams.autoAction;
           if (!("params" in autoAction)) {
             autoAction.params = {};
           }
           if (!("delay" in autoAction)) {
-            autoAction.delay = 10;
+            autoAction.delay = 100;
           }
           await denops.call(
             "ddu#ui#ff#_set_auto_action",
@@ -381,7 +382,7 @@ export class Ui extends BaseUi<Params> {
     if (
       saveCursor.pos.length != 0 && this.items.length != 0 &&
       currentText == saveCursor.text && !this.refreshed &&
-      !(args.uiParams.startFilter && "name" in args.uiParams.autoAction)
+      !(args.uiParams.startFilter && hasAutoAction)
     ) {
       // NOTE: startFilter with autoAction breaks cursor
       await args.denops.call(
@@ -389,6 +390,9 @@ export class Ui extends BaseUi<Params> {
         saveCursor.pos[1],
         saveCursor.pos[2],
       );
+    } else if (hasAutoAction && winid < 0) {
+      // Call auto action
+      await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
 
     if (this.filterBufnr < 0 || winid < 0) {
