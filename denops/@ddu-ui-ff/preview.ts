@@ -166,7 +166,8 @@ export class PreviewUi {
     } else {
       await batch(denops, async (denops: Denops) => {
         await fn.win_gotoid(denops, this.previewWinId);
-        await denops.cmd("enew");
+        // NOTE: Use enew! to ignore E948
+        await denops.cmd("enew!");
       });
     }
 
