@@ -28,7 +28,7 @@ type ActionData = Record<string, unknown>;
 export class PreviewUi {
   private previewWinId = -1;
   private terminalBufnr = -1;
-  private previewedTarget: ActionData = {};
+  private previewedTarget?: DduItem;
   private matchIds: Record<number, number> = {};
   private previewBufnrs: Set<number> = new Set();
 
@@ -75,7 +75,7 @@ export class PreviewUi {
     // Close if the target is the same as the previous one
     if (
       this.previewWinId > 0 &&
-      JSON.stringify(action) == JSON.stringify(this.previewedTarget)
+      JSON.stringify(item) == JSON.stringify(this.previewedTarget)
     ) {
       await this.close(denops, context);
       return ActionFlags.None;
@@ -139,7 +139,7 @@ export class PreviewUi {
 
     const previewBufnr = await fn.bufnr(denops);
     this.previewBufnrs.add(previewBufnr);
-    this.previewedTarget = action;
+    this.previewedTarget = item;
     if (previewer.kind == "terminal") {
       this.terminalBufnr = bufnr;
     }
