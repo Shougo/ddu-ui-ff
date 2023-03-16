@@ -484,6 +484,17 @@ export class Ui extends BaseUi<Params> {
   }
 
   override actions: UiActions<Params> = {
+    checkItems: async (args: {
+      denops: Denops;
+      options: DduOptions;
+    }) => {
+      await args.denops.call("ddu#redraw", args.options.name, {
+        check: true,
+        refreshItems: true,
+      });
+
+      return ActionFlags.None;
+    },
     chooseAction: async (args: {
       denops: Denops;
       options: DduOptions;
@@ -765,22 +776,24 @@ export class Ui extends BaseUi<Params> {
     if (!bufnr) {
       return;
     }
-    const winid = await fn.bufwinid(args.denops, bufnr);
-    if (winid > 0) {
-      await fn.win_gotoid(
-        args.denops,
-        await fn.bufwinid(args.denops, bufnr),
-      );
+    for (
+      const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
+    ) {
+      if (winid <= 0) {
+        continue;
+      }
 
+      await fn.win_gotoid(args.denops, winid);
       await this.closeFilterWindow(args.denops);
 
-      const winnr = await fn.winnr(args.denops, "$");
-      if (args.uiParams.split == "no" || winnr == 1) {
+      if (
+        args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+      ) {
         await args.denops.cmd(
           args.context.bufName == "" ? "enew" : `buffer ${args.context.bufNr}`,
         );
       } else {
-        await args.denops.cmd("silent! close!");
+        await args.denops.cmd("close!");
         await fn.win_gotoid(args.denops, args.context.winId);
       }
     }
