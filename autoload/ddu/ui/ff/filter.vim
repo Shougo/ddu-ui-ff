@@ -103,6 +103,9 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     let id = nvim_open_win(a:bufnr, v:true, params)
     call nvim_win_set_option(id, 'statusline', statusline)
   endif
+
+  call nvim_win_set_option(id, 'winhighlight',
+        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat'))
 endfunction
 
 function! s:init_buffer(name, params) abort
