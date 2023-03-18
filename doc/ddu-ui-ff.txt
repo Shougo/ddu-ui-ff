@@ -49,10 +49,6 @@ ddu#ui#ff#do_action({action-name}[, {params}])
 		{args} behavior depends on {action-name}.
 		NOTE: It can be called in the filter window or UI window.
 
-						*ddu#ui#ff#get_item()*
-ddu#ui#ff#get_item()
-		Return the current cursor item as |Dictionary|.
-
 						*ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 		Fire multiple actions.
@@ -102,6 +98,10 @@ expandItem
 		maxLevel:
 			Maximum expand recursive level.
 			If it is less than 0, infinite recursive.
+
+						*ddu-ui-ff-action-getItem*
+getItem
+		Set current item to "b:ddu_ui_item" variable.
 
 						*ddu-ui-ff-action-itemAction*
 itemAction
@@ -639,6 +639,9 @@ A: Please use "no" in |ddu-ui-filer-param-previewSplit|.
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.03.19
+* Remove "ddu#ui#ff#get_item()"  Please use "ddu#ui#get_item()" instead.
 
 2023.02.15
 * Remove "previewVertical".  Please use "previewSplit" instead.

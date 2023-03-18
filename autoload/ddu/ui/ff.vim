@@ -57,15 +57,6 @@ function! ddu#ui#ff#close() abort
     call win_gotoid(g:ddu#ui#ff#_filter_parent_winid)
   endif
 endfunction
-function! ddu#ui#ff#get_item() abort
-  if !('b:ddu_ui_name'->exists())
-    return {}
-  endif
-
-  call ddu#ui_action(b:ddu_ui_name, 'getItem', {})
-
-  return b:->get('ddu_ui_item', {})
-endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   let max_lines = a:lines->len()
