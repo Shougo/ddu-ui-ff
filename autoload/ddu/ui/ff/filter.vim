@@ -65,7 +65,9 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   let row = a:params.filterFloatingPosition ==# 'bottom'
         \ ? a:parent->winheight() : -1
-  if a:params.floatingBorder !=# 'none'
+  " NOTE: "floatingBorder" may be array.
+  " "!=#" does not work for array.
+  if a:params.floatingBorder isnot 'none'
     " Calc border offset
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
