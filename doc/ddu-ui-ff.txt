@@ -38,10 +38,6 @@ INTERFACE					*ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS					*ddu-ui-ff-functions*
 
-						*ddu#ui#ff#close()*
-ddu#ui#ff#close()
-		Close the current window and move to parent UI window.
-
 						*ddu#ui#ff#do_action()*
 ddu#ui#ff#do_action({action-name}[, {params}])
 		Fire {action-name} action with {params}.  You can find the
@@ -80,6 +76,10 @@ chooseAction
 					*ddu-ui-ff-action-clearSelectAllItems*
 clearSelectAllItems
 		Clear all selected items.
+
+					*ddu-ui-ff-action-closeFilterWindow*
+closeFilterWindow
+		Close the filter window and move to parent UI window.
 
 					*ddu-ui-ff-action-collapseItem*
 collapseItem
@@ -466,9 +466,9 @@ EXAMPLES					*ddu-ui-ff-examples*
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
-	  \ <Esc><Cmd>call ddu#ui#ff#close()<CR>
+	  \ <Esc><Cmd>call ddu#ui#ff#do_action('closeFilterWindow')<CR>
 	  nnoremap <buffer> <CR>
-	  \ <Cmd><Cmd>call ddu#ui#ff#close()<CR>
+	  \ <Cmd>call ddu#ui#ff#do_action('closeFilterWindow')<CR>
 	endfunction
 <
 
@@ -572,7 +572,7 @@ acceptable.
 
 Q: |:close| does not move to the ddu-ui-ff window sometimes.
 
-A: Please use |ddu#ui#ff#close()| instead.
+A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
 
 Q: I want to toggle selected items in visual mode.
 
@@ -641,7 +641,8 @@ A: Please use "no" in |ddu-ui-filer-param-previewSplit|.
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
 2023.03.19
-* Remove "ddu#ui#ff#get_item()"  Please use "ddu#ui#get_item()" instead.
+* Remove "ddu#ui#ff#get_item()".  Please use "ddu#ui#get_item()" instead.
+* Remove "ddu#ui#ff#close()".  Please use "closeFilterWindow" action instead.
 
 2023.02.15
 * Remove "previewVertical".  Please use "previewSplit" instead.
