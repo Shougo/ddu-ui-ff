@@ -65,9 +65,12 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   let row = a:params.filterFloatingPosition ==# 'bottom'
         \ ? a:parent->winheight() : -1
-  if a:params.floatingBorder isnot# 'none'
+  if a:params.floatingBorder !=# 'none'
+    " Calc border offset
     if a:params.filterFloatingPosition ==# 'top'
       let row -= 2
+    else
+      let row += 2
     endif
   endif
 
@@ -88,7 +91,8 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \   width: a:params.winWidth,
         \   height: 1,
         \   border: a:params.floatingBorder,
-        \}
+        \ }
+
   if a:bufnr->bufwinid() > 0
     call nvim_win_set_config(a:bufnr->bufwinid(), params)
   else
