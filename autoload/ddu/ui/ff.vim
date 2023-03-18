@@ -1,12 +1,11 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
-let s:in_action = v:false
 
 function! ddu#ui#ff#do_action(name, options = {}) abort
   if !('b:ddu_ui_name'->exists())
     return
   endif
 
-  let s:in_action = v:true
+  let g:ddu#ui#ff#_in_action = v:true
 
   if &l:filetype ==# 'ddu-ff'
         \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
@@ -20,7 +19,7 @@ function! ddu#ui#ff#do_action(name, options = {}) abort
 
   call ddu#ui_action(b:ddu_ui_name, a:name, a:options)
 
-  let s:in_action = v:false
+  let g:ddu#ui#ff#_in_action = v:false
 endfunction
 
 function! ddu#ui#ff#multi_actions(actions) abort
@@ -276,7 +275,7 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
   " NOTE: In action execution, auto action should be skipped
   augroup ddu-ui-auto_action
     autocmd CursorMoved <buffer> ++nested
-          \ : if !s:in_action
+          \ : if !(g:->get('ddu#ui#ff#_in_action', v:false))
           \ |   call ddu#ui#ff#_do_auto_action()
           \ | endif
   augroup END
