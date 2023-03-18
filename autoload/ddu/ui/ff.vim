@@ -64,14 +64,7 @@ function! ddu#ui#ff#get_item() abort
 
   call ddu#ui_action(b:ddu_ui_name, 'getItem', {})
 
-  if 'g:ddu#ui#ff#_filter_parent_winid'->exists()
-    let item = winbufnr(g:ddu#ui#ff#_filter_parent_winid)
-          \ ->getbufvar('ddu_ui_item', {})
-  else
-    let item = b:->get('ddu_ui_item', {})
-  endif
-
-  return item
+  return b:->get('ddu_ui_item', {})
 endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort

@@ -581,6 +581,12 @@ export class Ui extends BaseUi<Params> {
       const bufnr = this.buffers[args.options.name];
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item);
 
+      const ft = await op.filetype.getLocal(args.denops);
+      if (ft == "ddu-ff-filter") {
+        // Set for filter window
+        await vars.b.set(args.denops, "ddu_ui_item", item)
+      }
+
       return ActionFlags.None;
     },
     itemAction: async (args: {
