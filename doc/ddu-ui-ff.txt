@@ -49,6 +49,10 @@ ddu#ui#ff#do_action({action-name}[, {params}])
 		{args} behavior depends on {action-name}.
 		NOTE: It can be called in the filter window or UI window.
 
+						*ddu#ui#ff#get_item()*
+ddu#ui#ff#get_item()
+		Return the current cursor item as |Dictionary|.
+
 						*ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 		Fire multiple actions.
