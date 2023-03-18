@@ -507,9 +507,6 @@ export class Ui extends BaseUi<Params> {
       await this.closeFilterWindow(args.denops);
 
       const items = await this.getItems(args.denops);
-      if (items.length == 0) {
-        return ActionFlags.None;
-      }
 
       const actions = await args.denops.call(
         "ddu#get_item_actions",
