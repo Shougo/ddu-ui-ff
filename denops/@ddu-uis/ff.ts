@@ -118,6 +118,36 @@ export class Ui extends BaseUi<Params> {
     this.filterBufnr = -1;
   }
 
+  override async onBeforeAction(args: {
+    denops: Denops;
+  }): Promise<void> {
+    await vars.g.set(args.denops, "ddu#ui#ff#_in_action", true);
+
+    const ft = await op.filetype.getLocal(args.denops);
+    const parentId = await vars.g.get(
+      args.denops,
+      "ddu#ui#ff#_filter_parent_winid",
+      -1,
+    );
+    if (ft == "ddu-ff" || parentId < 0) {
+      await vars.b.set(args.denops, "ddu_ui_ff_cursor_pos",
+                       await fn.getcurpos(args.denops));
+      await vars.b.set(args.denops, "ddu_ui_ff_cursor_text",
+                       await fn.getline(args.denops, "."));
+    } else {
+      await fn.win_execute(args.denops, parentId,
+                           "let b:ddu_ui_ff_cursor_pos = getcurpos()");
+      await fn.win_execute(args.denops, parentId,
+                           "let b:ddu_ui_ff_cursor_text = getline('.')");
+    }
+  }
+
+  override async onAfterAction(args: {
+    denops: Denops;
+  }): Promise<void> {
+    await vars.g.set(args.denops, "ddu#ui#ff#_in_action", false);
+  }
+
   // deno-lint-ignore require-await
   async refreshItems(args: {
     items: DduItem[];

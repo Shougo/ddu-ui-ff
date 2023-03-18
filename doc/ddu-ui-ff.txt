@@ -40,23 +40,14 @@ FUNCTIONS					*ddu-ui-ff-functions*
 
 						*ddu#ui#ff#do_action()*
 ddu#ui#ff#do_action({action-name}[, {params}])
-		Fire {action-name} action with {params}.  You can find the
-		actions list in |ddu-ui-ff-actions|.
-		{args} behavior depends on {action-name}.
-		NOTE: It can be called in the filter window or UI window.
+		It is deprecated.  Please use |ddu#ui#do_actions()|
+		instead.
 
 						*ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
-		Fire multiple actions.
+		It is deprecated.  Please use |ddu#ui#multi_actions()|
+		instead.
 
-		Example: >
-
-		nnoremap <buffer> c
-		\ <Cmd>call ddu#ui#ff#multi_actions([
-		\ ['itemAction', {'name': 'copy'}],
-		\ ['clearSelectAllItems'],
-		\ ])<CR>
-<
 						*ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
@@ -454,21 +445,21 @@ EXAMPLES					*ddu-ui-ff-examples*
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
+	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  nnoremap <buffer> <Space>
-	  \ <Cmd>call ddu#ui#ff#do_action('toggleSelectItem')<CR>
+	  \ <Cmd>call ddu#ui#do_action('toggleSelectItem')<CR>
 	  nnoremap <buffer> i
-	  \ <Cmd>call ddu#ui#ff#do_action('openFilterWindow')<CR>
+	  \ <Cmd>call ddu#ui#do_action('openFilterWindow')<CR>
 	  nnoremap <buffer> q
-	  \ <Cmd>call ddu#ui#ff#do_action('quit')<CR>
+	  \ <Cmd>call ddu#ui#do_action('quit')<CR>
 	endfunction
 
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
-	  \ <Esc><Cmd>call ddu#ui#ff#do_action('closeFilterWindow')<CR>
+	  \ <Esc><Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
 	  nnoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#ff#do_action('closeFilterWindow')<CR>
+	  \ <Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
 	endfunction
 <
 
@@ -486,7 +477,7 @@ A:
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
+	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 <
 Q: I want to move the cursor in the filter window, while in insert mode.
@@ -512,7 +503,7 @@ A: You can use "b:ddu_ui_name".
 	function! s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
-	    \ <Cmd>call ddu#ui#ff#do_action(
+	    \ <Cmd>call ddu#ui#do_action(
 	    \ 'itemAction', {'name': 'edit'})<CR>
 	  endif
 	endfunction
@@ -520,7 +511,7 @@ A: You can use "b:ddu_ui_name".
 	function! s:ddu_filter_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> <CR>
-	    \ <Cmd>call ddu#ui#ff#do_action('itemAction')<CR>
+	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  endif
 	endfunction
 <
@@ -532,7 +523,7 @@ A: You can pass params like this.
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> E
-	  \ <Cmd>call ddu#ui#ff#do_action('itemAction',
+	  \ <Cmd>call ddu#ui#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
 <
@@ -578,7 +569,7 @@ Q: I want to toggle selected items in visual mode.
 
 A: >
 	xnoremap <silent><buffer> <Space>
-	\ :call ddu#ui#ff#do_action('toggleSelectItem')<CR>
+	\ :call ddu#ui#do_action('toggleSelectItem')<CR>
 
 Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 
@@ -627,7 +618,7 @@ Q: I want to switch sources without clear current filter input.
 
 A: >
   nnoremap <buffer> ff
-  \ <Cmd>call ddu#ui#ff#do_action('updateOptions', #{
+  \ <Cmd>call ddu#ui#do_action('updateOptions', #{
   \   sources: [
   \     #{ name: 'file' },
   \   ],
