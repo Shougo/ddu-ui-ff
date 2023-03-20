@@ -1,7 +1,7 @@
 function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
-  let parent_id = win_getid()
+  const parent_id = win_getid()
 
-  let ids = a:bufnr->win_findbuf()
+  const ids = a:bufnr->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
     call cursor('$'->line(), 0)
@@ -55,7 +55,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
 endfunction
 
 function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
-  let is_floating =
+  const is_floating =
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
@@ -78,11 +78,11 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   if a:params.split ==# 'floating'
     let row += a:params.winRow
-    let col = a:params.winCol
+    const col = a:params.winCol
   else
-    let winpos = a:parent->win_screenpos()
+    const winpos = a:parent->win_screenpos()
     let row += winpos[0] - 1
-    let col = winpos[1] - 1
+    const col = winpos[1] - 1
   endif
 
   " NOTE: relative: win does not work for resume feature
@@ -97,11 +97,11 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   if a:bufnr->bufwinid() > 0
     call nvim_win_set_config(a:bufnr->bufwinid(), params)
-    let id = a:bufnr->bufwinid()
+    const id = a:bufnr->bufwinid()
   else
     " statusline must be set for floating window
-    let statusline = &l:statusline
-    let id = nvim_open_win(a:bufnr, v:true, params)
+    const statusline = &l:statusline
+    const id = nvim_open_win(a:bufnr, v:true, params)
     call nvim_win_set_option(id, 'statusline', statusline)
   endif
 
@@ -110,16 +110,16 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 endfunction
 
 function! s:init_buffer(name, params) abort
-  let is_floating =
+  const is_floating =
         \ a:params.split ==# 'floating' ||
         \ a:params.filterSplitDirection ==# 'floating'
 
-  let bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
+  const bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
   else
-    let direction = is_floating ? 'botright' : a:params.filterSplitDirection
+    const direction = is_floating ? 'botright' : a:params.filterSplitDirection
     silent execute direction 'sbuffer' bufnr
   endif
 
@@ -165,7 +165,7 @@ function! s:init_prompt(prompt, highlight_prompt) abort
   augroup END
 endfunction
 function! s:update_prompt() abort
-  let id = 2000
+  const id = 2000
   call sign_unplace('', #{ id: id, buffer: '%'->bufnr() })
   call sign_place(id, '', s:prompt_name, '%'->bufnr(), #{ lnum: '.'->line() })
   let s:prev_lnum = '$'->line()
@@ -185,7 +185,7 @@ endfunction
 function! s:check_redraw() abort
   unlet! s:update_timer
 
-  let input = '.'->getline()
+  const input = '.'->getline()
 
   if &l:filetype !=# 'ddu-ff-filter' || input ==# s:filter_prev_input
     return

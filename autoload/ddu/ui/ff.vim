@@ -13,8 +13,8 @@ function! ddu#ui#ff#execute(command) abort
     return
   endif
 
-  let winid = g:ddu#ui#ff#_filter_parent_winid
-  let prev_curpos = s:getcurpos(winid)
+  const winid = g:ddu#ui#ff#_filter_parent_winid
+  const prev_curpos = s:getcurpos(winid)
 
   call win_execute(winid, a:command)
 
@@ -25,7 +25,7 @@ function! ddu#ui#ff#execute(command) abort
 endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
-  let max_lines = a:lines->len()
+  const max_lines = a:lines->len()
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   call setbufline(a:bufnr, 1, a:params.reversed ? reverse(a:lines) : a:lines)
@@ -39,9 +39,9 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   endif
 
   " Init the cursor
-  let winid = a:bufnr->bufwinid()
-  let curpos = s:getcurpos(winid)
-  let lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
+  const winid = a:bufnr->bufwinid()
+  const curpos = s:getcurpos(winid)
+  const lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
   if curpos[1] != lnum
     call win_execute(winid,
           \ printf('call cursor(%d, 0) | normal! zb', lnum))
@@ -123,14 +123,14 @@ endfunction
 function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
   let preview_width = a:params.previewWidth
   let preview_height = a:params.previewHeight
-  let winnr = a:bufnr->bufwinid()
-  let pos = winnr->win_screenpos()
-  let win_width = winnr->winwidth()
-  let win_height = winnr->winheight()
+  const winnr = a:bufnr->bufwinid()
+  const pos = winnr->win_screenpos()
+  const win_width = winnr->winwidth()
+  const win_height = winnr->winheight()
 
   if a:params.previewSplit ==# 'vertical'
     if a:params.previewFloating && '*nvim_win_set_config'->exists()
-      let buf = nvim_create_buf(v:true, v:false)
+      const buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
         let win_row = a:params.previewRow > 0 ?
@@ -162,7 +162,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
     endif
   elseif a:params.previewSplit ==# 'horizontal'
     if a:params.previewFloating && '*nvim_win_set_config'->exists()
-      let buf = nvim_create_buf(v:true, v:false)
+      const buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
         let preview_width = win_width
@@ -174,9 +174,9 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
               \ a:params.previewCol : pos[1] - 1
       if a:params.previewRow <= 0 && win_row <= preview_height
         let win_row += win_height + 1
-        let anchor = 'NW'
+        const anchor = 'NW'
       else
-        let anchor = 'SW'
+        const anchor = 'SW'
       endif
 
       call nvim_open_win(buf, v:true, #{
@@ -204,9 +204,9 @@ function! s:getcurpos(winid) abort
   endif
 
   " NOTE: Old neovim does not support getcurpos({winid})
-  let prev_winid = win_getid()
+  const prev_winid = win_getid()
   call win_gotoid(a:winid)
-  let cursor = getcurpos()
+  const cursor = getcurpos()
   call win_gotoid(prev_winid)
   return cursor
 endfunction
@@ -224,13 +224,13 @@ function! s:do_auto_action() abort
     return
   endif
 
-  let winid =
+  const winid =
         \ (&l:filetype ==# 'ddu-ff'
         \  || !('g:ddu#ui#ff#_filter_parent_winid'->exists())) ?
         \ win_getid() : g:ddu#ui#ff#_filter_parent_winid
-  let bufnr = winid->winbufnr()
+  const bufnr = winid->winbufnr()
 
-  let text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
+  const text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
   if text != s:cursor_text
     call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
     let s:cursor_text = text
@@ -263,7 +263,7 @@ function! ddu#ui#ff#_cursor(line, col) abort
     call cursor(a:line, a:col)
     normal! zb
   else
-    let winid = g:ddu#ui#ff#_filter_parent_winid
+    const winid = g:ddu#ui#ff#_filter_parent_winid
     call win_execute(winid,
           \ printf('call cursor(%d, %d) | normal! zb',
           \        a:line, a:col))
@@ -271,7 +271,7 @@ function! ddu#ui#ff#_cursor(line, col) abort
 endfunction
 
 function! ddu#ui#ff#_save_cursor() abort
-  let text = '.'->getline()
+  const text = '.'->getline()
 
   " NOTE: Skip save cursor if it is empty text.
   " Because the items are empty
