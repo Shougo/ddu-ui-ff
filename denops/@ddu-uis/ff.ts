@@ -577,15 +577,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       await this.closeFilterWindow(args.denops);
 
-      const parentId = await vars.g.get(
-        args.denops,
-        "ddu#ui#ff#_filter_parent_winid",
-        -1,
-      );
-      if (parentId > 0) {
-        // Move to parent window
-        await fn.win_gotoid(args.denops, parentId);
-      }
+      await this.moveParentWindow(args.denops);
 
       return ActionFlags.None;
     },
@@ -656,6 +648,15 @@ export class Ui extends BaseUi<Params> {
         params.params ?? {},
       );
 
+      return ActionFlags.None;
+    },
+    leaveFilterWindow: async (args: {
+      denops: Denops;
+      context: Context;
+      options: DduOptions;
+      uiParams: Params;
+    }) => {
+      await this.moveParentWindow(args.denops);
       return ActionFlags.None;
     },
     openFilterWindow: async (args: {
@@ -1023,6 +1024,19 @@ export class Ui extends BaseUi<Params> {
       if (filterWinNr > 0) {
         await denops.cmd(`silent! close! ${filterWinNr}`);
       }
+    }
+  }
+
+  private async moveParentWindow(
+    denops: Denops,
+  ): Promise<void> {
+    const parentId = await vars.g.get(
+      denops,
+      "ddu#ui#ff#_filter_parent_winid",
+      -1,
+    );
+    if (parentId > 0) {
+      await fn.win_gotoid(denops, parentId);
     }
   }
 

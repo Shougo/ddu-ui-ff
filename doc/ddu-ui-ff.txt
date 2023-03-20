@@ -70,7 +70,7 @@ clearSelectAllItems
 
 					*ddu-ui-ff-action-closeFilterWindow*
 closeFilterWindow
-		Close the filter window and move to parent UI window.
+		Close the filter window and move to the parent UI window.
 
 					*ddu-ui-ff-action-collapseItem*
 collapseItem
@@ -105,6 +105,10 @@ itemAction
 		If {name} is empty, "default" will be used.
 
 		NOTE: You cannot mix multiple kinds/sources.
+
+					*ddu-ui-ff-action-leaveFilterWindow*
+leaveFilterWindow
+		Move to the parent UI window.
 
 					*ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
