@@ -97,6 +97,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
 
   if a:bufnr->bufwinid() > 0
     call nvim_win_set_config(a:bufnr->bufwinid(), params)
+    let id = a:bufnr->bufwinid()
   else
     " statusline must be set for floating window
     let statusline = &l:statusline
