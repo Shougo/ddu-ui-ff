@@ -189,7 +189,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (
-      this.prevLength < 0 && args.uiParams.ignoreEmpty &&
+      this.prevLength <= 0 && args.uiParams.ignoreEmpty &&
       args.context.maxItems == 0
     ) {
       // Disable redraw when empty items
