@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.5.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.7.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.5.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.7.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -130,15 +130,27 @@ export class Ui extends BaseUi<Params> {
       -1,
     );
     if (ft == "ddu-ff" || parentId < 0) {
-      await vars.b.set(args.denops, "ddu_ui_ff_cursor_pos",
-                       await fn.getcurpos(args.denops));
-      await vars.b.set(args.denops, "ddu_ui_ff_cursor_text",
-                       await fn.getline(args.denops, "."));
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor_pos",
+        await fn.getcurpos(args.denops),
+      );
+      await vars.b.set(
+        args.denops,
+        "ddu_ui_ff_cursor_text",
+        await fn.getline(args.denops, "."),
+      );
     } else {
-      await fn.win_execute(args.denops, parentId,
-                           "let b:ddu_ui_ff_cursor_pos = getcurpos()");
-      await fn.win_execute(args.denops, parentId,
-                           "let b:ddu_ui_ff_cursor_text = getline('.')");
+      await fn.win_execute(
+        args.denops,
+        parentId,
+        "let b:ddu_ui_ff_cursor_pos = getcurpos()",
+      );
+      await fn.win_execute(
+        args.denops,
+        parentId,
+        "let b:ddu_ui_ff_cursor_text = getline('.')",
+      );
     }
   }
 
@@ -149,7 +161,7 @@ export class Ui extends BaseUi<Params> {
   }
 
   // deno-lint-ignore require-await
-  async refreshItems(args: {
+  override async refreshItems(args: {
     items: DduItem[];
   }): Promise<void> {
     // NOTE: Use only 1000 items
@@ -487,7 +499,7 @@ export class Ui extends BaseUi<Params> {
   }
 
   // deno-lint-ignore require-await
-  async collapseItem(args: {
+  override async collapseItem(args: {
     item: DduItem;
   }) {
     // Search index.
@@ -515,6 +527,36 @@ export class Ui extends BaseUi<Params> {
     this.items[startIndex] = args.item;
 
     this.selectedItems.clear();
+  }
+
+  override async visible(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiParams: Params;
+    tabNr: number;
+  }): Promise<boolean> {
+    const bufferName = `ddu-ff-${args.options.name}`;
+    const bufnr = await fn.bufnr(args.denops, bufferName);
+    if (args.tabNr > 0) {
+      return (await fn.tabpagebuflist(args.denops, args.tabNr) as number[])
+        .includes(bufnr);
+    } else {
+      // Search from all tabpages.
+      return (await fn.win_findbuf(args.denops, bufnr) as number[]).length > 0;
+    }
+  }
+
+  override async winId(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiParams: Params;
+  }): Promise<number> {
+    const bufferName = `ddu-ff-${args.options.name}`;
+    const bufnr = await fn.bufnr(args.denops, bufferName);
+    const winIds = await fn.win_findbuf(args.denops, bufnr) as number[];
+    return winIds.length > 0 ? winIds[0] : -1;
   }
 
   override actions: UiActions<Params> = {
@@ -626,7 +668,7 @@ export class Ui extends BaseUi<Params> {
       const ft = await op.filetype.getLocal(args.denops);
       if (ft == "ddu-ff-filter") {
         // Set for filter window
-        await vars.b.set(args.denops, "ddu_ui_item", item)
+        await vars.b.set(args.denops, "ddu_ui_item", item);
       }
 
       return ActionFlags.None;
