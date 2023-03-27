@@ -88,7 +88,7 @@ export type Params = {
 };
 
 export class Ui extends BaseUi<Params> {
-  private buffers: Record<string, number> = {};
+  private bufferName = "";
   private filterBufnr = -1;
   private items: DduItem[] = [];
   private viewItems: DduItem[] = [];
@@ -208,11 +208,11 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    const bufferName = `ddu-ff-${args.options.name}`;
-    const initialized = this.buffers[args.options.name] ||
-      (await fn.bufexists(args.denops, bufferName) &&
-        await fn.bufnr(args.denops, bufferName));
-    const bufnr = initialized || await this.initBuffer(args.denops, bufferName);
+    this.bufferName = `ddu-ff-${args.options.name}`;
+    const initialized = await fn.bufexists(args.denops, this.bufferName) &&
+      await fn.bufnr(args.denops, this.bufferName);
+    const bufnr = initialized ||
+      await this.initBuffer(args.denops, this.bufferName);
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
@@ -305,8 +305,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    // NOTE: buffers may be restored
-    if (!this.buffers[args.options.name] || winid < 0) {
+    if (winid < 0) {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
@@ -451,8 +450,6 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    this.buffers[args.options.name] = bufnr;
-
     this.refreshed = false;
   }
 
@@ -536,8 +533,7 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     tabNr: number;
   }): Promise<boolean> {
-    const bufferName = `ddu-ff-${args.options.name}`;
-    const bufnr = await fn.bufnr(args.denops, bufferName);
+    const bufnr = await this.getBufnr(args.denops);
     if (args.tabNr > 0) {
       return (await fn.tabpagebuflist(args.denops, args.tabNr) as number[])
         .includes(bufnr);
@@ -553,8 +549,7 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions;
     uiParams: Params;
   }): Promise<number> {
-    const bufferName = `ddu-ff-${args.options.name}`;
-    const bufnr = await fn.bufnr(args.denops, bufferName);
+    const bufnr = await this.getBufnr(args.denops);
     const winIds = await fn.win_findbuf(args.denops, bufnr) as number[];
     return winIds.length > 0 ? winIds[0] : -1;
   }
@@ -662,7 +657,7 @@ export class Ui extends BaseUi<Params> {
       }
 
       const item = this.items[idx];
-      const bufnr = this.buffers[args.options.name];
+      const bufnr = await this.getBufnr(args.denops);
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item);
 
       const ft = await op.filetype.getLocal(args.denops);
@@ -742,7 +737,7 @@ export class Ui extends BaseUi<Params> {
         args.options,
         args.uiParams,
         args.actionParams,
-        this.buffers[args.options.name],
+        await this.getBufnr(args.denops),
         item,
       );
     },
@@ -887,7 +882,7 @@ export class Ui extends BaseUi<Params> {
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
 
     // Move to the UI window.
-    const bufnr = this.buffers[args.options.name];
+    const bufnr = await this.getBufnr(args.denops);
     if (!bufnr) {
       return;
     }
@@ -1103,6 +1098,7 @@ export class Ui extends BaseUi<Params> {
 
     return ActionFlags.None;
   }
+
   private async initBuffer(
     denops: Denops,
     bufferName: string,
@@ -1162,6 +1158,12 @@ export class Ui extends BaseUi<Params> {
     if (uiParams.winWidth == 0) {
       uiParams.winWidth = Math.trunc((await op.columns.getGlobal(denops)) / 2);
     }
+  }
+
+  private async getBufnr(
+    denops: Denops,
+  ): Promise<number> {
+    return await fn.bufnr(denops, this.bufferName);
   }
 
   private async getIndex(
