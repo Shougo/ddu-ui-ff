@@ -305,7 +305,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (winid < 0) {
+    if (!initialized || winid < 0) {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
@@ -1169,17 +1169,14 @@ export class Ui extends BaseUi<Params> {
   private async getIndex(
     denops: Denops,
   ): Promise<number> {
-    const ft = await op.filetype.getLocal(denops);
-    const parentId = await vars.g.get(
-      denops,
-      "ddu#ui#ff#_filter_parent_winid",
-      -1,
-    );
+    const bufnr = await this.getBufnr(denops);
+    const cursorPos = await fn.getbufvar(
+      denops, bufnr, "ddu_ui_ff_cursor_pos", []) as number[];
+    if (cursorPos.length == 0) {
+      return -1;
+    }
 
-    const idx = ft == "ddu-ff"
-      ? (await fn.line(denops, ".")) - 1
-      : (await denops.call("line", ".", parentId) as number) - 1;
-    const viewItem = this.viewItems[idx];
+    const viewItem = this.viewItems[cursorPos[1] - 1];
     return this.items.findIndex(
       (item: DduItem) => item == viewItem,
     );
