@@ -76,6 +76,14 @@ closeFilterWindow
 collapseItem
 		Collapse the item tree.
 
+					*ddu-ui-ff-action-cursorNext*
+cursorNext
+		Move the cursor to the next.
+
+					*ddu-ui-ff-action-cursorPrevious*
+cursorPrevious
+		Move the cursor to the previous.
+
 					*ddu-ui-ff-action-expandItem*
 expandItem
 		Expand the item tree.
@@ -100,7 +108,8 @@ itemAction
 			{name}: action name
 			{params}: action params dictionary
 
-		Close the UI window and fire {name} action for items.
+		Close the UI window and fire {name} action for selected or
+		current cursor items.
 		You can find the actions list in item's kind documentation.
 		If {name} is empty, "default" will be used.
 
@@ -632,6 +641,18 @@ A: >
 Q: I want to use existing buffer to show preview.
 
 A: Please use "no" in |ddu-ui-filer-param-previewSplit|.
+
+Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
+   like commands are available?
+
+A: >
+
+  nnoremap <C-n>
+  \ <Cmd>call ddu#ui_action('files', 'cursorNext')<CR>
+  \ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
+  nnoremap <C-p>
+  \ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
+  \ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
