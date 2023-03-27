@@ -40,7 +40,7 @@ FUNCTIONS					*ddu-ui-ff-functions*
 
 						*ddu#ui#ff#do_action()*
 ddu#ui#ff#do_action({action-name}[, {params}])
-		It is deprecated.  Please use |ddu#ui#do_actions()|
+		It is deprecated.  Please use |ddu#ui#do_action()|
 		instead.
 
 						*ddu#ui#ff#multi_actions()*
