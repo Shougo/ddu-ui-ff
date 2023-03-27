@@ -187,7 +187,8 @@ autoResize	(boolean)
 
 						*ddu-ui-ff-param-cursorPos*
 cursorPos	(number)
-		Select {number} candidate.
+		Select {number} candidate.  It is 0 origin.
+		If you set the option, cursor restore feature is disabled.
 
 		Default: -1
 
