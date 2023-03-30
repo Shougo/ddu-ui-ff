@@ -56,8 +56,8 @@ endfunction
 
 function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   const is_floating =
-        \ a:params.split ==# 'floating' ||
-        \ a:params.filterSplitDirection ==# 'floating'
+        \ a:params.split ==# 'floating'
+        \ || a:params.filterSplitDirection ==# 'floating'
 
   if !has('nvim') || !is_floating
     return
@@ -111,8 +111,8 @@ endfunction
 
 function! s:init_buffer(name, params) abort
   const is_floating =
-        \ a:params.split ==# 'floating' ||
-        \ a:params.filterSplitDirection ==# 'floating'
+        \ a:params.split ==# 'floating'
+        \ || a:params.filterSplitDirection ==# 'floating'
 
   const bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
 

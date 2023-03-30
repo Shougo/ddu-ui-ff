@@ -216,18 +216,17 @@ let s:auto_action = {}
 let s:debounce_timer = -1
 function! ddu#ui#ff#_do_auto_action() abort
   silent! call timer_stop(s:debounce_timer)
-  let s:debounce_timer =
-        \ timer_start(s:auto_action.delay, { -> s:do_auto_action() })
+  let s:debounce_timer = timer_start(
+        \ s:auto_action.delay, { -> s:do_auto_action() })
 endfunction
 function! s:do_auto_action() abort
   if empty(s:auto_action)
     return
   endif
 
-  const winid =
-        \ (&l:filetype ==# 'ddu-ff'
-        \  || !('g:ddu#ui#ff#_filter_parent_winid'->exists())) ?
-        \ win_getid() : g:ddu#ui#ff#_filter_parent_winid
+  const winid = (&l:filetype ==# 'ddu-ff'
+        \        || !('g:ddu#ui#ff#_filter_parent_winid'->exists()))
+        \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
   const bufnr = winid->winbufnr()
 
   const text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
