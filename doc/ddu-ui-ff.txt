@@ -59,7 +59,7 @@ ACTIONS						*ddu-ui-ff-actions*
 
 					*ddu-ui-ff-action-chooseAction*
 chooseAction
-		Choose and fire the action.
+		Choose and fire the action by ddu UI.
 
 		NOTE: "ddu-source-action" is required.
 		https://github.com/Shougo/ddu-source-action
@@ -100,7 +100,15 @@ expandItem
 
 						*ddu-ui-ff-action-getItem*
 getItem
-		Set current item to "b:ddu_ui_item" variable.
+		Set cursor item to "b:ddu_ui_item" variable.
+
+					*ddu-ui-ff-action-getSelectedItems*
+getSelectedItems
+		Set selected items to "b:ddu_ui_selected_items" variable.
+
+						*ddu-ui-ff-action-inputAction*
+inputAction
+		Choose and fire the action by |input()|.
 
 						*ddu-ui-ff-action-itemAction*
 itemAction
