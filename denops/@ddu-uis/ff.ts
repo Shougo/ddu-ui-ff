@@ -200,10 +200,7 @@ export class Ui extends BaseUi<Params> {
       await this.previewUi.close(args.denops, args.context);
     }
 
-    if (
-      this.prevLength <= 0 && args.uiParams.ignoreEmpty &&
-      args.context.maxItems == 0
-    ) {
+    if (args.uiParams.ignoreEmpty && args.context.maxItems == 0) {
       // Disable redraw when empty items
       return;
     }
@@ -625,7 +622,11 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const bufnr = await this.getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
-        args.denops, bufnr, "ddu_ui_ff_cursor_pos", []) as number[];
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        [],
+      ) as number[];
       if (cursorPos.length == 0) {
         return ActionFlags.Persist;
       }
@@ -638,7 +639,11 @@ export class Ui extends BaseUi<Params> {
       }
       if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
         await fn.setbufvar(
-          args.denops, bufnr, "ddu_ui_ff_cursor_pos", cursorPos)
+          args.denops,
+          bufnr,
+          "ddu_ui_ff_cursor_pos",
+          cursorPos,
+        );
       }
 
       return ActionFlags.Persist;
@@ -649,7 +654,11 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const bufnr = await this.getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
-        args.denops, bufnr, "ddu_ui_ff_cursor_pos", []) as number[];
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        [],
+      ) as number[];
       if (cursorPos.length == 0) {
         return ActionFlags.Persist;
       }
@@ -662,7 +671,11 @@ export class Ui extends BaseUi<Params> {
       }
       if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
         await fn.setbufvar(
-          args.denops, bufnr, "ddu_ui_ff_cursor_pos", cursorPos)
+          args.denops,
+          bufnr,
+          "ddu_ui_ff_cursor_pos",
+          cursorPos,
+        );
       }
 
       return ActionFlags.Persist;
@@ -747,7 +760,10 @@ export class Ui extends BaseUi<Params> {
       );
 
       const actionName = await args.denops.call(
-        "ddu#util#input_list", "Input action name: ", actions);
+        "ddu#util#input_list",
+        "Input action name: ",
+        actions,
+      );
       if (actionName != "") {
         await args.denops.call(
           "ddu#item_action",
@@ -1263,7 +1279,11 @@ export class Ui extends BaseUi<Params> {
   ): Promise<number> {
     const bufnr = await this.getBufnr(denops);
     const cursorPos = await fn.getbufvar(
-      denops, bufnr, "ddu_ui_ff_cursor_pos", []) as number[];
+      denops,
+      bufnr,
+      "ddu_ui_ff_cursor_pos",
+      [],
+    ) as number[];
     if (cursorPos.length == 0) {
       return -1;
     }
