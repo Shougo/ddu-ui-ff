@@ -116,6 +116,7 @@ export class Ui extends BaseUi<Params> {
       this.saveCol = await fn.col(args.denops, ".") as number;
     }
     this.filterBufnr = -1;
+    this.items = [];
   }
 
   override async onBeforeAction(args: {
@@ -200,7 +201,7 @@ export class Ui extends BaseUi<Params> {
       await this.previewUi.close(args.denops, args.context);
     }
 
-    if (args.uiParams.ignoreEmpty && args.context.maxItems == 0) {
+    if (args.uiParams.ignoreEmpty && this.items.length == 0) {
       // Disable redraw when empty items
       return;
     }
