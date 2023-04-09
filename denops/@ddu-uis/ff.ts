@@ -24,6 +24,7 @@ type DoActionParams = {
 
 type HighlightGroup = {
   floating?: string;
+  floatingBorder?: string;
   preview?: string;
   prompt?: string;
   selected?: string;
@@ -248,16 +249,20 @@ export class Ui extends BaseUi<Params> {
           "border": args.uiParams.floatingBorder,
         });
 
+        const winnr = await fn.bufwinnr(args.denops, bufnr);
+        const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
+        const floatingHighlight = args.uiParams.highlights?.floatingBorder ?? "FloatBorder";
+
         await fn.setwinvar(
           args.denops,
-          await fn.bufwinnr(args.denops, bufnr),
+          winnr,
           "&winhighlight",
-          `Normal:${args.uiParams.highlights?.floating ?? "NormalFloat"}`,
+          `Normal:${highlight},FloatBorder:${floatingHighlight}`,
         );
 
         await fn.setwinvar(
           args.denops,
-          await fn.bufwinnr(args.denops, bufnr),
+          winnr,
           "&statusline",
           currentStatusline,
         );

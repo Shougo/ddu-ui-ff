@@ -106,7 +106,8 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   endif
 
   call nvim_win_set_option(id, 'winhighlight',
-        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat'))
+        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat') ..
+        \ ',FloatBorder:' .. a:params.highlights->get('floatingBorder', 'FloatBorder'))
 endfunction
 
 function! s:init_buffer(name, params) abort
@@ -121,11 +122,6 @@ function! s:init_buffer(name, params) abort
   else
     const direction = is_floating ? 'botright' : a:params.filterSplitDirection
     silent execute direction 'sbuffer' bufnr
-  endif
-
-  if has('nvim') && is_floating && a:params.highlights->has_key('floating')
-    call setwinvar(bufnr->bufwinnr(),
-          \ '&winhighlight', 'Normal:' .. a:params.highlights.floating)
   endif
 
   let b:ddu_ui_name = a:name

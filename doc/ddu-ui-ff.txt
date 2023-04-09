@@ -278,6 +278,10 @@ highlights	(dictionary)
 		Specify floating window background highlight.
 		Default: "NormalFloat"
 
+		floatingBorder			(string)
+		Specify border highlight of flowing window
+		Default: "FloatBorder"
+
 		preview				(string)
 		Specify preview window highlight.
 		Default: "Search"
