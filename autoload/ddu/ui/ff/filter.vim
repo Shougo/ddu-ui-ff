@@ -106,7 +106,8 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   endif
 
   call nvim_win_set_option(id, 'winhighlight',
-        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat'))
+        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat') ..
+        \ ',FloatBorder:' .. a:params.highlights->get('floatingBorder', 'FloatBorder'))
 endfunction
 
 function! s:init_buffer(name, params) abort
