@@ -123,11 +123,6 @@ function! s:init_buffer(name, params) abort
     silent execute direction 'sbuffer' bufnr
   endif
 
-  if has('nvim') && is_floating && a:params.highlights->has_key('floating')
-    call setwinvar(bufnr->bufwinnr(),
-          \ '&winhighlight', 'Normal:' .. a:params.highlights.floating)
-  endif
-
   let b:ddu_ui_name = a:name
 
   setlocal bufhidden=hide
