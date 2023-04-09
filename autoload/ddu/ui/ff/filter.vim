@@ -105,9 +105,11 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     call nvim_win_set_option(id, 'statusline', statusline)
   endif
 
+  const highlight = a:params.highlights->get('floating', 'NormalFloat')
+  const floating_highlight = a:params.highlights->get(
+        \ 'floatingBorder', 'FloatBorder')
   call nvim_win_set_option(id, 'winhighlight',
-        \ 'Normal:' .. a:params.highlights->get('floating', 'NormalFloat') ..
-        \ ',FloatBorder:' .. a:params.highlights->get('floatingBorder', 'FloatBorder'))
+        \ 'Normal:' .. highlight .. ',FloatBorder:' .. floating_highlight)
 endfunction
 
 function! s:init_buffer(name, params) abort
