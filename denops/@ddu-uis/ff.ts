@@ -251,7 +251,8 @@ export class Ui extends BaseUi<Params> {
 
         const winnr = await fn.bufwinnr(args.denops, bufnr);
         const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
-        const floatingHighlight = args.uiParams.highlights?.floatingBorder ?? "FloatBorder";
+        const floatingHighlight = args.uiParams.highlights?.floatingBorder ??
+          "FloatBorder";
 
         await fn.setwinvar(
           args.denops,
