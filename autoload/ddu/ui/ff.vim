@@ -28,8 +28,13 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   const max_lines = a:lines->len()
   call setbufvar(a:bufnr, '&modifiable', 1)
 
+  const winid = a:bufnr->bufwinid()
+
+  const current_lines = '$'->line(winid)
   call setbufline(a:bufnr, 1, a:params.reversed ? reverse(a:lines) : a:lines)
-  silent call deletebufline(a:bufnr, max_lines + 1, '$')
+  if current_lines > max_lines
+    call deletebufline(a:bufnr, max_lines + 1, '$')
+  endif
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
@@ -39,7 +44,6 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   endif
 
   " Init the cursor
-  const winid = a:bufnr->bufwinid()
   const curpos = s:getcurpos(winid)
   const lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
   if curpos[1] != lnum
