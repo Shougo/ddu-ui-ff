@@ -1021,8 +1021,11 @@ export class Ui extends BaseUi<Params> {
       if (
         args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
       ) {
+        const prevName = await fn.bufname(args.denops, args.context.bufNr);
         await args.denops.cmd(
-          args.context.bufName == "" ? "enew" : `buffer ${args.context.bufNr}`,
+            prevName != args.context.bufName
+            ? "enew"
+            : `buffer ${args.context.bufNr}`,
         );
       } else {
         await args.denops.cmd("close!");
