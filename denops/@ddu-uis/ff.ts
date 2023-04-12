@@ -352,8 +352,7 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const cursorPos = args.uiParams.cursorPos >= 0 &&
-        this.refreshed && args.context.done
+    const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
       ? args.uiParams.cursorPos
       : 0;
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
