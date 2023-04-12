@@ -202,14 +202,15 @@ export class Ui extends BaseUi<Params> {
       await this.previewUi.close(args.denops, args.context);
     }
 
-    if (args.uiParams.ignoreEmpty && this.items.length == 0) {
-      // Disable redraw when empty items
-      return;
-    }
-
     this.bufferName = `ddu-ff-${args.options.name}`;
     const initialized = await fn.bufexists(args.denops, this.bufferName) &&
       await fn.bufnr(args.denops, this.bufferName);
+
+    if (args.uiParams.ignoreEmpty && this.items.length == 0 && !initialized) {
+      // Disable open UI window when empty items
+      return;
+    }
+
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
 

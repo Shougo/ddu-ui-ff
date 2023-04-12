@@ -33,7 +33,7 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
 
   call setbufline(a:bufnr, 1, a:params.reversed ? reverse(a:lines) : a:lines)
   if current_lines > max_lines
-    call deletebufline(a:bufnr, max_lines + 1, '$')
+    silent call deletebufline(a:bufnr, max_lines + 1, '$')
   endif
 
   call setbufvar(a:bufnr, '&modifiable', 0)
