@@ -203,13 +203,20 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.bufferName = `ddu-ff-${args.options.name}`;
-    const initialized = await fn.bufexists(args.denops, this.bufferName) &&
-      await fn.bufnr(args.denops, this.bufferName);
 
-    if (args.uiParams.ignoreEmpty && this.items.length == 0 && !initialized) {
+    if (
+      args.uiParams.ignoreEmpty && this.items.length == 0 &&
+      (await fn.bufwinid(
+          args.denops,
+          await fn.bufnr(args.denops, this.bufferName),
+        )) < 0
+    ) {
       // Disable open UI window when empty items
       return;
     }
+
+    const initialized = await fn.bufexists(args.denops, this.bufferName) &&
+      await fn.bufnr(args.denops, this.bufferName);
 
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
