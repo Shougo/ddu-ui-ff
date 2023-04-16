@@ -211,7 +211,7 @@ export class PreviewUi {
     }
 
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
-    const exists = await fn.buflisted(denops, bufname);
+    const exists = await fn.bufexists(denops, bufname);
     if (this.previewWinId < 0) {
       try {
         await denops.call(
