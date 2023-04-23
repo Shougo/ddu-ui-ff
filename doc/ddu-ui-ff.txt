@@ -432,7 +432,7 @@ winCol		(number)
 		Set the column position of the window if
 		|ddu-ui-ff-param-split| is "floating".
 
-		Default: &columns / 4
+		Default: ('columns' - winWidth) / 2
 
 						*ddu-ui-ff-param-winHeight*
 winHeight	(number)
