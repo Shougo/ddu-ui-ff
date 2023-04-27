@@ -652,7 +652,7 @@ A: >
 
 Q: I want to use existing buffer to show preview.
 
-A: Please use "no" in |ddu-ui-filer-param-previewSplit|.
+A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
    like commands are available?
