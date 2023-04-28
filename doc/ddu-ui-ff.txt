@@ -196,6 +196,11 @@ autoAction	(dictionary)
 
 		Default: {}
 
+		sync				(boolean)	(Optional)
+		If it is true, action is executed synchronously.
+
+		Default: v:true
+
 					    	*ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
 		Auto resize the window height automatically.

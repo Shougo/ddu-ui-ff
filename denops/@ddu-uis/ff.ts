@@ -34,6 +34,7 @@ type AutoAction = {
   name?: string;
   params?: unknown;
   delay?: number;
+  sync?: boolean;
 };
 
 type FloatingBorder =
@@ -287,13 +288,10 @@ export class Ui extends BaseUi<Params> {
       await batch(args.denops, async (denops: Denops) => {
         await denops.call("ddu#ui#ff#_reset_auto_action");
         if (hasAutoAction) {
-          const autoAction = args.uiParams.autoAction;
-          if (!("params" in autoAction)) {
-            autoAction.params = {};
-          }
-          if (!("delay" in autoAction)) {
-            autoAction.delay = 100;
-          }
+          const autoAction = Object.assign(
+            { delay: 100, params: {}, sync: true },
+            args.uiParams.autoAction,
+          );
           await denops.call(
             "ddu#ui#ff#_set_auto_action",
             autoAction,
@@ -1023,7 +1021,7 @@ export class Ui extends BaseUi<Params> {
       ) {
         const prevName = await fn.bufname(args.denops, args.context.bufNr);
         await args.denops.cmd(
-            prevName != args.context.bufName
+          prevName != args.context.bufName
             ? "enew"
             : `buffer ${args.context.bufNr}`,
         );
@@ -1270,7 +1268,7 @@ export class Ui extends BaseUi<Params> {
   }
 
   private async setDefaultParams(denops: Denops, uiParams: Params) {
-    const columns = (await op.columns.getGlobal(denops));
+    const columns = await op.columns.getGlobal(denops);
     if (uiParams.winWidth == 0) {
       uiParams.winWidth = Math.trunc(columns / 2);
     }
