@@ -666,6 +666,24 @@ A: >
   \ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
   \ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
 
+Q: I want to display cursor mark on the left of ddu window like
+"telescope.nvim".
+
+A:
+>
+	autocmd FileType ddu-ff call s:ddu_my_settings()
+	function! s:ddu_my_settings() abort
+	  setlocal signcolumn=yes
+	  autocmd CursorMoved <buffer> call s:update_cursor()
+	endfunction
+	
+	function! s:update_cursor()
+	  sign unplace 100
+	  sign define cursor text=>> texthl=Search
+	  execute printf('sign place 100 line=%d name=cursor file=%s',
+	        \ '.'->line(), '%:p'->expand())
+	endfunction
+<
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
