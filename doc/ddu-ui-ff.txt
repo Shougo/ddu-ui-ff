@@ -198,6 +198,7 @@ autoAction	(dictionary)
 
 		sync				(boolean)	(Optional)
 		If it is true, action is executed synchronously.
+		NOTE: If it is false, the screen may be flickered.
 
 		Default: v:true
 
