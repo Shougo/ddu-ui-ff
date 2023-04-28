@@ -235,7 +235,11 @@ function! s:do_auto_action() abort
 
   const text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
   if text != s:cursor_text
-    call ddu#ui#ff#do_action(s:auto_action.name, s:auto_action.params)
+    if s:auto_action.sync
+      call ddu#ui#sync_action(s:auto_action.name, s:auto_action.params)
+    else
+      call ddu#ui#do_action(s:auto_action.name, s:auto_action.params)
+    endif
     let s:cursor_text = text
   endif
 endfunction
