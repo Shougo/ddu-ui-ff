@@ -336,9 +336,6 @@ export class Ui extends BaseUi<Params> {
 
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
-    const promptPrefix = args.uiParams.prompt == "" ? "" : " ".repeat(
-      1 + (await fn.strwidth(args.denops, args.uiParams.prompt) as number),
-    );
     const getSourceName = (sourceName: string) => {
       if (displaySourceName == "long") {
         return sourceName + " ";
@@ -358,7 +355,7 @@ export class Ui extends BaseUi<Params> {
       (args.uiParams.reversed && this.items.length != this.prevLength));
 
     const getPrefix = (item: DduItem) => {
-      return promptPrefix + `${getSourceName(item.__sourceName)}` +
+      return `${getSourceName(item.__sourceName)}` +
         (args.uiParams.displayTree
           ? " ".repeat(item.__level) +
             (!item.isTree ? "  " : item.__expanded ? "- " : "+ ")
@@ -1250,7 +1247,12 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&foldenable", 0);
       await fn.setwinvar(denops, winid, "&number", 0);
       await fn.setwinvar(denops, winid, "&relativenumber", 0);
-      await fn.setwinvar(denops, winid, "&signcolumn", "no");
+      await fn.setwinvar(
+        denops,
+        winid,
+        "&signcolumn",
+        uiParams.prompt.length > 0 ? "yes" : "no",
+      );
       await fn.setwinvar(denops, winid, "&spell", 0);
       await fn.setwinvar(denops, winid, "&wrap", 0);
 
