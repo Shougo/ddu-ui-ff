@@ -158,6 +158,8 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
             \   width: preview_width,
             \   height: preview_height,
             \   border: a:params.previewFloatingBorder,
+            \   title: a:params.previewFloatingTitle,
+            \   title_pos: a:params.previewFloatingTitlePos,
             \   zindex: a:params.previewFloatingZindex,
             \ })
     else
@@ -191,6 +193,8 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
             \   width: preview_width,
             \   height: preview_height,
             \   border: a:params.previewFloatingBorder,
+            \   title: a:params.previewFloatingTitle,
+            \   title_pos: a:params.previewFloatingTitlePos,
             \   zindex: a:params.previewFloatingZindex,
             \ })
     else
