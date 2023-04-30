@@ -241,6 +241,24 @@ floatingBorder		(string | list)
 
 		Default: "none"
 
+    				    	*ddu-ui-ff-param-floatingTitle*
+floatingTitle		(string | list)
+		Specify the title of the window border if
+		|ddu-ui-ff-param-floatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: ""
+
+    				    	*ddu-ui-ff-param-floatingTitlePos*
+floatingTitlePos	(string)
+		Specify the title position of the window border if
+		|ddu-ui-ff-param-floatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: "left"
+
 			    	*ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
@@ -254,6 +272,24 @@ filterFloatingPosition	(string)
 		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
 
 		Default: "bottom"
+
+				    	*ddu-ui-ff-param-filterFloatingTitle*
+filterFloatingTitle	(string | list)
+		Specify the title of the filter floating window with border if
+		|ddu-ui-ff-param-floatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: ""
+
+				    	*ddu-ui-ff-param-filterFloatingTitlePos*
+filterFloatingTitlePos	(string)
+		Specify the title position of the filter floating window with border if
+		|ddu-ui-ff-param-floatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: "left"
 
 				    	*ddu-ui-ff-param-filterSplitDirection*
 filterSplitDirection	(string)
@@ -329,6 +365,24 @@ previewFloatingBorder		(string | list)
 		NOTE: It is neovim only.
 
 		Default: "none"
+
+				    	*ddu-ui-ff-param-previewFloatingTitle*
+previewFloatingTitle	(string | list)
+		Specify the title of the preview floating window with border if
+		|ddu-ui-ff-param-previewfloatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: ""
+
+				    	*ddu-ui-ff-param-previewFloatingTitlePos*
+previewFloatingTitlePos	(string)
+		Specify the title position of the preview floating window with border if
+		|ddu-ui-ff-param-previewfloatingBorder| is not "none".
+		See |nvim_open_win()| for the detail.
+		NOTE: It is neovim only.
+
+		Default: "left"
 
 			    	*ddu-ui-ff-param-previewFloatingZindex*
 previewFloatingZindex		(number)
