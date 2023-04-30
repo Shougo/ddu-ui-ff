@@ -744,6 +744,20 @@ A:
 	        \ '.'->line(), '%:p'->expand())
 	endfunction
 <
+Q: How do I set the floating title with list style ?
+
+A: 
+>
+	call ddu#custom#patch_global(#{
+	  \ uiParams: #{
+	  \   ff: #{
+	  \     floatingBorder: 'rounded',
+	  \     floatingTitle: [['ddu', 'Red'], ['title', 'Blue']],
+	  \   }
+	  \ },
+	  \ })
+<
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
