@@ -40,7 +40,7 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
     call s:init_prompt(a:params.prompt,
-          \ get(a:params.highlights, 'prompt', 'Special'))
+          \ a:params.highlights->get('prompt', 'Special'))
   else
     setlocal signcolumn=no
   endif
