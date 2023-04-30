@@ -46,6 +46,12 @@ type FloatingBorder =
   | "shadow"
   | string[];
 
+type FloatingTitleHighlight = string;
+
+type FloatingTitle =
+  | string
+  | [string, FloatingTitleHighlight][];
+
 type SaveCursor = {
   pos: number[];
   text: string;
@@ -63,14 +69,20 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   filterFloatingPosition: "top" | "bottom";
+  filterFloatingTitle: FloatingTitle;
+  filterFloatingTitlePos: "left" | "center" | "right";
   filterSplitDirection: "botright" | "topleft" | "floating";
   filterUpdateTime: number;
   floatingBorder: FloatingBorder;
+  floatingTitle: FloatingTitle;
+  floatingTitlePos: "left" | "center" | "right";
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   previewCol: number;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
+  previewFloatingTitle: FloatingTitle;
+  previewFloatingTitlePos: "left" | "center" | "right";
   previewFloatingZindex: number;
   previewHeight: number;
   previewRow: number;
@@ -256,6 +268,8 @@ export class Ui extends BaseUi<Params> {
           "width": Number(args.uiParams.winWidth),
           "height": winHeight,
           "border": args.uiParams.floatingBorder,
+          "title": args.uiParams.floatingTitle,
+          "title_pos": args.uiParams.floatingTitlePos,
         });
 
         const winnr = await fn.bufwinnr(args.denops, bufnr);
@@ -961,13 +975,19 @@ export class Ui extends BaseUi<Params> {
       displayTree: false,
       filterFloatingPosition: "bottom",
       filterSplitDirection: "botright",
+      filterFloatingTitle: "",
+      filterFloatingTitlePos: "left",
       filterUpdateTime: 0,
       floatingBorder: "none",
+      floatingTitle: "",
+      floatingTitlePos: "left",
       highlights: {},
       ignoreEmpty: false,
       previewCol: 0,
       previewFloating: false,
       previewFloatingBorder: "none",
+      previewFloatingTitle: "",
+      previewFloatingTitlePos: "left",
       previewFloatingZindex: 50,
       previewHeight: 10,
       previewRow: 0,

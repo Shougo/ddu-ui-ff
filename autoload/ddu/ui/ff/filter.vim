@@ -93,6 +93,8 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \   width: a:params.winWidth,
         \   height: 1,
         \   border: a:params.floatingBorder,
+        \   title: a:params.filterFloatingTitle,
+        \   title_pos: a:params.filterFloatingTitlePos,
         \ }
 
   if a:bufnr->bufwinid() > 0
