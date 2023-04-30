@@ -230,7 +230,7 @@ export class PreviewUi {
       await fn.win_gotoid(denops, this.previewWinId);
     }
     if (!exists) {
-      await denops.cmd(`edit ${bufname}`);
+      await denops.cmd(`noswap edit ${bufname}`);
       const text = await this.getContents(denops, previewer);
       const bufnr = await fn.bufnr(denops) as number;
       await batch(denops, async (denops: Denops) => {
