@@ -176,7 +176,7 @@ updateOptions
 ==============================================================================
 PARAMS						*ddu-ui-ff-params*
 
-					    	*ddu-ui-ff-param-autoAction*
+						*ddu-ui-ff-param-autoAction*
 autoAction	(dictionary)
 		Action executed when the cursor is moved.
 		It has the following keys.
@@ -202,7 +202,7 @@ autoAction	(dictionary)
 
 		Default: v:true
 
-					    	*ddu-ui-ff-param-autoResize*
+						*ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
 		Auto resize the window height automatically.
 
@@ -215,7 +215,7 @@ cursorPos	(number)
 
 		Default: -1
 
-				    	*ddu-ui-ff-param-displaySourceName*
+					*ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
@@ -226,13 +226,13 @@ displaySourceName	(string)
 
 		Default: "no"
 
-					    	*ddu-ui-ff-param-displayTree*
+						*ddu-ui-ff-param-displayTree*
 displayTree	(boolean)
 		Display tree structure.
 
 		Default: v:false
 
-    				    	*ddu-ui-ff-param-floatingBorder*
+					*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
 		|ddu-ui-ff-param-split| is "floating".
@@ -241,7 +241,7 @@ floatingBorder		(string | list)
 
 		Default: "none"
 
-    				    	*ddu-ui-ff-param-floatingTitle*
+					*ddu-ui-ff-param-floatingTitle*
 floatingTitle		(string | list)
 		Specify the title of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
@@ -250,7 +250,7 @@ floatingTitle		(string | list)
 
 		Default: ""
 
-    				    	*ddu-ui-ff-param-floatingTitlePos*
+					*ddu-ui-ff-param-floatingTitlePos*
 floatingTitlePos	(string)
 		Specify the title position of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
@@ -259,7 +259,7 @@ floatingTitlePos	(string)
 
 		Default: "left"
 
-			    	*ddu-ui-ff-param-filterFloatingPosition*
+				*ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
 
@@ -273,7 +273,7 @@ filterFloatingPosition	(string)
 
 		Default: "bottom"
 
-				    	*ddu-ui-ff-param-filterFloatingTitle*
+					*ddu-ui-ff-param-filterFloatingTitle*
 filterFloatingTitle	(string | list)
 		Specify the title of the filter floating window with border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
@@ -282,16 +282,16 @@ filterFloatingTitle	(string | list)
 
 		Default: ""
 
-				    	*ddu-ui-ff-param-filterFloatingTitlePos*
+				*ddu-ui-ff-param-filterFloatingTitlePos*
 filterFloatingTitlePos	(string)
-		Specify the title position of the filter floating window with border if
-		|ddu-ui-ff-param-floatingBorder| is not "none".
+		Specify the title position of the filter floating window with
+		border if |ddu-ui-ff-param-floatingBorder| is not "none".
 		See |nvim_open_win()| for the detail.
 		NOTE: It is neovim only.
 
 		Default: "left"
 
-				    	*ddu-ui-ff-param-filterSplitDirection*
+					*ddu-ui-ff-param-filterSplitDirection*
 filterSplitDirection	(string)
 		Specify the filter window direction as {direction}.
 
@@ -304,14 +304,14 @@ filterSplitDirection	(string)
 
 		Default: "botright"
 
-				    	*ddu-ui-ff-param-filterUpdateTime*
+					*ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
 		Specify the update time in the filter window.
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
 
-				    	*ddu-ui-ff-param-highlights*
+					*ddu-ui-ff-param-highlights*
 highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.
 		It can contain following keys
@@ -338,7 +338,7 @@ highlights	(dictionary)
 
 		Default: {}
 
-				    		*ddu-ui-ff-param-ignoreEmpty*
+						*ddu-ui-ff-param-ignoreEmpty*
 ignoreEmpty	(boolean)
 		Don't open the UI window if the items are empty.
 
@@ -357,7 +357,7 @@ previewFloating	(boolean)
 
 		Default: v:false
 
-			    	*ddu-ui-ff-param-previewFloatingBorder*
+				*ddu-ui-ff-param-previewFloatingBorder*
 previewFloatingBorder		(string | list)
 		Specify the style of the preview window border if
 		|ddu-ui-ff-param-previewFloating| is v:true.
@@ -366,25 +366,26 @@ previewFloatingBorder		(string | list)
 
 		Default: "none"
 
-				    	*ddu-ui-ff-param-previewFloatingTitle*
+					*ddu-ui-ff-param-previewFloatingTitle*
 previewFloatingTitle	(string | list)
-		Specify the title of the preview floating window with border if
-		|ddu-ui-ff-param-previewfloatingBorder| is not "none".
+		Specify the title of the preview floating window with border
+		if |ddu-ui-ff-param-previewFloatingBorder| is not "none".
 		See |nvim_open_win()| for the detail.
 		NOTE: It is neovim only.
 
 		Default: ""
 
-				    	*ddu-ui-ff-param-previewFloatingTitlePos*
+				*ddu-ui-ff-param-previewFloatingTitlePos*
 previewFloatingTitlePos	(string)
-		Specify the title position of the preview floating window with border if
-		|ddu-ui-ff-param-previewfloatingBorder| is not "none".
+		Specify the title position of the preview floating window with
+		border if |ddu-ui-ff-param-previewFloatingBorder| is not
+		"none".
 		See |nvim_open_win()| for the detail.
 		NOTE: It is neovim only.
 
 		Default: "left"
 
-			    	*ddu-ui-ff-param-previewFloatingZindex*
+				*ddu-ui-ff-param-previewFloatingZindex*
 previewFloatingZindex		(number)
 		Specify the style of the preview window zindex if
 		|ddu-ui-ff-param-split| is "floating".
@@ -430,7 +431,7 @@ previewWidth	(number)
 
 		Default: 40
 
-				    		*ddu-ui-ff-param-prompt*
+						*ddu-ui-ff-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
 		NOTE: It must be one or two width characters.
@@ -445,7 +446,7 @@ replaceCol	(number)
 
 		Default: 0
 
-				    		*ddu-ui-ff-param-reversed*
+						*ddu-ui-ff-param-reversed*
 reversed	(boolean)
 		Display the items in reversed order.
 		NOTE: It may increase screen flicker.  Because the cursor must
@@ -453,7 +454,7 @@ reversed	(boolean)
 
 		Default: v:false
 
-				    		*ddu-ui-ff-param-split*
+						*ddu-ui-ff-param-split*
 split		(string)
 		Specify split mode.
 
@@ -466,13 +467,13 @@ split		(string)
 
 		Default: "horizontal"
 
-				    	*ddu-ui-ff-param-splitDirection*
+					*ddu-ui-ff-param-splitDirection*
 splitDirection	(string)
 		Specify split direction.
 
 		Default: "botright"
 
-				    		*ddu-ui-ff-param-startFilter*
+						*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
 		Note: If it is enabled and |ddu-ui-ff-param-autoAction| is
@@ -480,7 +481,7 @@ startFilter	(boolean)
 
 		Default: v:false
 
-				    		*ddu-ui-ff-param-statusline*
+						*ddu-ui-ff-param-statusline*
 statusline	(boolean)
 		If it is true, the original 'statusline' value is set on the
 		buffer.
