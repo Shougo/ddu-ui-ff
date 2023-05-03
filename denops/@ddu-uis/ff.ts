@@ -114,6 +114,7 @@ export class Ui extends BaseUi<Params> {
   private refreshed = false;
   private prevLength = -1;
   private previewUi = new PreviewUi();
+  private popupId = -1;
 
   override async onInit(args: {
     denops: Denops;
@@ -236,14 +237,16 @@ export class Ui extends BaseUi<Params> {
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
+    const floating = args.uiParams.split == "floating";
     const hasNvim = args.denops.meta.host == "nvim";
     const hasAutoAction = "name" in args.uiParams.autoAction;
-    const floating = args.uiParams.split == "floating" && hasNvim;
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.items.length, 1)
       : Number(args.uiParams.winHeight);
-    const winid = await fn.bufwinid(args.denops, bufnr);
+    const winid = (floating && !hasNvim)
+      ? this.popupId
+      : await fn.bufwinid(args.denops, bufnr);
     if (winid < 0) {
       const direction = args.uiParams.splitDirection;
       if (args.uiParams.split == "horizontal") {
@@ -260,36 +263,60 @@ export class Ui extends BaseUi<Params> {
       } else if (floating) {
         // statusline must be set for floating window
         const currentStatusline = await op.statusline.get(args.denops);
-
-        await args.denops.call("nvim_open_win", bufnr, true, {
-          "relative": "editor",
-          "row": Number(args.uiParams.winRow),
-          "col": Number(args.uiParams.winCol),
-          "width": Number(args.uiParams.winWidth),
-          "height": winHeight,
-          "border": args.uiParams.floatingBorder,
-          "title": args.uiParams.floatingTitle,
-          "title_pos": args.uiParams.floatingTitlePos,
-        });
-
-        const winnr = await fn.bufwinnr(args.denops, bufnr);
         const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
-        const floatingHighlight = args.uiParams.highlights?.floatingBorder ??
+        const borderHighlight = args.uiParams.highlights?.floatingBorder ??
           "FloatBorder";
 
-        await fn.setwinvar(
-          args.denops,
-          winnr,
-          "&winhighlight",
-          `Normal:${highlight},FloatBorder:${floatingHighlight}`,
-        );
+        if (hasNvim) {
+          this.popupId = await args.denops.call("nvim_open_win", bufnr, true, {
+            "relative": "editor",
+            "row": Number(args.uiParams.winRow),
+            "col": Number(args.uiParams.winCol),
+            "width": Number(args.uiParams.winWidth),
+            "height": winHeight,
+            "border": args.uiParams.floatingBorder,
+            "title": args.uiParams.floatingTitle,
+            "title_pos": args.uiParams.floatingTitlePos,
+          }) as number;
+        } else {
+          this.popupId = await args.denops.call("popup_create", bufnr, {
+            "pos": "topleft",
+            "line": Number(args.uiParams.winRow) + 1,
+            "col": Number(args.uiParams.winCol) + 1,
+            "highlight": highlight,
+            "borderhighlight": [borderHighlight],
+            "minwidth": Number(args.uiParams.winWidth),
+            "maxwidth": Number(args.uiParams.winWidth),
+            "minheight": winHeight,
+            "maxheight": winHeight,
+            "scrollbar": 0,
+            "title": args.uiParams.floatingTitle,
+            "wrap": 0,
+          }) as number;
+        }
 
-        await fn.setwinvar(
-          args.denops,
-          winnr,
-          "&statusline",
-          currentStatusline,
-        );
+        if (hasNvim) {
+          await fn.setwinvar(
+            args.denops,
+            this.popupId,
+            "&winhighlight",
+            `Normal:${highlight},FloatBorder:${borderHighlight}`,
+          );
+
+          await fn.setwinvar(
+            args.denops,
+            this.popupId,
+            "&statusline",
+            currentStatusline,
+          );
+        } else {
+          await fn.setwinvar(
+            args.denops,
+            this.popupId,
+            "&cursorline",
+            true,
+          );
+        }
       } else if (args.uiParams.split == "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       } else {
@@ -457,12 +484,14 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (this.filterBufnr < 0 || winid < 0) {
-      if (args.uiParams.startFilter) {
+      const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
+      if (startFilter) {
         this.filterBufnr = await args.denops.call(
           "ddu#ui#ff#filter#_open",
           args.options.name,
           args.context.input,
           this.filterBufnr,
+          floating ? this.popupId : await fn.bufwinid(args.denops, bufnr),
           args.uiParams,
         ) as number;
       } else {
@@ -840,6 +869,9 @@ export class Ui extends BaseUi<Params> {
         args.options.name,
         args.context.input,
         this.filterBufnr,
+        args.uiParams.split == "floating"
+          ? this.popupId
+          : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
         args.uiParams,
       ) as number;
 
@@ -1023,28 +1055,39 @@ export class Ui extends BaseUi<Params> {
     if (!bufnr) {
       return;
     }
-    for (
-      const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
+
+    if (
+      args.uiParams.split == "floating" && args.denops.meta.host != "nvim" &&
+      this.popupId > 0
     ) {
-      if (winid <= 0) {
-        continue;
-      }
-
-      await fn.win_gotoid(args.denops, winid);
-      await this.closeFilterWindow(args.denops);
-
-      if (
-        args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+      // Close popup
+      await args.denops.call("popup_close", this.popupId);
+      await args.denops.cmd("redraw!");
+      this.popupId = -1;
+    } else {
+      for (
+        const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
       ) {
-        const prevName = await fn.bufname(args.denops, args.context.bufNr);
-        await args.denops.cmd(
-          prevName != args.context.bufName
-            ? "enew"
-            : `buffer ${args.context.bufNr}`,
-        );
-      } else {
-        await args.denops.cmd("close!");
-        await fn.win_gotoid(args.denops, args.context.winId);
+        if (winid <= 0) {
+          continue;
+        }
+
+        await fn.win_gotoid(args.denops, winid);
+        await this.closeFilterWindow(args.denops);
+
+        if (
+          args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+        ) {
+          const prevName = await fn.bufname(args.denops, args.context.bufNr);
+          await args.denops.cmd(
+            prevName != args.context.bufName
+              ? "enew"
+              : `buffer ${args.context.bufNr}`,
+          );
+        } else {
+          await args.denops.cmd("close!");
+          await fn.win_gotoid(args.denops, args.context.winId);
+        }
       }
     }
 

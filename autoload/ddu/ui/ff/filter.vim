@@ -1,6 +1,4 @@
-function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
-  const parent_id = win_getid()
-
+function! ddu#ui#ff#filter#_open(name, input, bufnr, parent_id, params) abort
   const ids = a:bufnr->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
@@ -36,6 +34,12 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   autocmd ddu-ff-filter BufLeave <buffer> ++once
         \ let &whichwrap = s:save_whichwrap
 
+  if !has('nvim') && a:params.split ==# 'floating'
+    " Vim's popup does not support enter the window
+    autocmd ddu-ff-filter WinClosed <buffer>
+          \ call ddu#ui#do_action('quit')
+  endif
+
   " NOTE: prompt must set after cursor move
   if a:params.prompt !=# ''
     setlocal signcolumn=yes
@@ -46,11 +50,13 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, params) abort
   endif
 
   " NOTE: startinsert! does not work in Vim or autoAction
-  call feedkeys('A', 'n')
+  if mode() !=# 'i'
+    call feedkeys('A', 'n')
+  endif
 
   let s:filter_prev_input = '.'->getline()
   let s:filter_updatetime = a:params.filterUpdateTime
-  let g:ddu#ui#ff#_filter_parent_winid = parent_id
+  let g:ddu#ui#ff#_filter_parent_winid = a:parent_id
   return '%'->bufnr()
 endfunction
 

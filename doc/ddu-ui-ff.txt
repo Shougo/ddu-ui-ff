@@ -246,7 +246,6 @@ floatingTitle		(string | list)
 		Specify the title of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
 		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
 
 		Default: ""
 
@@ -462,8 +461,11 @@ split		(string)
 
 		"horizontal": horizontal split
 		"vertical": vertical split
-		"floating": use neovim floating window feature
+		"floating": use floating window feature
 		"no": no split
+
+		Note: If you have enabled "floating" in Vim,
+		|ddu-ui-ff-param-startFilter| is enabled automatically.
 
 		Default: "horizontal"
 
