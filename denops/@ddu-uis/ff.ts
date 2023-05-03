@@ -120,9 +120,9 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
-    if (this.saveMode == "c") {
+    if (this.saveMode === "c") {
       this.saveMode = await fn.getcmdtype(args.denops) as string;
-      if (this.saveMode == ":") {
+      if (this.saveMode === ":") {
         // Save command line state
         this.saveCmdline = await fn.getcmdline(args.denops) as string;
         this.saveCmdpos = await fn.getcmdpos(args.denops) as number;
@@ -145,7 +145,7 @@ export class Ui extends BaseUi<Params> {
       "ddu#ui#ff#_filter_parent_winid",
       -1,
     );
-    if (ft == "ddu-ff" || parentId < 0) {
+    if (ft === "ddu-ff" || parentId < 0) {
       await vars.b.set(
         args.denops,
         "ddu_ui_ff_cursor_pos",
@@ -191,7 +191,7 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     item: DduItem;
   }) {
-    const pos = this.items.findIndex((item) => item == args.item);
+    const pos = this.items.findIndex((item) => item === args.item);
 
     if (pos > 0) {
       await fn.cursor(args.denops, pos + 1, 0);
@@ -211,7 +211,7 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    if (this.items.length == 0) {
+    if (this.items.length === 0) {
       // Close preview window when empty items
       await this.previewUi.close(args.denops, args.context);
     }
@@ -219,7 +219,7 @@ export class Ui extends BaseUi<Params> {
     this.bufferName = `ddu-ff-${args.options.name}`;
 
     if (
-      args.uiParams.ignoreEmpty && this.items.length == 0 &&
+      args.uiParams.ignoreEmpty && this.items.length === 0 &&
       (await fn.bufwinid(
           args.denops,
           await fn.bufnr(args.denops, this.bufferName),
@@ -237,8 +237,8 @@ export class Ui extends BaseUi<Params> {
 
     await this.setDefaultParams(args.denops, args.uiParams);
 
-    const floating = args.uiParams.split == "floating";
-    const hasNvim = args.denops.meta.host == "nvim";
+    const floating = args.uiParams.split === "floating";
+    const hasNvim = args.denops.meta.host === "nvim";
     const hasAutoAction = "name" in args.uiParams.autoAction;
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
@@ -249,12 +249,12 @@ export class Ui extends BaseUi<Params> {
       : await fn.bufwinid(args.denops, bufnr);
     if (winid < 0) {
       const direction = args.uiParams.splitDirection;
-      if (args.uiParams.split == "horizontal") {
+      if (args.uiParams.split === "horizontal") {
         const header = `silent keepalt ${direction} `;
         await args.denops.cmd(
           header + `sbuffer +resize\\ ${winHeight} ${bufnr}`,
         );
-      } else if (args.uiParams.split == "vertical") {
+      } else if (args.uiParams.split === "vertical") {
         const header = `silent keepalt vertical ${direction} `;
         await args.denops.cmd(
           header +
@@ -317,7 +317,7 @@ export class Ui extends BaseUi<Params> {
             true,
           );
         }
-      } else if (args.uiParams.split == "no") {
+      } else if (args.uiParams.split === "no") {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       } else {
         await args.denops.call(
@@ -378,10 +378,10 @@ export class Ui extends BaseUi<Params> {
     // Update main buffer
     const displaySourceName = args.uiParams.displaySourceName;
     const getSourceName = (sourceName: string) => {
-      if (displaySourceName == "long") {
+      if (displaySourceName === "long") {
         return sourceName + " ";
       }
-      if (displaySourceName == "short") {
+      if (displaySourceName === "short") {
         return sourceName.match(/[^a-zA-Z]/)
           ? sourceName.replaceAll(/([a-zA-Z])[a-zA-Z]+/g, "$1") + " "
           : sourceName.slice(0, 2) + " ";
@@ -393,7 +393,7 @@ export class Ui extends BaseUi<Params> {
       : 0;
     const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
-      (args.uiParams.reversed && this.items.length != this.prevLength));
+      (args.uiParams.reversed && this.items.length !== this.prevLength));
 
     const getPrefix = (item: DduItem) => {
       return `${getSourceName(item.__sourceName)}` +
@@ -457,19 +457,19 @@ export class Ui extends BaseUi<Params> {
       { pos: [], text: "" },
     ) as SaveCursor;
     let currentText = "";
-    if (saveCursor.pos.length != 0) {
+    if (saveCursor.pos.length !== 0) {
       const buflines = await fn.getbufline(
         args.denops,
         bufnr,
         saveCursor.pos[1],
       );
-      if (buflines.length != 0) {
+      if (buflines.length !== 0) {
         currentText = buflines[0];
       }
     }
     if (
-      saveCursor.pos.length != 0 && this.items.length != 0 &&
-      currentText == saveCursor.text && !this.refreshed &&
+      saveCursor.pos.length !== 0 && this.items.length !== 0 &&
+      currentText === saveCursor.text && !this.refreshed &&
       !(args.uiParams.startFilter && hasAutoAction)
     ) {
       // NOTE: startFilter with autoAction breaks cursor
@@ -526,8 +526,8 @@ export class Ui extends BaseUi<Params> {
     // Search index.
     const index = this.items.findIndex(
       (item: DduItem) =>
-        item.treePath == args.parent.treePath &&
-        item.__sourceIndex == args.parent.__sourceIndex,
+        item.treePath === args.parent.treePath &&
+        item.__sourceIndex === args.parent.__sourceIndex,
     );
 
     const insertItems = args.children;
@@ -551,8 +551,8 @@ export class Ui extends BaseUi<Params> {
     // Search index.
     const startIndex = this.items.findIndex(
       (item: DduItem) =>
-        item.treePath == args.item.treePath &&
-        item.__sourceIndex == args.item.__sourceIndex,
+        item.treePath === args.item.treePath &&
+        item.__sourceIndex === args.item.__sourceIndex,
     );
     if (startIndex < 0) {
       return;
@@ -679,7 +679,7 @@ export class Ui extends BaseUi<Params> {
         "ddu_ui_ff_cursor_pos",
         [],
       ) as number[];
-      if (cursorPos.length == 0) {
+      if (cursorPos.length === 0) {
         return ActionFlags.Persist;
       }
 
@@ -711,7 +711,7 @@ export class Ui extends BaseUi<Params> {
         "ddu_ui_ff_cursor_pos",
         [],
       ) as number[];
-      if (cursorPos.length == 0) {
+      if (cursorPos.length === 0) {
         return ActionFlags.Persist;
       }
 
@@ -746,7 +746,7 @@ export class Ui extends BaseUi<Params> {
       const params = args.actionParams as ExpandItemParams;
 
       if (item.__expanded) {
-        if (params.mode == "toggle") {
+        if (params.mode === "toggle") {
           return await this.collapseItemAction(args.denops, args.options);
         }
         return ActionFlags.None;
@@ -775,7 +775,7 @@ export class Ui extends BaseUi<Params> {
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item);
 
       const ft = await op.filetype.getLocal(args.denops);
-      if (ft == "ddu-ff-filter") {
+      if (ft === "ddu-ff-filter") {
         // Set for filter window
         await vars.b.set(args.denops, "ddu_ui_item", item);
       }
@@ -791,7 +791,7 @@ export class Ui extends BaseUi<Params> {
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_selected_items", items);
 
       const ft = await op.filetype.getLocal(args.denops);
-      if (ft == "ddu-ff-filter") {
+      if (ft === "ddu-ff-filter") {
         // Set for filter window
         await vars.b.set(args.denops, "ddu_ui_selected_items", items);
       }
@@ -816,7 +816,7 @@ export class Ui extends BaseUi<Params> {
         "Input action name: ",
         actions,
       );
-      if (actionName != "") {
+      if (actionName !== "") {
         await args.denops.call(
           "ddu#item_action",
           args.options.name,
@@ -869,7 +869,7 @@ export class Ui extends BaseUi<Params> {
         args.options.name,
         args.context.input,
         this.filterBufnr,
-        args.uiParams.split == "floating"
+        args.uiParams.split === "floating"
           ? this.popupId
           : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
         args.uiParams,
@@ -954,7 +954,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      if (this.items.length == 0) {
+      if (this.items.length === 0) {
         return ActionFlags.None;
       }
 
@@ -1057,7 +1057,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (
-      args.uiParams.split == "floating" && args.denops.meta.host != "nvim" &&
+      args.uiParams.split === "floating" && args.denops.meta.host !== "nvim" &&
       this.popupId > 0
     ) {
       // Close popup
@@ -1076,11 +1076,12 @@ export class Ui extends BaseUi<Params> {
         await this.closeFilterWindow(args.denops);
 
         if (
-          args.uiParams.split == "no" || (await fn.winnr(args.denops, "$")) == 1
+          args.uiParams.split === "no" ||
+          (await fn.winnr(args.denops, "$")) === 1
         ) {
           const prevName = await fn.bufname(args.denops, args.context.bufNr);
           await args.denops.cmd(
-            prevName != args.context.bufName
+            prevName !== args.context.bufName
               ? "enew"
               : `buffer ${args.context.bufNr}`,
           );
@@ -1097,7 +1098,7 @@ export class Ui extends BaseUi<Params> {
       "ddu#ui#ff#_save_title",
       "",
     );
-    if (saveTitle != "") {
+    if (saveTitle !== "") {
       args.denops.call(
         "nvim_set_option",
         "titlestring",
@@ -1106,7 +1107,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     // Restore mode
-    if (this.saveMode == "i") {
+    if (this.saveMode === "i") {
       if (!args.cancel && args.uiParams.replaceCol > 0) {
         const currentLine = await fn.getline(args.denops, ".");
         const replaceLine = currentLine.slice(
@@ -1122,7 +1123,7 @@ export class Ui extends BaseUi<Params> {
         args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
         "n",
       );
-    } else if (this.saveMode == ":") {
+    } else if (this.saveMode === ":") {
       const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
         ? this.saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
           this.saveCmdline.slice(this.saveCmdpos - 1)
@@ -1152,7 +1153,7 @@ export class Ui extends BaseUi<Params> {
 
   private async getItems(denops: Denops): Promise<DduItem[]> {
     let items: DduItem[];
-    if (this.selectedItems.size == 0) {
+    if (this.selectedItems.size === 0) {
       const item = await this.getItem(denops);
       if (!item) {
         return [];
@@ -1199,8 +1200,8 @@ export class Ui extends BaseUi<Params> {
     const async = `${context.done ? "" : "[async]"}`;
     const laststatus = await op.laststatus.get(denops);
 
-    if (hasNvim && (floating || laststatus == 0)) {
-      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) == "") {
+    if (hasNvim && (floating || laststatus === 0)) {
+      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) === "") {
         const saveTitle = await denops.call(
           "nvim_get_option",
           "titlestring",
@@ -1324,9 +1325,9 @@ export class Ui extends BaseUi<Params> {
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);
 
-      if (uiParams.split == "horizontal") {
+      if (uiParams.split === "horizontal") {
         await fn.setbufvar(denops, bufnr, "&winfixheight", 1);
-      } else if (uiParams.split == "vertical") {
+      } else if (uiParams.split === "vertical") {
         await fn.setbufvar(denops, bufnr, "&winfixwidth", 1);
       }
     });
@@ -1334,15 +1335,15 @@ export class Ui extends BaseUi<Params> {
 
   private async setDefaultParams(denops: Denops, uiParams: Params) {
     const columns = await op.columns.getGlobal(denops);
-    if (uiParams.winWidth == 0) {
+    if (uiParams.winWidth === 0) {
       uiParams.winWidth = Math.trunc(columns / 2);
     }
-    if (uiParams.winRow == 0) {
+    if (uiParams.winRow === 0) {
       uiParams.winRow = Math.trunc(
         (await denops.call("eval", "&lines") as number) / 2 - 10,
       );
     }
-    if (uiParams.winCol == 0) {
+    if (uiParams.winCol === 0) {
       uiParams.winCol = Math.trunc((columns - uiParams.winWidth) / 2);
     }
   }
@@ -1363,13 +1364,13 @@ export class Ui extends BaseUi<Params> {
       "ddu_ui_ff_cursor_pos",
       [],
     ) as number[];
-    if (cursorPos.length == 0) {
+    if (cursorPos.length === 0) {
       return -1;
     }
 
     const viewItem = this.viewItems[cursorPos[1] - 1];
     return this.items.findIndex(
-      (item: DduItem) => item == viewItem,
+      (item: DduItem) => item === viewItem,
     );
   }
 }
