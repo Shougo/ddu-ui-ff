@@ -1118,9 +1118,10 @@ export class Ui extends BaseUi<Params> {
         await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
       }
 
+      const endCol = await fn.col(args.denops, ".");
       await fn.feedkeys(
         args.denops,
-        args.cancel || args.uiParams.replaceCol > 1 ? "a" : "I",
+        args.uiParams.replaceCol > 1 || this.saveCol > endCol ? "a" : "i",
         "n",
       );
     } else if (this.saveMode === ":") {
