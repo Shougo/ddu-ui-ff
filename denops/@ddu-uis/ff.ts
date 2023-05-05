@@ -113,6 +113,7 @@ export class Ui extends BaseUi<Params> {
   private saveCol = 0;
   private refreshed = false;
   private prevLength = -1;
+  private prevInput = "";
   private previewUi = new PreviewUi();
   private popupId = -1;
 
@@ -178,10 +179,12 @@ export class Ui extends BaseUi<Params> {
 
   // deno-lint-ignore require-await
   override async refreshItems(args: {
+    context: Context;
     items: DduItem[];
   }): Promise<void> {
     // NOTE: Use only 1000 items
     this.prevLength = this.items.length;
+    this.prevInput = args.context.input;
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
     this.refreshed = true;
@@ -391,9 +394,6 @@ export class Ui extends BaseUi<Params> {
     const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
       ? args.uiParams.cursorPos
       : 0;
-    const refreshed = args.uiParams.cursorPos >= 0 || (this.refreshed &&
-        (this.prevLength > 0 && this.items.length < this.prevLength) ||
-      (args.uiParams.reversed && this.items.length !== this.prevLength));
 
     const getPrefix = (item: DduItem) => {
       return `${getSourceName(item.__sourceName)}` +
@@ -405,6 +405,9 @@ export class Ui extends BaseUi<Params> {
 
     // Update main buffer
     try {
+      const checkRefreshed = args.context.input !== this.prevInput ||
+        (this.prevLength > 0 && this.items.length < this.prevLength) ||
+        (args.uiParams.reversed && this.items.length !== this.prevLength);
       // Note: Use batch for screen flicker when highlight items.
       await batch(args.denops, async (denops: Denops) => {
         await denops.call(
@@ -412,7 +415,7 @@ export class Ui extends BaseUi<Params> {
           args.uiParams,
           bufnr,
           this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-          refreshed,
+          args.uiParams.cursorPos >= 0 || (this.refreshed && checkRefreshed),
           cursorPos,
         );
         await denops.call(
