@@ -228,7 +228,7 @@ export class PreviewUi {
       await fn.win_gotoid(denops, this.previewWinId);
     }
     if (!exists) {
-      await denops.cmd(`noswap edit ${bufname}`);
+      await denops.cmd(`noswap edit ${await fn.fnameescape(denops, bufname)}`);
       const text = await this.getContents(denops, previewer);
       const bufnr = await fn.bufnr(denops) as number;
       await batch(denops, async (denops: Denops) => {
@@ -244,7 +244,8 @@ export class PreviewUi {
         }
       });
     } else {
-      await denops.cmd(`buffer ${bufname}`);
+      const bufnr = await fn.bufnr(denops, bufname) as number;
+      await denops.cmd(`buffer ${bufnr}`);
     }
 
     // Set options
