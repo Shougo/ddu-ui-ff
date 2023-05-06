@@ -430,6 +430,17 @@ previewWidth	(number)
 
 		Default: 40
 
+						*ddu-ui-ff-param-previewWindowOptions*
+previewWindowOptions	(list)
+		Set the window options of the |preview-window| in
+		|ddu-ui-ff-action-preview|.
+		If |ddu-ui-ff-param-previewFloating|, set the options of the
+		floating window.
+		See |options| for the detail.
+		NOTE: Options are applied in array order.
+
+		Default: [["&signcolumn", "no"], ["&foldcolumn", 0], ["&foldenable", 0], ["&number", 0], ["&wrap", 0]]
+
 						*ddu-ui-ff-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.

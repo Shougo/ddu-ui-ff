@@ -52,6 +52,8 @@ type FloatingTitle =
   | string
   | [string, FloatingTitleHighlight][];
 
+type WindowOption = [string, number | string];
+
 type SaveCursor = {
   pos: number[];
   text: string;
@@ -88,6 +90,7 @@ export type Params = {
   previewRow: number;
   previewSplit: "horizontal" | "vertical" | "no";
   previewWidth: number;
+  previewWindowOptions: WindowOption[];
   prompt: string;
   replaceCol: number;
   reversed: boolean;
@@ -1028,6 +1031,7 @@ export class Ui extends BaseUi<Params> {
       previewRow: 0,
       previewSplit: "horizontal",
       previewWidth: 40,
+      previewWindowOptions: [["&signcolumn", "no"], ["&foldcolumn", 0], ["&foldenable", 0], ["&number", 0], ["&wrap", 0]],
       prompt: "",
       reversed: false,
       replaceCol: 0,
