@@ -228,11 +228,16 @@ export class PreviewUi {
       await fn.win_gotoid(denops, this.previewWinId);
     }
     if (!exists) {
-      await denops.cmd(`noswap edit ${await fn.fnameescape(denops, bufname)}`);
+      // Create new buffer
+      const bufnr = await fn.bufadd(denops, bufname);
       const text = await this.getContents(denops, previewer);
-      const bufnr = await fn.bufnr(denops) as number;
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
+        // Disable swapfile
+        await fn.setbufvar(denops, bufnr, "&swapfile", 0);
+
+        await fn.bufload(denops, bufnr);
+        await denops.cmd(`buffer ${bufnr}`);
         await replace(denops, bufnr, text);
         const limit = actionParams.syntaxLimitChars ?? 200000;
         if (text.join("\n").length < limit) {
