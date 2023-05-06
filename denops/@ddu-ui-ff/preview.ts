@@ -250,9 +250,9 @@ export class PreviewUi {
 
     // Set options
     await batch(denops, async (denops: Denops) => {
-      await fn.setwinvar(denops, this.previewWinId, "&signcolumn", "no");
-      await fn.setwinvar(denops, this.previewWinId, "&foldcolumn", 0);
-      await fn.setwinvar(denops, this.previewWinId, "&foldenable", 0);
+      for (const [option, value] of uiParams.previewWindowOptions) {
+        await fn.setwinvar(denops, this.previewWinId, option, value);
+      }
     });
 
     if (uiParams.previewSplit !== "no") {
