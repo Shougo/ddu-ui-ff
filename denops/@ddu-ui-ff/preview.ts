@@ -235,6 +235,8 @@ export class PreviewUi {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
         // Disable swapfile
         await fn.setbufvar(denops, bufnr, "&swapfile", 0);
+        // NOTE: Set hidden to save contents
+        await fn.setbufvar(denops, bufnr, "&hidden", 1);
 
         await fn.bufload(denops, bufnr);
         await denops.cmd(`buffer ${bufnr}`);
