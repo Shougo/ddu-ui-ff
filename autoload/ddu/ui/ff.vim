@@ -272,11 +272,10 @@ function! ddu#ui#ff#_cursor(line, col) abort
   if &l:filetype ==# 'ddu-ff'
         \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     call cursor(a:line, a:col)
-    normal! zb
   else
     const winid = g:ddu#ui#ff#_filter_parent_winid
     call win_execute(winid,
-          \ printf('call cursor(%d, %d) | normal! zb',
+          \ printf('call cursor(%d, %d) | redraw',
           \        a:line, a:col))
   endif
 endfunction

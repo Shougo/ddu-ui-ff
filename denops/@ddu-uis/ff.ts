@@ -704,6 +704,9 @@ export class Ui extends BaseUi<Params> {
         );
       }
 
+      // Change real cursor
+      await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
+
       return ActionFlags.Persist;
     },
     cursorPrevious: async (args: {
@@ -735,6 +738,9 @@ export class Ui extends BaseUi<Params> {
           cursorPos,
         );
       }
+
+      // Change real cursor
+      await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
 
       return ActionFlags.Persist;
     },
