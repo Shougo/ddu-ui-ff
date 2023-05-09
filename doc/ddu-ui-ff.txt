@@ -580,19 +580,18 @@ A: Please set |ddu-ui-ff-param-startFilter|.
 
 Q: I want to call default action in the filter window.
 
-A:
->
+A: >
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
-<
+
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
-must force this behaviour.
->
+must force this behaviour. >
+
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
 	  inoremap <C-j>
@@ -600,11 +599,11 @@ must force this behaviour.
 	  inoremap <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
-<
+
 Q: I want to define |ddu-option-name| depend key mappings.
 
-A: You can use "b:ddu_ui_name".
->
+A: You can use "b:ddu_ui_name". >
+
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
@@ -620,25 +619,23 @@ A: You can use "b:ddu_ui_name".
 	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  endif
 	endfunction
-<
 
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
-A: You can pass params like this.
->
+A: You can pass params like this. >
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> E
 	  \ <Cmd>call ddu#ui#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
-<
+
 Q: I want to use Vim syntax highlight in the buffer.
 
 A: Please use |Syntax| autocmd.  |FileType| autocmd cannot change syntax
 highlights.  |Syntax| autocmd must be called in |FileType| autocmd. >
-Or you can use "syntax/ddu-ff.vim" file instead.
->
+Or you can use "syntax/ddu-ff.vim" file instead. >
+
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function! s:ddu_ff_my_settings() abort
 	  autocmd Syntax <buffer> call s:ddu_ff_my_syntax()
@@ -674,8 +671,8 @@ A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
 Q: I want to toggle selected items in visual mode.
 
 A: >
-	xnoremap <silent><buffer> <Space>
-	\ :call ddu#ui#do_action('toggleSelectItem')<CR>
+  xnoremap <silent><buffer> <Space>
+  \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 
 Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 
@@ -686,49 +683,49 @@ Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
 A: >
-  inoremap <C-q> <Cmd>call ddu#start(#{
-  \   name: 'file',
-  \   ui: 'ff',
-  \   input: matchstr(getline('.')[: col('.') - 1], '\f*$'),
-  \   sources: [
-  \     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
-  \   ],
-  \   uiParams: #{
-  \     ff: #{
-  \       startFilter: v:true,
-  \       replaceCol: match(getline('.')[: col('.') - 1], '\f*$') + 1,
-  \     },
-  \   },
-  \ })<CR>
->
+	inoremap <C-q> <Cmd>call ddu#start(#{
+	\   name: 'file',
+	\   ui: 'ff',
+	\   input: matchstr(getline('.')[: col('.') - 1], '\f*$'),
+	\   sources: [
+	\     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
+	\   ],
+	\   uiParams: #{
+	\     ff: #{
+	\       startFilter: v:true,
+	\       replaceCol: match(getline('.')[: col('.') - 1], '\f*$') + 1,
+	\     },
+	\   },
+	\ })<CR>
+
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
 A: >
-  cnoremap <C-q> <Cmd>call ddu#start(#{
-  \   name: 'file',
-  \   ui: 'ff',
-  \   input: matchstr(getcmdline()[: getcmdpos() - 2], '\f*$'),
-  \   sources: [
-  \     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
-  \   ],
-  \   uiParams: #{
-  \     ff: #{
-  \       startFilter: v:true,
-  \       replaceCol: match(getcmdline()[: getcmdpos() - 2], '\f*$') + 1,
-  \     },
-  \   },
-  \ })<CR><Cmd>call setcmdline('')<CR><CR>
-<
+	cnoremap <C-q> <Cmd>call ddu#start(#{
+	\   name: 'file',
+	\   ui: 'ff',
+	\   input: matchstr(getcmdline()[: getcmdpos() - 2], '\f*$'),
+	\   sources: [
+	\     #{ name: 'file', options: #{ defaultAction: 'feedkeys' } },
+	\   ],
+	\   uiParams: #{
+	\     ff: #{
+	\       startFilter: v:true,
+	\       replaceCol: match(getcmdline()[: getcmdpos() - 2], '\f*$') + 1,
+	\     },
+	\   },
+	\ })<CR><Cmd>call setcmdline('')<CR><CR>
+
 Q: I want to switch sources without clear current filter input.
 
 A: >
-  nnoremap <buffer> ff
-  \ <Cmd>call ddu#ui#do_action('updateOptions', #{
-  \   sources: [
-  \     #{ name: 'file' },
-  \   ],
-  \ })<CR>
+	nnoremap <buffer> ff
+	\ <Cmd>call ddu#ui#do_action('updateOptions', #{
+	\   sources: [
+	\     #{ name: 'file' },
+	\   ],
+	\ })<CR>
 
 Q: I want to use existing buffer to show preview.
 
@@ -738,19 +735,17 @@ Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
    like commands are available?
 
 A: >
-
-  nnoremap <C-n>
-  \ <Cmd>call ddu#ui_action('files', 'cursorNext')<CR>
-  \ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
-  nnoremap <C-p>
-  \ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
-  \ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
+	nnoremap <C-n>
+	\ <Cmd>call ddu#ui_action('files', 'cursorNext')<CR>
+	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
+	nnoremap <C-p>
+	\ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
+	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
 
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
-A:
->
+A: >
 	autocmd FileType ddu-ff call s:ddu_my_settings()
 	function! s:ddu_my_settings() abort
 	  setlocal signcolumn=yes
@@ -763,20 +758,26 @@ A:
 	  execute printf('sign place 100 line=%d name=cursor file=%s',
 	        \ '.'->line(), '%:p'->expand())
 	endfunction
-<
+
 Q: How do I set the floating title with list style ?
 
-A: 
->
+A: >
 	call ddu#custom#patch_global(#{
-	  \ uiParams: #{
-	  \   ff: #{
-	  \     floatingBorder: 'rounded',
-	  \     floatingTitle: [['ddu', 'Red'], ['title', 'Blue']],
-	  \   }
-	  \ },
+	  \   uiParams: #{
+	  \     ff: #{
+	  \       floatingBorder: 'rounded',
+	  \       floatingTitle: [['ddu', 'Red'], ['title', 'Blue']],
+	  \     }
+	  \   },
 	  \ })
-<
+
+Q: Opens file in insert mode after |ddu-ui-ff-action-itemAction| executed.
+
+A: I think you have executed the action by |ddu#ui#do_action|.  It executes
+the action asynchronously.  When the action is executed, "ddu-ui-ff" executes
+|:stopinsert| to exit insert mode.  But if it is executed in |:autocmd|,
+|:stopinsert| may not work.  To prevent it, you should use
+|ddu#ui#sync_action| instead.
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
