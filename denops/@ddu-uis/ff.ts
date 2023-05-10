@@ -285,11 +285,13 @@ export class Ui extends BaseUi<Params> {
             "title_pos": args.uiParams.floatingTitlePos,
           }) as number;
         } else {
-          this.popupId = await args.denops.call("popup_create", bufnr, {
+          const opts = {
             "pos": "topleft",
             "line": Number(args.uiParams.winRow) + 1,
             "col": Number(args.uiParams.winCol) + 1,
             "highlight": highlight,
+            "border": [],
+            "borderchars": [],
             "borderhighlight": [borderHighlight],
             "minwidth": Number(args.uiParams.winWidth),
             "maxwidth": Number(args.uiParams.winWidth),
@@ -298,7 +300,24 @@ export class Ui extends BaseUi<Params> {
             "scrollbar": 0,
             "title": args.uiParams.floatingTitle,
             "wrap": 0,
-          }) as number;
+          } as Record<string, unknown>;
+
+          switch (args.uiParams.floatingBorder) {
+            case "none":
+              break;
+            case "single":
+            case "rounded":
+            case "solid":
+            case "shadow":
+              opts["border"] = [1, 1, 1, 1];
+              break;
+            case "double":
+              opts["border"] = [2, 2, 2, 2];
+              break;
+            default:
+              opts["borderchars"] = args.uiParams.floatingBorder;
+          }
+          this.popupId = await args.denops.call("popup_create", bufnr, opts) as number;
         }
 
         if (hasNvim) {
