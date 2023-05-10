@@ -1159,7 +1159,8 @@ export class Ui extends BaseUi<Params> {
         cmdpos,
       );
     } else {
-      await args.denops.cmd("stopinsert");
+      // NOTE: :stopinsert may not work in asynchronous execution
+      await args.denops.call("ddu#ui#ff#_stopinsert");
     }
 
     await args.denops.call("ddu#event", args.options.name, "close");
