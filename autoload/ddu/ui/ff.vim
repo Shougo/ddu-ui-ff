@@ -24,10 +24,9 @@ function! ddu#ui#ff#execute(command) abort
   endif
 endfunction
 
-function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
+function! ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) abort
   const max_lines = a:lines->len()
-  const winid = a:bufnr->bufwinid()
-  const current_lines = '$'->line(winid)
+  const current_lines = '$'->line(a:winid)
 
   call setbufvar(a:bufnr, '&modifiable', 1)
 
@@ -44,13 +43,13 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, lines, refreshed, pos) abort
   endif
 
   " Init the cursor
-  const curpos = s:getcurpos(winid)
+  const curpos = s:getcurpos(a:winid)
   const lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
   if curpos[1] != lnum
-    call win_execute(winid,
+    call win_execute(a:winid,
           \ printf('call cursor(%d, 0) | normal! zb', lnum))
   elseif a:params.reversed
-    call win_execute(winid, 'normal! zb')
+    call win_execute(a:winid, 'normal! zb')
   endif
 endfunction
 

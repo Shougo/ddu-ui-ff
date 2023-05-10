@@ -417,6 +417,7 @@ export class Ui extends BaseUi<Params> {
           "ddu#ui#ff#_update_buffer",
           args.uiParams,
           bufnr,
+          floating ? this.popupId : await fn.bufwinid(args.denops, bufnr),
           this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
           args.uiParams.cursorPos >= 0 || (this.refreshed && checkRefreshed),
           cursorPos,
