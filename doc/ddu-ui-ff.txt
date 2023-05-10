@@ -783,10 +783,10 @@ A: >
 
 Q: Opens file in insert mode after |ddu-ui-ff-action-itemAction| executed.
 
-A: I think you have executed the action by |ddu#ui#do_action()|.  It executes
-the action asynchronously.  When the action is executed, "ddu-ui-ff" executes
-|:stopinsert| to exit insert mode.  But if it is executed in |:autocmd|,
-|:stopinsert| may not work.  To prevent it, you should use
+A: I think you have executed the action by |ddu#ui#do_action()| in filter
+window.  It executes the action asynchronously.  When the action is executed,
+"ddu-ui-ff" executes |:stopinsert| to exit insert mode.  But if it is executed
+in |:autocmd|, |:stopinsert| may not work.  To prevent it, you should use
 |ddu#ui#sync_action()| instead.
 
 ==============================================================================
