@@ -233,10 +233,8 @@ export class PreviewUi {
       const text = await this.getContents(denops, previewer);
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
-        // Disable swapfile
         await fn.setbufvar(denops, bufnr, "&swapfile", 0);
-        // NOTE: Set bufhidden to save contents
-        await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");
+        await fn.setbufvar(denops, bufnr, "&bufhidden", "wipe");
 
         await fn.bufload(denops, bufnr);
         await denops.cmd(`buffer ${bufnr}`);
