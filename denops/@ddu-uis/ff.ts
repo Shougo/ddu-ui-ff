@@ -6,14 +6,14 @@ import {
   DduOptions,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.8.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.8.3/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.8.4/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -317,7 +317,11 @@ export class Ui extends BaseUi<Params> {
             default:
               opts["borderchars"] = args.uiParams.floatingBorder;
           }
-          this.popupId = await args.denops.call("popup_create", bufnr, opts) as number;
+          this.popupId = await args.denops.call(
+            "popup_create",
+            bufnr,
+            opts,
+          ) as number;
         }
 
         if (hasNvim) {
