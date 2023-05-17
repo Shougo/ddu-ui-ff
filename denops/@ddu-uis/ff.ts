@@ -686,6 +686,12 @@ export class Ui extends BaseUi<Params> {
       this.selectedItems.clear();
       return ActionFlags.Redraw;
     },
+    collapseItem: async (args: {
+      denops: Denops;
+      options: DduOptions;
+    }) => {
+      return await this.collapseItemAction(args.denops, args.options);
+    },
     closeFilterWindow: async (args: {
       denops: Denops;
       context: Context;
