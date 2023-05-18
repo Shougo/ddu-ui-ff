@@ -1244,9 +1244,11 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    const header =
-      `[ddu-${options.name}] ${this.items.length}/${context.maxItems}`;
-    const linenr = "printf('%'.(len(line('$'))+2).'d/%d',line('.'),line('$'))";
+    const header = `[ddu-${options.name}]` +
+      (this.items.length !== context.maxItems
+        ? ` ${this.items.length}/${context.maxItems}`
+        : "");
+    const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
     const async = `${context.done ? "" : "[async]"}`;
     const laststatus = await op.laststatus.get(denops);
 
