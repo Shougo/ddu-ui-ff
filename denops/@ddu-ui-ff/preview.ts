@@ -124,11 +124,14 @@ export class PreviewUi {
     }
 
     if (uiParams.previewFloating) {
+      const highlight = uiParams.highlights?.floating ?? "NormalFloat";
+      const borderHighlight = uiParams.highlights?.floatingBorder ??
+        "FloatBorder";
       await fn.setwinvar(
         denops,
         this.previewWinId,
         "&winhighlight",
-        `Normal:${uiParams.highlights?.floating ?? "NormalFloat"}`,
+        `Normal:${highlight},FloatBorder:${borderHighlight}`,
       );
     }
 

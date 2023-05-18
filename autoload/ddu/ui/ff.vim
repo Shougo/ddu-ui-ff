@@ -131,8 +131,11 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
   const win_width = winnr->winwidth()
   const win_height = winnr->winheight()
 
+  const check_floating =
+        \ a:params.previewFloating && '*nvim_win_set_config'->exists()
+
   if a:params.previewSplit ==# 'vertical'
-    if a:params.previewFloating && '*nvim_win_set_config'->exists()
+    if check_floating
       const buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
@@ -166,7 +169,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
       execute 'vert resize ' .. preview_width
     endif
   elseif a:params.previewSplit ==# 'horizontal'
-    if a:params.previewFloating && '*nvim_win_set_config'->exists()
+    if check_floating
       const buf = nvim_create_buf(v:true, v:false)
 
       if a:params.split ==# 'floating'
