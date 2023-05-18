@@ -1249,7 +1249,7 @@ export class Ui extends BaseUi<Params> {
         ? ` ${this.items.length}/${context.maxItems}`
         : "");
     const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
-    const async = `${context.done ? "" : "[async]"}`;
+    const async = `${context.done ? "" : " [async]"}`;
     const laststatus = await op.laststatus.get(denops);
 
     if (hasNvim && (floating || laststatus === 0)) {
