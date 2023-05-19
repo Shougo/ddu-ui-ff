@@ -499,16 +499,15 @@ export class Ui extends BaseUi<Params> {
     }
     if (
       saveCursor.pos.length !== 0 && this.items.length !== 0 &&
-      currentText === saveCursor.text && !this.refreshed &&
-      !(args.uiParams.startFilter && hasAutoAction)
+      currentText === saveCursor.text && !this.refreshed
     ) {
-      // NOTE: startFilter with autoAction breaks cursor
+      // Restore the cursor
       await args.denops.call(
         "ddu#ui#ff#_cursor",
         saveCursor.pos[1],
         saveCursor.pos[2],
       );
-    } else if (hasAutoAction && winid < 0) {
+    } else if (hasAutoAction) {
       // Call auto action
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
