@@ -16,7 +16,7 @@ import {
   fn,
   op,
 } from "https://deno.land/x/ddu_vim@v2.8.4/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v4.3.0/buffer/mod.ts";
+import { replace } from "https://deno.land/x/denops_std@v4.3.3/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 type PreviewParams = {

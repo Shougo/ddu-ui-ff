@@ -668,9 +668,9 @@ export class Ui extends BaseUi<Params> {
             name: "action",
             options: {},
             params: {
-              actions: actions,
+              actions,
               name: args.options.name,
-              items: items,
+              items,
             },
           },
         ],
