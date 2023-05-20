@@ -26,7 +26,7 @@ endfunction
 
 function! ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) abort
   const max_lines = a:lines->len()
-  const current_lines = a:bufnr->getbufline(1, '$')->len()
+  const current_lines = '$'->line(a:bufnr->bufwinid())
 
   call setbufvar(a:bufnr, '&modifiable', 1)
 
