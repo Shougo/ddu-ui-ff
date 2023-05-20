@@ -1129,7 +1129,7 @@ export class Ui extends BaseUi<Params> {
         ) {
           const prevName = await fn.bufname(args.denops, args.context.bufNr);
           await args.denops.cmd(
-            prevName !== args.context.bufName
+            prevName !== args.context.bufName || args.context.bufNr == bufnr
               ? "enew"
               : `buffer ${args.context.bufNr}`,
           );
