@@ -662,6 +662,7 @@ export class Ui extends BaseUi<Params> {
 
       await args.denops.call("ddu#start", {
         name: args.options.name,
+        ui: args.options.ui,
         push: true,
         sources: [
           {
