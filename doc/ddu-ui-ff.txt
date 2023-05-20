@@ -789,8 +789,15 @@ window.  It executes the action asynchronously.  When the action is executed,
 in |:autocmd|, |:stopinsert| may not work.  To prevent it, you should use
 |ddu#ui#sync_action()| instead.
 
+Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
+
+A: You can set 'signcolumn' option in UI buffer.
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.05.20
+* 'signcolumn' option does not be set automatically.
 
 2023.03.19
 * Remove "ddu#ui#ff#get_item()".  Please use "ddu#ui#get_item()" instead.
