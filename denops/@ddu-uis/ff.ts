@@ -1187,7 +1187,7 @@ export class Ui extends BaseUi<Params> {
         cmdpos,
       );
     } else if ((await fn.mode(args.denops)) === "i") {
-      // NOTE: ":stopinsert" does not work well...
+      // Return to normal mode
       await args.denops.call("ddu#ui#ff#_stopinsert");
     }
 
