@@ -309,6 +309,10 @@ endfunction
 function! ddu#ui#ff#_stopinsert() abort
   " NOTE: Stop insert mode immediately.
   call feedkeys("\<ESC>", 'nx')
-  " NOTE: feedkeys() restores mode.  :stopinsert is needed
+
+  " NOTE: "feedkeys()" restores mode.  ":stopinsert" is needed
   stopinsert
+
+  " NOTE: ":stopinsert" changes column
+  call cursor(0, '.'->col() + 1)
 endfunction
