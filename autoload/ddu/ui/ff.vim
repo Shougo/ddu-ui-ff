@@ -143,15 +143,15 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
               \ a:params.previewRow : pos[0] - 1
         let win_col = a:params.previewCol > 0 ?
               \ a:params.previewCol : pos[1] - 1
-        let preview_height = win_height
+        " let preview_height = win_height
       else
         let win_row = pos[0] - 1
         let win_col = pos[1] - 1
       endif
-      let win_col += win_width
-      if (win_col + preview_width) > &columns
-        let win_col -= preview_width
-      endif
+"       let win_col += win_width
+"       if (win_col + preview_width) > &columns
+"         let win_col -= preview_width
+"       endif
 
       call nvim_open_win(buf, v:true, #{
             \   relative: 'editor',
