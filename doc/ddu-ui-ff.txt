@@ -793,6 +793,20 @@ Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
+Q: When calling `ddu#ui#do_action('quit')` from insert mode of the filter
+window, the cursor position is shifted to the left when returning to the
+original buffer.
+
+A: It is the feature.  Because "ddu-ui-ff" executes |:stopinsert| and it moves
+the cursor.  You must escape insert mode when quit from the filter window.
+>
+	autocmd FileType ddu-ff-filter call <SID>ddu_ff_filter_mapping()
+	function! s:ddu_ff_filter_mapping() abort
+	  inoremap <buffer><silent> <Esc>
+	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
+	endfunction
+<
+
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
 
