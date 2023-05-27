@@ -312,13 +312,23 @@ export class PreviewUi {
           "$",
         );
       } else if (
-        previewer.path && (await exists(previewer.path)) &&
+        previewer.path && await exists(previewer.path) &&
         !(await isDirectory(previewer.path))
       ) {
         const data = Deno.readFileSync(previewer.path);
         return new TextDecoder().decode(data).split("\n");
+      } else if (
+        previewer.path && await fn.bufexists(denops, previewer.path)
+      ) {
+        // Use buffer instead.
+        return await fn.getbufline(
+          denops,
+          await fn.bufnr(denops, previewer.path),
+          1,
+          "$",
+        );
       } else {
-        return [];
+        return [`"${previewer.path}" cannot be opened.`];
       }
     } else {
       return previewer.contents;
