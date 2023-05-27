@@ -305,7 +305,7 @@ export class PreviewUi {
     previewer: BufferPreviewer | NoFilePreviewer,
   ): Promise<string[]> {
     if (previewer.kind === "buffer") {
-      const bufferPath = previewer?.expr ?? previewer?.path;
+      const bufferPath = previewer?.expr || previewer?.path;
       if (
         previewer.path && await exists(previewer.path) &&
         !(await isDirectory(previewer.path))
