@@ -323,7 +323,9 @@ export class PreviewUi {
           "$",
         );
       } else {
-        return [`"${previewer.path}" cannot be opened.`];
+        return [
+          "Error", `"${previewer.path}" cannot be opened.`,
+        ];
       }
     } else {
       return previewer.contents;
