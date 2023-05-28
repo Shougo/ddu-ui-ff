@@ -305,7 +305,7 @@ export class PreviewUi {
     previewer: BufferPreviewer | NoFilePreviewer,
   ): Promise<string[]> {
     if (previewer.kind === "buffer") {
-      // NOTE: "undefined" is converted to 0, so "previewer.expr" may be zero
+      // NOTE: "undefined" is converted to 0, so "previewer.expr" may be 0.
       const bufferPath = previewer?.expr || previewer?.path;
       if (
         previewer.path && await exists(previewer.path) &&
