@@ -1,19 +1,22 @@
 import {
   ActionFlags,
+  BaseActionParams,
   BaseUi,
   Context,
   DduItem,
   DduOptions,
+  PreviewContext,
+  Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.9.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.8.4/deps.ts";
+} from "https://deno.land/x/ddu_vim@v2.9.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -924,6 +927,12 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
+      getPreviewer: (
+        denops: Denops,
+        item: DduItem,
+        actionParams: BaseActionParams,
+        previewContext: PreviewContext,
+      ) => Promise<Previewer | undefined>;
     }) => {
       const idx = await this.getIndex(args.denops);
       if (idx < 0) {
@@ -938,9 +947,9 @@ export class Ui extends BaseUi<Params> {
       return this.previewUi.previewContents(
         args.denops,
         args.context,
-        args.options,
         args.uiParams,
         args.actionParams,
+        args.getPreviewer,
         await this.getBufnr(args.denops),
         item,
       );

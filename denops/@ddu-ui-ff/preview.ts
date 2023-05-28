@@ -1,22 +1,22 @@
 import {
   ActionFlags,
+  BaseActionParams,
   BufferPreviewer,
   Context,
   DduItem,
-  DduOptions,
   NoFilePreviewer,
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v2.8.4/types.ts";
+} from "https://deno.land/x/ddu_vim@v2.9.0/types.ts";
 import {
   batch,
   Denops,
   ensureObject,
   fn,
   op,
-} from "https://deno.land/x/ddu_vim@v2.8.4/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v4.3.3/buffer/mod.ts";
+} from "https://deno.land/x/ddu_vim@v2.9.0/deps.ts";
+import { replace } from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 type PreviewParams = {
@@ -60,9 +60,14 @@ export class PreviewUi {
   async previewContents(
     denops: Denops,
     context: Context,
-    options: DduOptions,
     uiParams: Params,
     actionParams: unknown,
+    getPreviewer: (
+      denops: Denops,
+      item: DduItem,
+      actionParams: BaseActionParams,
+      previewContext: PreviewContext,
+    ) => Promise<Previewer | undefined>,
     bufnr: number,
     item: DduItem,
   ): Promise<ActionFlags> {
@@ -86,13 +91,12 @@ export class PreviewUi {
       isFloating: uiParams.previewFloating,
       split: uiParams.previewSplit,
     };
-    const previewer = await denops.call(
-      "ddu#get_previewer",
-      options.name,
+    const previewer = await getPreviewer(
+      denops,
       item,
-      actionParams,
+      actionParams as BaseActionParams,
       previewContext,
-    ) as Previewer | undefined;
+    );
 
     if (!previewer) {
       return ActionFlags.None;
@@ -305,8 +309,7 @@ export class PreviewUi {
     previewer: BufferPreviewer | NoFilePreviewer,
   ): Promise<string[]> {
     if (previewer.kind === "buffer") {
-      // NOTE: "undefined" is converted to 0, so "previewer.expr" may be 0.
-      const bufferPath = previewer?.expr || previewer?.path;
+      const bufferPath = previewer?.expr ?? previewer?.path;
       if (
         previewer.path && await exists(previewer.path) &&
         !(await isDirectory(previewer.path))
@@ -325,7 +328,8 @@ export class PreviewUi {
         );
       } else {
         return [
-          "Error", `"${previewer.path}" cannot be opened.`,
+          "Error",
+          `"${previewer.path}" cannot be opened.`,
         ];
       }
     } else {
