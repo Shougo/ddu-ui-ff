@@ -400,7 +400,7 @@ previewFloatingZindex		(number)
 		See |nvim_open_win()| for the detail.
 		NOTE: It is neovim only.
 
-		Default: 50
+		Default: 100
 
 					*ddu-ui-ff-param-previewHeight*
 previewHeight	(number)

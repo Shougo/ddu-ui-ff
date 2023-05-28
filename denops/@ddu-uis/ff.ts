@@ -1070,7 +1070,7 @@ export class Ui extends BaseUi<Params> {
       previewFloatingBorder: "none",
       previewFloatingTitle: "",
       previewFloatingTitlePos: "left",
-      previewFloatingZindex: 50,
+      previewFloatingZindex: 100,
       previewHeight: 10,
       previewRow: 0,
       previewSplit: "horizontal",
