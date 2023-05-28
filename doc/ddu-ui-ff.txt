@@ -680,7 +680,7 @@ A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
 Q: I want to toggle selected items in visual mode.
 
 A: >
-  xnoremap <silent><buffer> <Space>
+  xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 
 Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
@@ -802,7 +802,7 @@ the cursor.  You must escape insert mode when quit from the filter window.
 >
 	autocmd FileType ddu-ff-filter call <SID>ddu_ff_filter_mapping()
 	function! s:ddu_ff_filter_mapping() abort
-	  inoremap <buffer><silent> <Esc>
+	  inoremap <buffer> <Esc>
 	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
 	endfunction
 <
