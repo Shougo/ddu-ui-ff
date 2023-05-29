@@ -765,8 +765,8 @@ A: >
 	function! s:update_cursor()
 	  sign unplace 100
 	  sign define cursor text=>> texthl=Search
-	  execute printf('sign place 100 line=%d name=cursor file=%s',
-	        \ '.'->line(), '%:p'->expand())
+	  execute printf('sign place 100 line=%d name=cursor buffer=%s',
+	        \ '.'->line(), '%'->bufnr())
 	endfunction
 
 Q: How do I set the floating title with list style ?
