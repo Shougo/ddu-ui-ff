@@ -352,6 +352,13 @@ ignoreEmpty	(boolean)
 
 		Default: v:false
 
+					*ddu-ui-ff-param-immediatelyAction*
+immediateAction (string)
+		If it is not empty the number of item is exactly one, it runs
+		the action name immediately.
+
+		Default: ""
+
 						*ddu-ui-ff-param-previewCol*
 previewCol	(number)
 		Set the column position of the preview window if

@@ -83,6 +83,7 @@ export type Params = {
   floatingTitlePos: "left" | "center" | "right";
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
+  immediateAction: string;
   previewCol: number;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
@@ -227,15 +228,30 @@ export class Ui extends BaseUi<Params> {
 
     this.bufferName = `ddu-ff-${args.options.name}`;
 
-    if (
-      args.uiParams.ignoreEmpty && this.items.length === 0 &&
-      (await fn.bufwinid(
-          args.denops,
-          await fn.bufnr(args.denops, this.bufferName),
-        )) < 0
-    ) {
-      // Disable open UI window when empty items
-      return;
+    const existsUI = await fn.bufwinid(
+      args.denops,
+      await fn.bufnr(args.denops, this.bufferName),
+    ) > 0;
+
+    if (!existsUI) {
+      if (args.uiParams.ignoreEmpty && this.items.length === 0) {
+        // Disable open UI window when empty items
+        return;
+      }
+      if (
+        args.uiParams.immediateAction.length != 0 &&
+        this.items.length === 1
+      ) {
+        // Immediately action
+        await args.denops.call(
+          "ddu#item_action",
+          args.options.name,
+          args.uiParams.immediateAction,
+          this.items,
+          {},
+        );
+        return;
+      }
     }
 
     const initialized = await fn.bufexists(args.denops, this.bufferName) &&
@@ -1065,6 +1081,7 @@ export class Ui extends BaseUi<Params> {
       floatingTitlePos: "left",
       highlights: {},
       ignoreEmpty: false,
+      immediateAction: "",
       previewCol: 0,
       previewFloating: false,
       previewFloatingBorder: "none",
