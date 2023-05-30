@@ -352,7 +352,7 @@ ignoreEmpty	(boolean)
 
 		Default: v:false
 
-					*ddu-ui-ff-param-immediatelyAction*
+					*ddu-ui-ff-param-immediateAction*
 immediateAction (string)
 		If it is not empty the number of item is exactly one, it runs
 		the action name immediately.

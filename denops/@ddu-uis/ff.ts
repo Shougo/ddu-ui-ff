@@ -242,7 +242,7 @@ export class Ui extends BaseUi<Params> {
         args.uiParams.immediateAction.length != 0 &&
         this.items.length === 1
       ) {
-        // Immediately action
+        // Immediate action
         await args.denops.call(
           "ddu#item_action",
           args.options.name,
