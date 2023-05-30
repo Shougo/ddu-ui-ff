@@ -615,9 +615,9 @@ must force this behaviour. >
 
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
 	function! s:ddu_filter_my_settings() abort
-	  inoremap <C-j>
+	  inoremap <buffer> <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
-	  inoremap <C-k>
+	  inoremap <buffer> <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
 
@@ -629,8 +629,7 @@ A: You can use "b:ddu_ui_name". >
 	function! s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
-	    \ <Cmd>call ddu#ui#do_action(
-	    \ 'itemAction', {'name': 'edit'})<CR>
+	    \ <Cmd>call ddu#ui#do_action('itemAction', {'name': 'edit'})<CR>
 	  endif
 	endfunction
 	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
