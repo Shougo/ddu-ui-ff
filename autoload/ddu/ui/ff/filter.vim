@@ -50,7 +50,9 @@ function! ddu#ui#ff#filter#_open(name, input, bufnr, parent_id, params) abort
   endif
 
   " NOTE: startinsert! does not work in Vim or autoAction
-  if mode() !=# 'i'
+  if mode() ==# 'i'
+    startinsert!
+  else
     call feedkeys('A', 'n')
   endif
 
