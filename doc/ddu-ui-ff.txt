@@ -178,8 +178,8 @@ PARAMS						*ddu-ui-ff-params*
 
 						*ddu-ui-ff-param-autoAction*
 autoAction	(dictionary)
-		Action executed when the cursor is moved.
-		It has the following keys.
+		If it is specified, the UI action is executed when the cursor
+		is moved. It has the following keys.
 
 		delay				(number)	(Optional)
 		Time in milliseconds to delay the auto action.
@@ -355,8 +355,11 @@ ignoreEmpty	(boolean)
 
 					*ddu-ui-ff-param-immediateAction*
 immediateAction (string)
-		If it is not empty the number of item is exactly one, it runs
-		the action name immediately.
+		If it is not empty and the number of item is exactly one, it
+		runs |ddu-ui-ff-action-itemAction| immediately.
+
+		Note: You need to set |ddu-option-sync|.  Because UI window
+		may be created before all sources are finished.
 		Note: It works only if the UI window is not visible.
 
 		Default: ""
