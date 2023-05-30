@@ -896,7 +896,11 @@ export class Ui extends BaseUi<Params> {
       actionParams: unknown;
     }) => {
       const params = args.actionParams as DoActionParams;
+
       const items = params.items ?? await this.getItems(args.denops);
+      if (items.length === 0) {
+        return ActionFlags.Persist;
+      }
 
       await args.denops.call(
         "ddu#item_action",
