@@ -349,6 +349,7 @@ highlights	(dictionary)
 						*ddu-ui-ff-param-ignoreEmpty*
 ignoreEmpty	(boolean)
 		Don't open the UI window if the items are empty.
+		Note: It works only if the UI window is not visible.
 
 		Default: v:false
 
@@ -356,6 +357,7 @@ ignoreEmpty	(boolean)
 immediateAction (string)
 		If it is not empty the number of item is exactly one, it runs
 		the action name immediately.
+		Note: It works only if the UI window is not visible.
 
 		Default: ""
 
