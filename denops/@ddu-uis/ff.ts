@@ -238,6 +238,7 @@ export class Ui extends BaseUi<Params> {
         // Disable open UI window when empty items
         return;
       }
+
       if (
         args.uiParams.immediateAction.length != 0 &&
         this.items.length === 1
