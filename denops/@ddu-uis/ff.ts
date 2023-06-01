@@ -1383,6 +1383,7 @@ export class Ui extends BaseUi<Params> {
     bufnr: number,
   ): Promise<void> {
     const winid = await fn.bufwinid(denops, bufnr);
+    const existsStatusColumn = await fn.exists(denops, "+statuscolumn");
 
     await batch(denops, async (denops: Denops) => {
       await fn.setbufvar(denops, bufnr, "ddu_ui_name", options.name);
@@ -1396,6 +1397,9 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&relativenumber", 0);
       await fn.setwinvar(denops, winid, "&spell", 0);
       await fn.setwinvar(denops, winid, "&wrap", 0);
+      if (existsStatusColumn) {
+        await fn.setwinvar(denops, winid, "&statuscolumn", "");
+      }
 
       await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");

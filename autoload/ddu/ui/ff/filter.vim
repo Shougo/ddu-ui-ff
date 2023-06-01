@@ -152,6 +152,9 @@ function! s:init_buffer(name, params) abort
   setlocal noswapfile
   setlocal nowrap
   setlocal winfixheight
+  if '+statuscolumn'->exists()
+    setlocal statuscolumn=
+  endif
 
   resize 1
 
