@@ -127,7 +127,12 @@ function! s:init_buffer(name, params) abort
         \ a:params.split ==# 'floating'
         \ || a:params.filterSplitDirection ==# 'floating'
 
-  const bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
+  const bufname = 'ddu-ff-filter-' .. a:name
+  if bufname->bufexists()
+    return
+  endif
+
+  const bufnr = bufname->bufadd()
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
