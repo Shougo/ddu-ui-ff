@@ -1,10 +1,11 @@
-function! ddu#ui#ff#filter#_open(name, input, bufnr, parent_id, params) abort
-  const ids = a:bufnr->win_findbuf()
+function! ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
+  const bufname = 'ddu-ff-filter-' .. a:name
+  const ids = bufname->bufnr()->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
     call cursor('$'->line(), 0)
   else
-    call s:init_buffer(a:name, a:params)
+    call s:init_buffer(a:name, bufname, a:params)
 
     " Set the current input
     if '$'->getline() ==# ''
@@ -122,12 +123,12 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \ 'Normal:' .. highlight .. ',FloatBorder:' .. floating_highlight)
 endfunction
 
-function! s:init_buffer(name, params) abort
+function! s:init_buffer(name, bufname, params) abort
   const is_floating =
         \ a:params.split ==# 'floating'
         \ || a:params.filterSplitDirection ==# 'floating'
 
-  const bufnr = ('ddu-ff-filter-' .. a:name)->bufadd()
+  const bufnr = a:bufname->bufadd()
 
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
@@ -172,13 +173,20 @@ function! s:init_prompt(prompt, highlight_prompt) abort
 
   augroup ddu-ff-filter
     autocmd TextChangedI,TextChangedP,TextChanged <buffer>
-          \ if s:prev_lnum != '$'->line() | call s:update_prompt() | endif
+          \ : if s:prev_lnum != '$'->line()
+          \ |   call s:update_prompt()
+          \ | endif
   augroup END
 endfunction
 function! s:update_prompt() abort
   const id = 2000
-  call sign_unplace('', #{ id: id, buffer: '%'->bufnr() })
-  call sign_place(id, '', s:prompt_name, '%'->bufnr(), #{ lnum: '.'->line() })
+  call sign_unplace('', #{
+        \   id: id,
+        \   buffer: '%'->bufnr(),
+        \ })
+  call sign_place(id, '', s:prompt_name, '%'->bufnr(), #{
+        \   lnum: '.'->line(),
+        \ })
   let s:prev_lnum = '$'->line()
 endfunction
 

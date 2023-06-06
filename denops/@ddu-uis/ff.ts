@@ -539,7 +539,6 @@ export class Ui extends BaseUi<Params> {
           "ddu#ui#ff#filter#_open",
           args.options.name,
           args.context.input,
-          this.filterBufnr,
           floating ? this.popupId : await fn.bufwinid(args.denops, bufnr),
           args.uiParams,
         ) as number;
@@ -933,7 +932,6 @@ export class Ui extends BaseUi<Params> {
         "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
-        this.filterBufnr,
         args.uiParams.split === "floating"
           ? this.popupId
           : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
