@@ -25,6 +25,10 @@ type DoActionParams = {
   params?: unknown;
 };
 
+type CursorActionParams = {
+  count?: number;
+};
+
 type HighlightGroup = {
   floating?: string;
   floatingBorder?: string;
@@ -729,6 +733,7 @@ export class Ui extends BaseUi<Params> {
     cursorNext: async (args: {
       denops: Denops;
       uiParams: Params;
+      actionParams: unknown;
     }) => {
       const bufnr = await this.getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
@@ -741,11 +746,14 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.Persist;
       }
 
+      const params = args.actionParams as CursorActionParams;
+      const count = params.count ?? 1;
+
       // Move to the next
       if (args.uiParams.reversed) {
-        cursorPos[1] -= 1;
+        cursorPos[1] -= count;
       } else {
-        cursorPos[1] += 1;
+        cursorPos[1] += count;
       }
       if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
         await fn.setbufvar(
@@ -764,6 +772,7 @@ export class Ui extends BaseUi<Params> {
     cursorPrevious: async (args: {
       denops: Denops;
       uiParams: Params;
+      actionParams: unknown;
     }) => {
       const bufnr = await this.getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
@@ -776,11 +785,14 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.Persist;
       }
 
+      const params = args.actionParams as CursorActionParams;
+      const count = params.count ?? 1;
+
       // Move to the previous
       if (args.uiParams.reversed) {
-        cursorPos[1] += 1;
+        cursorPos[1] += count;
       } else {
-        cursorPos[1] -= 1;
+        cursorPos[1] -= count;
       }
       if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
         await fn.setbufvar(

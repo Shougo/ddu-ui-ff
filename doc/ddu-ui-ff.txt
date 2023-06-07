@@ -78,25 +78,32 @@ collapseItem
 
 					*ddu-ui-ff-action-cursorNext*
 cursorNext
+		params:
+			{count}: Move count
+
 		Move the cursor to the next.
 
 					*ddu-ui-ff-action-cursorPrevious*
 cursorPrevious
+		params:
+			{count}: Move count
+
 		Move the cursor to the previous.
 
 					*ddu-ui-ff-action-expandItem*
 expandItem
-		Expand the item tree.
-		mode:
+		params:
 			{mode}: The supported values are:
 
-			"toggle":
-				Close the item tree if the directory is
-				opened.
+				"toggle":
+					Close the item tree if the directory
+					is opened.
 
-		maxLevel:
-			Maximum expand recursive level.
-			If it is less than 0, infinite recursive.
+			{maxLevel}:
+				Maximum expand recursive level.
+				If it is less than 0, infinite recursive.
+
+		Expand the item tree.
 
 						*ddu-ui-ff-action-getItem*
 getItem
@@ -113,8 +120,8 @@ inputAction
 						*ddu-ui-ff-action-itemAction*
 itemAction
 		params:
-			{name}: action name
-			{params}: action params dictionary
+			{name}: Action name
+			{params}: Action params dictionary
 
 		Close the UI window and fire {name} action for selected or
 		current cursor items.
@@ -168,7 +175,7 @@ toggleSelectItem
 					*ddu-ui-ff-action-updateOptions*
 updateOptions
 		params:
-			{option-name}: option name and value
+			{option-name}: Option name and value
 
 		Update current options and redraw the UI.
 		Refer to |ddu-options| about options.
@@ -583,8 +590,8 @@ EXAMPLES					*ddu-ui-ff-examples*
 	  \ <Cmd>call ddu#ui#do_action('quit')<CR>
 	endfunction
 
-	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
-	function! s:ddu_filter_my_settings() abort
+	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Esc><Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
 	  nnoremap <buffer> <CR>
@@ -602,8 +609,8 @@ A: Please set |ddu-ui-ff-param-startFilter|.
 Q: I want to call default action in the filter window.
 
 A: >
-	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
-	function! s:ddu_filter_my_settings() abort
+	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
@@ -613,8 +620,8 @@ Q: I want to move the cursor in the filter window, while in insert mode.
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour. >
 
-	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
-	function! s:ddu_filter_my_settings() abort
+	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
 	  inoremap <buffer> <C-k>
@@ -632,8 +639,8 @@ A: You can use "b:ddu_ui_name". >
 	    \ <Cmd>call ddu#ui#do_action('itemAction', {'name': 'edit'})<CR>
 	  endif
 	endfunction
-	autocmd FileType ddu-ff-filter call s:ddu_filter_my_settings()
-	function! s:ddu_filter_my_settings() abort
+	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	function! s:ddu_ff_filter_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> <CR>
 	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
@@ -767,8 +774,8 @@ Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
 A: >
-	autocmd FileType ddu-ff call s:ddu_my_settings()
-	function! s:ddu_my_settings() abort
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
 	  setlocal signcolumn=yes
 	  autocmd CursorMoved <buffer> call s:update_cursor()
 	endfunction
@@ -804,17 +811,27 @@ Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
-Q: When calling `ddu#ui#do_action('quit')` from insert mode of the filter
+Q: When calling |ddu-ui-ff-action-quit| from insert mode of the filter
 window, the cursor position is shifted to the left when returning to the
 original buffer.
 
 A: It is the feature.  Because "ddu-ui-ff" executes |:stopinsert| and it moves
 the cursor.  You must escape insert mode when quit from the filter window.
 >
-	autocmd FileType ddu-ff-filter call <SID>ddu_ff_filter_mapping()
-	function! s:ddu_ff_filter_mapping() abort
+	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <Esc>
 	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
+	endfunction
+<
+
+Q: I cannot see what item is selected in the filter window.
+
+A: You can set 'cursorline' option in ddu buffer.
+>
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function! s:ddu_ff_my_settings() abort
+	  setlocal cursorline
 	endfunction
 <
 
