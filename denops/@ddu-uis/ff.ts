@@ -809,7 +809,7 @@ export class Ui extends BaseUi<Params> {
       const item = this.items[idx];
       const params = args.actionParams as ExpandItemParams;
 
-      if (item.__expanded) {
+      if (item.__expanded || item.isExpanded) {
         if (params.mode === "toggle") {
           return await this.collapseItemAction(args.denops, args.options);
         }
