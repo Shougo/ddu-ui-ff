@@ -447,7 +447,7 @@ export class Ui extends BaseUi<Params> {
           ? " ".repeat(item.__level) +
             (!item.isTree
               ? "  "
-              : item.isExpanded || item.__expanded
+              : item.__expanded
               ? "- "
               : "+ ")
           : "");
@@ -809,7 +809,7 @@ export class Ui extends BaseUi<Params> {
       const item = this.items[idx];
       const params = args.actionParams as ExpandItemParams;
 
-      if (item.__expanded || item.isExpanded) {
+      if (item.__expanded) {
         if (params.mode === "toggle") {
           return await this.collapseItemAction(args.denops, args.options);
         }
