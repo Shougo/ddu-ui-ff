@@ -9,14 +9,14 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v2.9.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.0.0/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v2.9.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.0.0/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -445,7 +445,11 @@ export class Ui extends BaseUi<Params> {
       return `${getSourceName(item.__sourceName)}` +
         (args.uiParams.displayTree
           ? " ".repeat(item.__level) +
-            (!item.isTree ? "  " : item.__expanded ? "- " : "+ ")
+            (!item.isTree
+              ? "  "
+              : item.isExpanded || item.__expanded
+              ? "- "
+              : "+ ")
           : "");
     };
 
