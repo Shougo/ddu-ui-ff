@@ -8,14 +8,14 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.0.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.0.2/types.ts";
 import {
   batch,
   Denops,
   ensureObject,
   fn,
   op,
-} from "https://deno.land/x/ddu_vim@v3.0.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.0.2/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
@@ -332,9 +332,9 @@ export class PreviewUi {
       }
       if ("lineNr" in previewer && previewer.lineNr) {
         await fn.cursor(denops, [previewer.lineNr, 0]);
-        await denops.cmd("normal! zv");
-        await denops.cmd("normal! zz");
       }
+      await denops.cmd("normal! zv");
+      await denops.cmd("normal! zz");
     });
   }
 
