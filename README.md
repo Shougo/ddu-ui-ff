@@ -17,7 +17,7 @@ https://github.com/Shougo/ddu.vim
 ## Configuration
 
 ```vim
-call ddu#custom#patch_global({
-    \ 'ui': 'ff',
+call ddu#custom#patch_global(#{
+    \   ui: 'ff',
     \ })
 ```

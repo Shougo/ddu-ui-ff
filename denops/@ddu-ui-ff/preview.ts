@@ -140,6 +140,25 @@ export class PreviewUi {
 
     await this.jump(denops, previewer);
 
+    if (uiParams.onPreview) {
+      if (typeof uiParams.onPreview === "string") {
+        await denops.call(
+          "denops#callback#call",
+          uiParams.onPreview,
+          {
+            context,
+            item,
+          },
+        );
+      } else {
+        await uiParams.onPreview({
+          denops,
+          context,
+          item,
+        });
+      }
+    }
+
     const previewBufnr = await fn.bufnr(denops);
     this.previewBufnrs.add(previewBufnr);
     this.previewedTarget = item;

@@ -51,7 +51,7 @@ ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 						*ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
-		Note: It does not execute |:redraw| automatically.
+		NOTE: It does not execute |:redraw| automatically.
 		You need to execute |:redraw| if needed.
 
 ------------------------------------------------------------------------------
@@ -356,7 +356,7 @@ highlights	(dictionary)
 						*ddu-ui-ff-param-ignoreEmpty*
 ignoreEmpty	(boolean)
 		Don't open the UI window if the items are empty.
-		Note: It works only if the UI window is not visible.
+		NOTE: It works only if the UI window is not visible.
 
 		Default: v:false
 
@@ -365,11 +365,17 @@ immediateAction (string)
 		If it is not empty and the number of item is exactly one, it
 		runs |ddu-ui-ff-action-itemAction| immediately.
 
-		Note: You need to set |ddu-option-sync|.  Because UI window
+		NOTE: You need to set |ddu-option-sync|.  Because UI window
 		may be created before all sources are finished.
-		Note: It works only if the UI window is not visible.
+		NOTE: It works only if the UI window is not visible.
 
 		Default: ""
+
+						*ddu-ui-ff-param-onPreview*
+onPreview	(function)
+		It is called when |ddu-ui-ff-action-preview| is fired.
+		NOTE: The function must be registered by
+		|denops#callback#register()|.
 
 						*ddu-ui-ff-param-previewCol*
 previewCol	(number)
@@ -511,7 +517,7 @@ split		(string)
 		"floating": use floating window feature
 		"no": no split
 
-		Note: If you have enabled "floating" in Vim,
+		NOTE: If you have enabled "floating" in Vim,
 		|ddu-ui-ff-param-startFilter| is enabled automatically.
 
 		Default: "horizontal"
@@ -525,7 +531,7 @@ splitDirection	(string)
 						*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
-		Note: If it is enabled and |ddu-ui-ff-param-autoAction| is
+		NOTE: If it is enabled and |ddu-ui-ff-param-autoAction| is
 		set, The restore cursor feature is disabled.
 
 		Default: v:false
@@ -574,8 +580,8 @@ winWidth	(number)
 ==============================================================================
 EXAMPLES					*ddu-ui-ff-examples*
 >
-	call ddu#custom#patch_global({
-	    \ 'ui': 'ff',
+	call ddu#custom#patch_global(#{
+	    \   ui: 'ff',
 	    \ })
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
@@ -834,6 +840,19 @@ A: You can set 'cursorline' option in ddu buffer.
 	  setlocal cursorline
 	endfunction
 <
+
+Q: I want to change preview cursor on the top.
+
+A: >
+	call ddu#custom#patch_global(#{
+	      \   uiParams: #{
+	      \     ff: #{
+	      \       onPreview: denops#callback#register(
+	      \         { args -> execute('normal! zt') }
+	      \       ),
+	      \     },
+	      \   },
+	      \ })
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*

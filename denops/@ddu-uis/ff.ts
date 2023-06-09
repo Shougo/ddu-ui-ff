@@ -71,6 +71,12 @@ type ExpandItemParams = {
   maxLevel?: number;
 };
 
+type OnPreviewArguments = {
+  denops: Denops;
+  context: Context;
+  item: DduItem;
+};
+
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
@@ -88,6 +94,7 @@ export type Params = {
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
+  onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
   previewCol: number;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
@@ -462,7 +469,7 @@ export class Ui extends BaseUi<Params> {
       const checkRefreshed = args.context.input !== this.prevInput ||
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
         (args.uiParams.reversed && this.items.length !== this.prevLength);
-      // Note: Use batch for screen flicker when highlight items.
+      // NOTE: Use batch for screen flicker when highlight items.
       await batch(args.denops, async (denops: Denops) => {
         await denops.call(
           "ddu#ui#ff#_update_buffer",
@@ -1101,6 +1108,7 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
+      onPreview: (_) => { return Promise.resolve(); },
       previewCol: 0,
       previewFloating: false,
       previewFloatingBorder: "none",
