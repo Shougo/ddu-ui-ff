@@ -323,14 +323,19 @@ export class PreviewUi {
 
   private async jump(denops: Denops, previewer: Previewer) {
     await batch(denops, async (denops: Denops) => {
-      if ("pattern" in previewer && previewer.pattern) {
+      const hasPattern = "pattern" in previewer && previewer.pattern;
+      const hasLineNr = "lineNr" in previewer && previewer.lineNr;
+
+      if (hasPattern) {
         await fn.search(denops, previewer.pattern, "w");
       }
-      if ("lineNr" in previewer && previewer.lineNr) {
+      if (hasLineNr && previewer.lineNr) {
         await fn.cursor(denops, [previewer.lineNr, 0]);
       }
-      await denops.cmd("normal! zv");
-      await denops.cmd("normal! zz");
+      if (hasPattern || hasLineNr) {
+        await denops.cmd("normal! zv");
+        await denops.cmd("normal! zz");
+      }
     });
   }
 
