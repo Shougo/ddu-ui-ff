@@ -25,7 +25,6 @@ type PreviewParams = {
 
 export class PreviewUi {
   private previewWinId = -1;
-  private terminalBufnr = -1;
   private previewedTarget?: DduItem;
   private matchIds: Record<number, number> = {};
   private previewBufnrs: Set<number> = new Set();
@@ -144,9 +143,6 @@ export class PreviewUi {
     const previewBufnr = await fn.bufnr(denops);
     this.previewBufnrs.add(previewBufnr);
     this.previewedTarget = item;
-    if (previewer.kind === "terminal") {
-      this.terminalBufnr = bufnr;
-    }
     await fn.win_gotoid(denops, prevId);
 
     return ActionFlags.Persist;
