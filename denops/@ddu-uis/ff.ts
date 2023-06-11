@@ -405,7 +405,7 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight} | normal! zb`,
       );
-      if ((await fn.bufwinid(args.denops, this.filterBufnr)) >= 0) {
+      if (await fn.bufwinid(args.denops, this.filterBufnr) >= 0) {
         // Redraw floating window
         await args.denops.call(
           "ddu#ui#ff#filter#_floating",
@@ -1230,7 +1230,7 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
-    } else if ((await fn.mode(args.denops)) === "i") {
+    } else if (await fn.mode(args.denops) === "i") {
       // Return to normal mode
       await args.denops.call("ddu#ui#ff#_stopinsert");
     }
@@ -1297,7 +1297,7 @@ export class Ui extends BaseUi<Params> {
     const laststatus = await op.laststatus.get(denops);
 
     if (hasNvim && (floating || laststatus === 0)) {
-      if ((await vars.g.get(denops, "ddu#ui#ff#_save_title", "")) === "") {
+      if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
         const saveTitle = await denops.call(
           "nvim_get_option",
           "titlestring",
