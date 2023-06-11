@@ -456,11 +456,7 @@ export class Ui extends BaseUi<Params> {
       return `${getSourceName(item.__sourceName)}` +
         (args.uiParams.displayTree
           ? " ".repeat(item.__level) +
-            (!item.isTree
-              ? "  "
-              : item.__expanded
-              ? "- "
-              : "+ ")
+            (!item.isTree ? "  " : item.__expanded ? "- " : "+ ")
           : "");
     };
 
@@ -1099,7 +1095,9 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
-      onPreview: (_) => { return Promise.resolve(); },
+      onPreview: (_) => {
+        return Promise.resolve();
+      },
       previewCol: 0,
       previewFloating: false,
       previewFloatingBorder: "none",
@@ -1230,9 +1228,6 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
-    } else if (await fn.mode(args.denops) === "i") {
-      // Return to normal mode
-      await args.denops.call("ddu#ui#ff#_stopinsert");
     }
 
     await args.denops.call("ddu#event", args.options.name, "close");

@@ -805,24 +805,15 @@ A: >
 	  \   },
 	  \ })
 
-Q: Opens file in insert mode after |ddu-ui-ff-action-itemAction| executed.
-
-A: I think you have executed the action by |ddu#ui#do_action()| in filter
-window.  It executes the action asynchronously.  When the action is executed,
-"ddu-ui-ff" executes |:stopinsert| to exit insert mode.  But if it is executed
-in |:autocmd|, |:stopinsert| may not work.  To prevent it, you should use
-|ddu#ui#sync_action()| instead.
-
 Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
-Q: When calling |ddu-ui-ff-action-quit| from insert mode of the filter
-window, the cursor position is shifted to the left when returning to the
-original buffer.
+Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
+insert mode of the filter window, it remains insert mode.
 
-A: It is the feature.  Because "ddu-ui-ff" executes |:stopinsert| and it moves
-the cursor.  You must escape insert mode when quit from the filter window.
+A: It is the feature.  Because |ddu#ui#do_action()| does not change any mode.
+You must escape insert mode when leave from the filter window.
 >
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
 	function! s:ddu_ff_filter_my_settings() abort
@@ -856,6 +847,10 @@ A: >
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.06.11
+* Does not restore to normal mode automatically.  It should be configured by
+  user.
 
 2023.05.20
 * 'signcolumn' option does not be set automatically.

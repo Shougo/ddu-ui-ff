@@ -307,13 +307,3 @@ function! ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
   call feedkeys(':' .. a:cmdline ..
         \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction
-
-function! ddu#ui#ff#_stopinsert() abort
-  if mode() ==# 'i'
-    " NOTE: Stop insert mode immediately.
-    call feedkeys("\<ESC>", 'nx')
-  endif
-
-  " NOTE: "feedkeys()" restores mode.  ":stopinsert" is needed
-  stopinsert
-endfunction
