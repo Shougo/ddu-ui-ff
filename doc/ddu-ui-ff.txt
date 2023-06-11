@@ -618,7 +618,7 @@ A: >
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
 	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
+	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 
 Q: I want to move the cursor in the filter window, while in insert mode.
@@ -819,6 +819,8 @@ You must escape insert mode when leave from the filter window.
 	function! s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <Esc>
 	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
+	  inoremap <buffer> <CR>
+	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 <
 
