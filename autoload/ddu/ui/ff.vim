@@ -153,6 +153,11 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
         let win_col -= preview_width
       endif
 
+      if a:params.previewFloatingBorder !=# 'none'
+        let preview_width -= 2
+        let preview_height -= 2
+      endif
+
       call nvim_open_win(buf, v:true, #{
             \   relative: 'editor',
             \   row: win_row,
@@ -181,11 +186,17 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, prev_winid) abort
               \ a:params.previewRow : pos[0] - 1
       let win_col = a:params.previewCol > 0 ?
               \ a:params.previewCol : pos[1] - 1
+
       if a:params.previewRow <= 0 && win_row <= preview_height
         let win_row += win_height + 1
         const anchor = 'NW'
       else
         const anchor = 'SW'
+      endif
+
+      if a:params.previewFloatingBorder !=# 'none'
+        let preview_width -= 2
+        let preview_height -= 2
       endif
 
       call nvim_open_win(buf, v:true, #{
