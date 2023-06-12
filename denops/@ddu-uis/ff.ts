@@ -284,122 +284,162 @@ export class Ui extends BaseUi<Params> {
     const winid = (floating && !hasNvim)
       ? this.popupId
       : await fn.bufwinid(args.denops, bufnr);
-    if (winid < 0) {
-      const direction = args.uiParams.splitDirection;
-      if (args.uiParams.split === "horizontal") {
+
+    const direction = args.uiParams.splitDirection;
+    if (args.uiParams.split === "horizontal") {
+      if (winid >= 0) {
+        await fn.win_execute(
+          args.denops,
+          winid,
+          `resize ${winHeight}`,
+        );
+      } else {
         const header = `silent keepalt ${direction} `;
         await args.denops.cmd(
           header + `sbuffer +resize\\ ${winHeight} ${bufnr}`,
         );
-      } else if (args.uiParams.split === "vertical") {
+      }
+    } else if (args.uiParams.split === "vertical") {
+      if (winid >= 0) {
+        await fn.win_execute(
+          args.denops,
+          winid,
+          `vertical resize ${args.uiParams.winWidth}`,
+        );
+      } else {
         const header = `silent keepalt vertical ${direction} `;
         await args.denops.cmd(
           header +
             `sbuffer +vertical\\ resize\\ ${args.uiParams.winWidth} ${bufnr}`,
         );
-      } else if (floating) {
-        // statusline must be set for floating window
-        const currentStatusline = await op.statusline.get(args.denops);
-        const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
-        const borderHighlight = args.uiParams.highlights?.floatingBorder ??
-          "FloatBorder";
+      }
+    } else if (floating) {
+      // statusline must be set for floating window
+      const currentStatusline = await op.statusline.get(args.denops);
+      const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
+      const borderHighlight = args.uiParams.highlights?.floatingBorder ??
+        "FloatBorder";
 
-        if (hasNvim) {
-          this.popupId = await args.denops.call("nvim_open_win", bufnr, true, {
-            "relative": "editor",
-            "row": Number(args.uiParams.winRow),
-            "col": Number(args.uiParams.winCol),
-            "width": Number(args.uiParams.winWidth),
-            "height": winHeight,
-            "border": args.uiParams.floatingBorder,
-            "title": args.uiParams.floatingTitle,
-            "title_pos": args.uiParams.floatingTitlePos,
-          }) as number;
+      if (hasNvim) {
+        const winOpts = {
+          "relative": "editor",
+          "row": Number(args.uiParams.winRow),
+          "col": Number(args.uiParams.winCol),
+          "width": Number(args.uiParams.winWidth),
+          "height": winHeight,
+          "border": args.uiParams.floatingBorder,
+          "title": args.uiParams.floatingTitle,
+          "title_pos": args.uiParams.floatingTitlePos,
+        };
+        if (winid >= 0) {
+          await args.denops.call(
+            "nvim_win_set_config",
+            this.popupId,
+            winOpts,
+          );
         } else {
-          const opts = {
-            "pos": "topleft",
-            "line": Number(args.uiParams.winRow) + 1,
-            "col": Number(args.uiParams.winCol) + 1,
-            "highlight": highlight,
-            "border": [],
-            "borderchars": [],
-            "borderhighlight": [borderHighlight],
-            "minwidth": Number(args.uiParams.winWidth),
-            "maxwidth": Number(args.uiParams.winWidth),
-            "minheight": winHeight,
-            "maxheight": winHeight,
-            "scrollbar": 0,
-            "title": args.uiParams.floatingTitle,
-            "wrap": 0,
-          } as Record<string, unknown>;
+          this.popupId = await args.denops.call(
+            "nvim_open_win",
+            bufnr,
+            true,
+            winOpts,
+          ) as number;
+        }
+      } else {
+        const winOpts = {
+          "pos": "topleft",
+          "line": Number(args.uiParams.winRow) + 1,
+          "col": Number(args.uiParams.winCol) + 1,
+          "highlight": highlight,
+          "border": [],
+          "borderchars": [],
+          "borderhighlight": [borderHighlight],
+          "minwidth": Number(args.uiParams.winWidth),
+          "maxwidth": Number(args.uiParams.winWidth),
+          "minheight": winHeight,
+          "maxheight": winHeight,
+          "scrollbar": 0,
+          "title": args.uiParams.floatingTitle,
+          "wrap": 0,
+        } as Record<string, unknown>;
 
-          switch (args.uiParams.floatingBorder) {
-            case "none":
-              break;
-            case "single":
-            case "rounded":
-            case "solid":
-            case "shadow":
-              opts["border"] = [1, 1, 1, 1];
-              break;
-            case "double":
-              opts["border"] = [2, 2, 2, 2];
-              break;
-            default:
-              opts["borderchars"] = args.uiParams.floatingBorder;
-          }
+        switch (args.uiParams.floatingBorder) {
+          case "none":
+            break;
+          case "single":
+          case "rounded":
+          case "solid":
+          case "shadow":
+            winOpts["border"] = [1, 1, 1, 1];
+            break;
+          case "double":
+            winOpts["border"] = [2, 2, 2, 2];
+            break;
+          default:
+            winOpts["borderchars"] = args.uiParams.floatingBorder;
+        }
+        if (winid >= 0) {
+          await args.denops.call(
+            "popup_move",
+            this.popupId,
+            winOpts,
+          );
+        } else {
           this.popupId = await args.denops.call(
             "popup_create",
             bufnr,
-            opts,
+            winOpts,
           ) as number;
         }
-
-        if (hasNvim) {
-          await fn.setwinvar(
-            args.denops,
-            this.popupId,
-            "&winhighlight",
-            `Normal:${highlight},FloatBorder:${borderHighlight}`,
-          );
-
-          await fn.setwinvar(
-            args.denops,
-            this.popupId,
-            "&statusline",
-            currentStatusline,
-          );
-        } else {
-          await fn.setwinvar(
-            args.denops,
-            this.popupId,
-            "&cursorline",
-            true,
-          );
-        }
-      } else if (args.uiParams.split === "no") {
-        await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
-      } else {
-        await args.denops.call(
-          "ddu#util#print_error",
-          `Invalid split param: ${args.uiParams.split}`,
-        );
-        return;
       }
-      await batch(args.denops, async (denops: Denops) => {
-        await denops.call("ddu#ui#ff#_reset_auto_action");
-        if (hasAutoAction) {
-          const autoAction = Object.assign(
-            { delay: 100, params: {}, sync: true },
-            args.uiParams.autoAction,
-          );
-          await denops.call(
-            "ddu#ui#ff#_set_auto_action",
-            autoAction,
-          );
-        }
-      });
-    } else if (args.uiParams.autoResize) {
+
+      if (hasNvim) {
+        await fn.setwinvar(
+          args.denops,
+          this.popupId,
+          "&winhighlight",
+          `Normal:${highlight},FloatBorder:${borderHighlight}`,
+        );
+
+        await fn.setwinvar(
+          args.denops,
+          this.popupId,
+          "&statusline",
+          currentStatusline,
+        );
+      } else {
+        await fn.setwinvar(
+          args.denops,
+          this.popupId,
+          "&cursorline",
+          true,
+        );
+      }
+    } else if (args.uiParams.split === "no") {
+      await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
+    } else {
+      await args.denops.call(
+        "ddu#util#print_error",
+        `Invalid split param: ${args.uiParams.split}`,
+      );
+      return;
+    }
+
+    await batch(args.denops, async (denops: Denops) => {
+      await denops.call("ddu#ui#ff#_reset_auto_action");
+      if (hasAutoAction) {
+        const autoAction = Object.assign(
+          { delay: 100, params: {}, sync: true },
+          args.uiParams.autoAction,
+        );
+        await denops.call(
+          "ddu#ui#ff#_set_auto_action",
+          autoAction,
+        );
+      }
+    });
+
+    if (args.uiParams.autoResize) {
       await fn.win_execute(
         args.denops,
         winid,
