@@ -435,6 +435,7 @@ export class Ui extends BaseUi<Params> {
         );
         await denops.call(
           "ddu#ui#ff#_set_auto_action",
+          winid,
           autoAction,
         );
       }
@@ -461,7 +462,7 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
-    const augroupName = `${await op.filetype.getLocal(args.denops)}-${bufnr}`;
+    const augroupName = `ddu-ui-ff-${bufnr}`;
     await args.denops.cmd(`augroup ${augroupName}`);
     await args.denops.cmd(`autocmd! ${augroupName}`);
 

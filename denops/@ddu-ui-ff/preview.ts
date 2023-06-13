@@ -14,7 +14,6 @@ import {
   Denops,
   ensureObject,
   fn,
-  op,
 } from "https://deno.land/x/ddu_vim@v3.0.2/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";

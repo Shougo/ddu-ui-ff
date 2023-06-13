@@ -19,8 +19,8 @@ function! ddu#ui#ff#execute(command) abort
   call win_execute(winid, a:command)
 
   if s:getcurpos(winid) != prev_curpos
-    " NOTE: CursorMoved autocmd does not work when cursor()
-    call win_execute(winid, 'doautocmd CursorMoved')
+    " NOTE: CursorMoved autocmd does not work when win_execute()
+    call ddu#ui#ff#_do_auto_action()
   endif
 endfunction
 
@@ -196,7 +196,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, preview_bufnr, prev_wini
       endif
     else
       call win_gotoid(winnr)
-      execute 'silent rightbelow vsplit' a:preview_bufnr
+      execute 'silent rightbelow vertical sbuffer' a:preview_bufnr
       execute 'vert resize ' .. preview_width
       const winid = win_getid()
     endif
@@ -264,7 +264,7 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, preview_bufnr, prev_wini
       endif
     else
       call win_gotoid(winnr)
-      execute 'silent aboveleft split' a:preview_bufnr
+      execute 'silent aboveleft sbuffer' a:preview_bufnr
       execute 'resize ' .. preview_height
       const winid = win_getid()
     endif
@@ -331,9 +331,11 @@ function! ddu#ui#ff#_reset_auto_action() abort
     autocmd!
   augroup END
 endfunction
-function! ddu#ui#ff#_set_auto_action(auto_action) abort
+function! ddu#ui#ff#_set_auto_action(winid, auto_action) abort
+  const prev_winid = win_getid()
   let s:auto_action = a:auto_action
 
+  call win_gotoid(a:winid)
   " NOTE: In action execution, auto action should be skipped
   augroup ddu-ui-auto_action
     autocmd CursorMoved <buffer> ++nested
@@ -341,6 +343,7 @@ function! ddu#ui#ff#_set_auto_action(auto_action) abort
           \ |   call ddu#ui#ff#_do_auto_action()
           \ | endif
   augroup END
+  call win_gotoid(prev_winid)
 endfunction
 
 function! ddu#ui#ff#_cursor(line, col) abort
@@ -350,8 +353,10 @@ function! ddu#ui#ff#_cursor(line, col) abort
   else
     const winid = g:ddu#ui#ff#_filter_parent_winid
     call win_execute(winid,
-          \ printf('call cursor(%d, %d) | redraw',
-          \        a:line, a:col))
+          \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
+
+    " NOTE: CursorMoved autocmd does not work when win_execute()
+    call ddu#ui#ff#_do_auto_action()
   endif
 endfunction
 
