@@ -286,7 +286,7 @@ filterFloatingPosition	(string)
 		NOTE: To use it, you need to use neovim and
 		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
 
-		Default: "bottom"
+		Default: "top"
 
 					*ddu-ui-ff-param-filterFloatingTitle*
 filterFloatingTitle	(string | list)
@@ -317,7 +317,7 @@ filterSplitDirection	(string)
 
 		NOTE: To use "floating", you need to use neovim.
 
-		Default: "botright"
+		Default: "topleft"
 
 					*ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
