@@ -14,11 +14,11 @@ function! ddu#ui#ff#execute(command) abort
   endif
 
   const winid = g:ddu#ui#ff#_filter_parent_winid
-  const prev_curpos = s:getcurpos(winid)
+  const prev_curpos = getcurpos(winid)
 
   call win_execute(winid, a:command)
 
-  if s:getcurpos(winid) != prev_curpos
+  if getcurpos(winid) != prev_curpos
     " NOTE: CursorMoved autocmd does not work when win_execute()
     call ddu#ui#ff#_do_auto_action()
   endif
@@ -43,7 +43,7 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) 
   endif
 
   " Init the cursor
-  const curpos = s:getcurpos(a:winid)
+  const curpos = getcurpos(a:winid)
   const lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
   if curpos[1] != lnum
     call win_execute(a:winid,
@@ -123,7 +123,8 @@ function! ddu#ui#ff#_highlight(
   endif
 endfunction
 
-function! ddu#ui#ff#_open_preview_window(params, bufnr, preview_bufnr, prev_winid, preview_winid) abort
+function! ddu#ui#ff#_open_preview_window(
+      \ params, bufnr, preview_bufnr, prev_winid, preview_winid) abort
   if a:preview_winid >= 0 && (!a:params.previewFloating || has('nvim'))
     call win_gotoid(a:preview_winid)
     execute 'buffer' a:preview_bufnr
@@ -281,19 +282,6 @@ function! ddu#ui#ff#_open_preview_window(params, bufnr, preview_bufnr, prev_wini
   return winid
 endfunction
 
-function! s:getcurpos(winid) abort
-  if has('nvim-0.7') || !has('nvim')
-    return getcurpos(a:winid)
-  endif
-
-  " NOTE: Old neovim does not support getcurpos({winid})
-  const prev_winid = win_getid()
-  call win_gotoid(a:winid)
-  const cursor = getcurpos()
-  call win_gotoid(prev_winid)
-  return cursor
-endfunction
-
 let s:cursor_text = ''
 let s:auto_action = {}
 let s:debounce_timer = -1
@@ -312,7 +300,7 @@ function! s:do_auto_action() abort
         \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
   const bufnr = winid->winbufnr()
 
-  const text = bufnr->getbufline(s:getcurpos(winid)[1])[0]
+  const text = bufnr->getbufline(getcurpos(winid)[1])[0]
   if text != s:cursor_text
     if s:auto_action.sync
       call ddu#ui#sync_action(s:auto_action.name, s:auto_action.params)
