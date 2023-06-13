@@ -314,16 +314,11 @@ export class PreviewUi {
       ) {
         const data = Deno.readFileSync(previewer.path);
         return new TextDecoder().decode(data).split("\n");
-      } else if (
-        bufferPath && await fn.bufexists(denops, bufferPath)
-      ) {
+      } else if (bufferPath && await fn.bufexists(denops, bufferPath)) {
         // Use buffer instead.
-        return await fn.getbufline(
-          denops,
-          await fn.bufnr(denops, bufferPath),
-          1,
-          "$",
-        );
+        const bufnr = await fn.bufnr(denops, bufferPath);
+        await fn.bufload(denops, bufnr);
+        return await fn.getbufline(denops, bufnr, 1, "$");
       } else {
         return [
           "Error",
