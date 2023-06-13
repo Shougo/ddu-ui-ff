@@ -29,22 +29,26 @@ export class PreviewUi {
   private matchIds: Record<number, number> = {};
   private previewBufnrs: Set<number> = new Set();
 
-  async close(denops: Denops, context: Context) {
+  async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
     if (this.previewWinId > 0 && (await fn.winnr(denops, "$")) !== 1) {
-      const saveId = await fn.win_getid(denops);
-      await batch(denops, async (denops) => {
-        await fn.win_gotoid(denops, this.previewWinId);
-        if (this.previewWinId === context.winId) {
-          await denops.cmd(
-            context.bufName === "" ? "enew" : `buffer ${context.bufNr}`,
-          );
-        } else {
-          await denops.cmd("close!");
-        }
-        await fn.win_gotoid(denops, saveId);
-      });
+      if (uiParams.previewFloating && denops.meta.host !== "nvim") {
+        await denops.call("popup_close", this.previewWinId);
+      } else {
+        const saveId = await fn.win_getid(denops);
+        await batch(denops, async (denops) => {
+          await fn.win_gotoid(denops, this.previewWinId);
+          if (this.previewWinId === context.winId) {
+            await denops.cmd(
+              context.bufName === "" ? "enew" : `buffer ${context.bufNr}`,
+            );
+          } else {
+            await denops.cmd("close!");
+          }
+          await fn.win_gotoid(denops, saveId);
+        });
+      }
       this.previewWinId = -1;
     }
     await batch(denops, async (denops) => {
@@ -78,7 +82,7 @@ export class PreviewUi {
       this.previewWinId > 0 &&
       JSON.stringify(item) === JSON.stringify(this.previewedTarget)
     ) {
-      await this.close(denops, context);
+      await this.close(denops, context, uiParams);
       return ActionFlags.None;
     }
 
@@ -155,6 +159,7 @@ export class PreviewUi {
           denops,
           context,
           item,
+          previewWinId: this.previewWinId,
         });
       }
     }
@@ -220,48 +225,43 @@ export class PreviewUi {
 
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.bufexists(denops, bufname);
-    if (this.previewWinId < 0) {
-      try {
-        await denops.call(
-          "ddu#ui#ff#_open_preview_window",
-          uiParams,
-          bufnr,
-          previousWinId,
-        );
-      } catch (_) {
-        // Failed to open preview window
-        return ActionFlags.None;
-      }
-
-      this.previewWinId = await fn.win_getid(denops) as number;
-    } else {
-      await fn.win_gotoid(denops, this.previewWinId);
-    }
+    let previewBufnr = await fn.bufnr(denops, bufname);
+    const text = await this.getContents(denops, previewer);
     if (!exists || previewer.kind === "nofile") {
       // Create new buffer
-      const bufnr = await fn.bufadd(denops, bufname);
-      const text = await this.getContents(denops, previewer);
+      previewBufnr = await fn.bufadd(denops, bufname);
       await batch(denops, async (denops: Denops) => {
-        await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
-        await fn.setbufvar(denops, bufnr, "&swapfile", 0);
-        await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");
-        await fn.setbufvar(denops, bufnr, "&modeline", 1);
+        await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
+        await fn.setbufvar(denops, previewBufnr, "&swapfile", 0);
+        await fn.setbufvar(denops, previewBufnr, "&bufhidden", "hide");
+        await fn.setbufvar(denops, previewBufnr, "&modeline", 1);
 
-        await fn.bufload(denops, bufnr);
-        await denops.cmd(`buffer ${bufnr}`);
-        await replace(denops, bufnr, text);
-        const limit = actionParams.syntaxLimitChars ?? 400000;
-        if (text.join("\n").length < limit) {
-          if (previewer.syntax) {
-            await fn.setbufvar(denops, bufnr, "&syntax", previewer.syntax);
-          } else if (previewer.kind === "buffer") {
-            await denops.cmd("filetype detect");
-          }
-        }
+        await fn.bufload(denops, previewBufnr);
+        await replace(denops, previewBufnr, text);
       });
-    } else {
-      const bufnr = await fn.bufnr(denops, bufname) as number;
-      await denops.cmd(`buffer ${bufnr}`);
+    }
+
+    try {
+      this.previewWinId = await denops.call(
+        "ddu#ui#ff#_open_preview_window",
+        uiParams,
+        bufnr,
+        previewBufnr,
+        previousWinId,
+        this.previewWinId,
+      ) as number;
+    } catch (_) {
+      // Failed to open preview window
+      return ActionFlags.None;
+    }
+
+    const limit = actionParams.syntaxLimitChars ?? 400000;
+    if (text.join("\n").length < limit) {
+      if (previewer.syntax) {
+        await fn.setbufvar(denops, previewBufnr, "&syntax", previewer.syntax);
+      } else if (previewer.kind === "buffer") {
+        await fn.win_execute(denops, this.previewWinId, "filetype detect");
+      }
     }
 
     // Set options
@@ -271,12 +271,6 @@ export class PreviewUi {
       }
     });
 
-    if (uiParams.previewSplit !== "no") {
-      // Set previewwindow option.
-      await op.previewwindow.setLocal(denops, true);
-    }
-
-    const previewBufnr = await fn.bufnr(denops) as number;
     await this.highlight(
       denops,
       previewer,

@@ -75,6 +75,7 @@ type OnPreviewArguments = {
   denops: Denops;
   context: Context;
   item: DduItem;
+  previewWinId: number;
 };
 
 export type Params = {
@@ -234,7 +235,7 @@ export class Ui extends BaseUi<Params> {
 
     if (this.items.length === 0) {
       // Close preview window when empty items
-      await this.previewUi.close(args.denops, args.context);
+      await this.previewUi.close(args.denops, args.context, args.uiParams);
     }
 
     this.bufferName = `ddu-ff-${args.options.name}`;
@@ -1176,7 +1177,7 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     cancel: boolean;
   }): Promise<void> {
-    await this.previewUi.close(args.denops, args.context);
+    await this.previewUi.close(args.denops, args.context, args.uiParams);
     await this.closeFilterWindow(args.denops);
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
 

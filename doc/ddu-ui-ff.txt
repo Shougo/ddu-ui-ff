@@ -403,8 +403,6 @@ previewFloatingBorder		(string | list)
 previewFloatingTitle	(string | list)
 		Specify the title of the preview floating window with border
 		if |ddu-ui-ff-param-previewFloatingBorder| is not "none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
 
 		Default: ""
 
@@ -413,8 +411,6 @@ previewFloatingTitlePos	(string)
 		Specify the title position of the preview floating window with
 		border if |ddu-ui-ff-param-previewFloatingBorder| is not
 		"none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
 
 		Default: "left"
 
@@ -422,8 +418,6 @@ previewFloatingTitlePos	(string)
 previewFloatingZindex		(number)
 		Specify the style of the preview window zindex if
 		|ddu-ui-ff-param-split| is "floating".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
 
 		Default: 100
 
