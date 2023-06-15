@@ -1,4 +1,4 @@
-function! ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
+function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   const bufname = 'ddu-ff-filter-' .. a:name
   const ids = bufname->bufnr()->win_findbuf()
   if !empty(ids)
@@ -63,7 +63,7 @@ function! ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   return '%'->bufnr()
 endfunction
 
-function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
+function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   const is_floating =
         \ a:params.split ==# 'floating'
         \ || a:params.filterSplitDirection ==# 'floating'
@@ -123,7 +123,7 @@ function! ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \ 'Normal:' .. highlight .. ',FloatBorder:' .. floating_highlight)
 endfunction
 
-function! s:init_buffer(name, bufname, params) abort
+function s:init_buffer(name, bufname, params) abort
   const is_floating =
         \ a:params.split ==# 'floating'
         \ || a:params.filterSplitDirection ==# 'floating'
@@ -163,7 +163,7 @@ function! s:init_buffer(name, bufname, params) abort
 endfunction
 
 let s:prompt_name = 'ddu_ui_ff_filter_prompt'
-function! s:init_prompt(prompt, highlight_prompt) abort
+function s:init_prompt(prompt, highlight_prompt) abort
   call sign_define(s:prompt_name, #{
         \   text: a:prompt->strwidth() > 2 ? '>' : a:prompt,
         \   texthl: a:highlight_prompt,
@@ -178,7 +178,7 @@ function! s:init_prompt(prompt, highlight_prompt) abort
           \ | endif
   augroup END
 endfunction
-function! s:update_prompt() abort
+function s:update_prompt() abort
   const id = 2000
   call sign_unplace('', #{
         \   id: id,
@@ -190,7 +190,7 @@ function! s:update_prompt() abort
   let s:prev_lnum = '$'->line()
 endfunction
 
-function! s:check_update() abort
+function s:check_update() abort
   if s:filter_updatetime > 0
     if 's:update_timer'->exists()
       call timer_stop(s:update_timer)
@@ -201,7 +201,7 @@ function! s:check_update() abort
     call s:check_redraw()
   endif
 endfunction
-function! s:check_redraw() abort
+function s:check_redraw() abort
   unlet! s:update_timer
 
   const input = '.'->getline()

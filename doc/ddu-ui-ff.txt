@@ -579,7 +579,7 @@ EXAMPLES					*ddu-ui-ff-examples*
 	    \ })
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> <CR>
 	  \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  nnoremap <buffer> <Space>
@@ -591,7 +591,7 @@ EXAMPLES					*ddu-ui-ff-examples*
 	endfunction
 
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function! s:ddu_ff_filter_my_settings() abort
+	function s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <Esc><Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
 	  nnoremap <buffer> <CR>
@@ -610,7 +610,7 @@ Q: I want to call default action in the filter window.
 
 A: >
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function! s:ddu_ff_filter_my_settings() abort
+	function s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <CR>
 	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
@@ -621,7 +621,7 @@ A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour. >
 
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function! s:ddu_ff_filter_my_settings() abort
+	function s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
 	  inoremap <buffer> <C-k>
@@ -633,14 +633,14 @@ Q: I want to define |ddu-option-name| depend key mappings.
 A: You can use "b:ddu_ui_name". >
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
 	    \ <Cmd>call ddu#ui#do_action('itemAction', {'name': 'edit'})<CR>
 	  endif
 	endfunction
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function! s:ddu_ff_filter_my_settings() abort
+	function s:ddu_ff_filter_my_settings() abort
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> <CR>
 	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
@@ -651,7 +651,7 @@ Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
 A: You can pass params like this. >
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> E
 	  \ <Cmd>call ddu#ui#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
@@ -664,10 +664,10 @@ highlights.  |Syntax| autocmd must be called in |FileType| autocmd. >
 Or you can use "syntax/ddu-ff.vim" file instead. >
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  autocmd Syntax <buffer> call s:ddu_ff_my_syntax()
 	endfunction
-	function! s:ddu_ff_my_syntax()
+	function s:ddu_ff_my_syntax()
 	  if b:ddu_ui_name ==# 'vim'
 	    runtime! syntax/vim.vim
 	  endif
@@ -775,12 +775,12 @@ Q: I want to display cursor mark on the left of ddu window like
 
 A: >
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  setlocal signcolumn=yes
 	  autocmd CursorMoved <buffer> call s:update_cursor()
 	endfunction
 	
-	function! s:update_cursor()
+	function s:update_cursor()
 	  sign unplace 100
 	  sign define cursor text=>> texthl=Search
 	  execute printf('sign place 100 line=%d name=cursor buffer=%s',
@@ -810,7 +810,7 @@ A: It is the feature.  Because |ddu#ui#do_action()| does not change any mode.
 You must escape insert mode when leave from the filter window.
 >
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function! s:ddu_ff_filter_my_settings() abort
+	function s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <Esc>
 	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
 	  inoremap <buffer> <CR>
@@ -823,7 +823,7 @@ Q: I cannot see what item is selected in the filter window.
 A: You can set 'cursorline' option in ddu buffer.
 >
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
-	function! s:ddu_ff_my_settings() abort
+	function s:ddu_ff_my_settings() abort
 	  setlocal cursorline
 	endfunction
 <

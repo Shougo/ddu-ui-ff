@@ -1,14 +1,14 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function! ddu#ui#ff#do_action(name, options = {}) abort
+function ddu#ui#ff#do_action(name, options = {}) abort
   return ddu#ui#do_action(a:name, a:options)
 endfunction
 
-function! ddu#ui#ff#multi_actions(actions) abort
+function ddu#ui#ff#multi_actions(actions) abort
   return ddu#ui#multi_actions(a:actions)
 endfunction
 
-function! ddu#ui#ff#execute(command) abort
+function ddu#ui#ff#execute(command) abort
   if !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     return
   endif
@@ -24,7 +24,7 @@ function! ddu#ui#ff#execute(command) abort
   endif
 endfunction
 
-function! ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) abort
+function ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) abort
   const max_lines = a:lines->len()
   const current_lines = '$'->line(a:bufnr->bufwinid())
 
@@ -53,7 +53,7 @@ function! ddu#ui#ff#_update_buffer(params, bufnr, winid, lines, refreshed, pos) 
   endif
 endfunction
 
-function! ddu#ui#ff#_highlight_items(
+function ddu#ui#ff#_highlight_items(
       \ params, bufnr, max_lines, highlight_items, selected_items) abort
   " Buffer must be loaded
   if !(a:bufnr->bufloaded())
@@ -92,7 +92,7 @@ function! ddu#ui#ff#_highlight_items(
   endif
 endfunction
 
-function! ddu#ui#ff#_highlight(
+function ddu#ui#ff#_highlight(
       \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
   if !has('nvim')
     " Add prop_type
@@ -123,7 +123,7 @@ function! ddu#ui#ff#_highlight(
   endif
 endfunction
 
-function! ddu#ui#ff#_open_preview_window(
+function ddu#ui#ff#_open_preview_window(
       \ params, bufnr, preview_bufnr, prev_winid, preview_winid) abort
   if a:preview_winid >= 0 && (!a:params.previewFloating || has('nvim'))
     call win_gotoid(a:preview_winid)
@@ -285,7 +285,7 @@ endfunction
 let s:cursor_text = ''
 let s:auto_action = {}
 let s:debounce_timer = -1
-function! ddu#ui#ff#_do_auto_action() abort
+function ddu#ui#ff#_do_auto_action() abort
   silent! call timer_stop(s:debounce_timer)
   if empty(s:auto_action)
     return
@@ -293,7 +293,7 @@ function! ddu#ui#ff#_do_auto_action() abort
   let s:debounce_timer = timer_start(
         \ s:auto_action.delay, { -> s:do_auto_action() })
 endfunction
-function! s:do_auto_action() abort
+function s:do_auto_action() abort
   const winid = (&l:filetype ==# 'ddu-ff'
         \        || !('g:ddu#ui#ff#_filter_parent_winid'->exists()))
         \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
@@ -309,7 +309,7 @@ function! s:do_auto_action() abort
     let s:cursor_text = text
   endif
 endfunction
-function! ddu#ui#ff#_reset_auto_action() abort
+function ddu#ui#ff#_reset_auto_action() abort
   silent! call timer_stop(s:debounce_timer)
   let s:debounce_timer = -1
   let s:cursor_text = ''
@@ -318,7 +318,7 @@ function! ddu#ui#ff#_reset_auto_action() abort
     autocmd!
   augroup END
 endfunction
-function! ddu#ui#ff#_set_auto_action(winid, auto_action) abort
+function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   const prev_winid = win_getid()
   let s:auto_action = a:auto_action
 
@@ -333,7 +333,7 @@ function! ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   call win_gotoid(prev_winid)
 endfunction
 
-function! ddu#ui#ff#_cursor(line, col) abort
+function ddu#ui#ff#_cursor(line, col) abort
   if &l:filetype ==# 'ddu-ff'
         \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     call cursor(a:line, a:col)
@@ -347,7 +347,7 @@ function! ddu#ui#ff#_cursor(line, col) abort
   endif
 endfunction
 
-function! ddu#ui#ff#_save_cursor() abort
+function ddu#ui#ff#_save_cursor() abort
   const text = '.'->getline()
 
   " NOTE: Skip save cursor if it is empty text.
@@ -362,11 +362,11 @@ function! ddu#ui#ff#_save_cursor() abort
         \ }
 endfunction
 
-function! ddu#ui#ff#_echo(msg) abort
+function ddu#ui#ff#_echo(msg) abort
   echo a:msg
 endfunction
 
-function! ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
+function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
   call feedkeys(':' .. a:cmdline ..
         \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction
