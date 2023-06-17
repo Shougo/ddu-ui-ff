@@ -155,7 +155,7 @@ function ddu#ui#ff#_open_preview_window(
         let win_col -= preview_width
       endif
 
-      if a:params.previewFloatingBorder !=# 'none'
+      if a:params.previewFloatingBorder isnot# 'none'
         let preview_width -= 2
         let preview_height -= 2
       endif
@@ -212,7 +212,7 @@ function ddu#ui#ff#_open_preview_window(
       let win_col = a:params.previewCol > 0 ?
               \ a:params.previewCol : pos[1] - 1
 
-      if a:params.previewFloatingBorder !=# 'none'
+      if a:params.previewFloatingBorder isnot# 'none'
         let preview_width -= 2
         let preview_height -= 2
       endif
