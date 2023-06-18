@@ -331,6 +331,10 @@ highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.
 		It can contain following keys
 
+		filterText			(string)
+		Specify filter text highlight.
+		Default: "Normal"
+
 		floating			(string)
 		Specify floating window background highlight.
 		Default: "NormalFloat"

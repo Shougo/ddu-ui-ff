@@ -30,6 +30,7 @@ type CursorActionParams = {
 };
 
 type HighlightGroup = {
+  filterText?: string;
   floating?: string;
   floatingBorder?: string;
   preview?: string;

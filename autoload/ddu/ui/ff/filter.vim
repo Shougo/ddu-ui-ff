@@ -160,6 +160,12 @@ function s:init_buffer(name, bufname, params) abort
   resize 1
 
   setfiletype ddu-ff-filter
+
+  const highlight = a:params.highlights->get('filterText', '')
+  if highlight !=# ''
+    execute 'highlight link FilterText' highlight
+    syntax match   FilterText      '^.*$'
+  endif
 endfunction
 
 let s:prompt_name = 'ddu_ui_ff_filter_prompt'
