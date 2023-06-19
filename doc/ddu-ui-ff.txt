@@ -343,6 +343,11 @@ highlights	(dictionary)
 		Specify border highlight of flowing window
 		Default: "FloatBorder"
 
+		floatingCursorLine		(string)
+		Specify cursor line highlight of floating window
+		Default: "CursorLine"
+		NOTE: It is neovim only.
+
 		preview				(string)
 		Specify preview window highlight.
 		Default: "Search"

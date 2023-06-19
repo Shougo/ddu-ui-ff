@@ -133,11 +133,13 @@ export class PreviewUi {
       const highlight = uiParams.highlights?.floating ?? "NormalFloat";
       const borderHighlight = uiParams.highlights?.floatingBorder ??
         "FloatBorder";
+      const cursorLineHighlight = uiParams.highlights?.floatingCursorLine ??
+        "CursorLine";
       await fn.setwinvar(
         denops,
         this.previewWinId,
         "&winhighlight",
-        `Normal:${highlight},FloatBorder:${borderHighlight}`,
+        `Normal:${highlight},FloatBorder:${borderHighlight},CursorLine:${cursorLineHighlight}`,
       );
     }
 

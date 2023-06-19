@@ -33,6 +33,7 @@ type HighlightGroup = {
   filterText?: string;
   floating?: string;
   floatingBorder?: string;
+  floatingCursorLine?: string;
   preview?: string;
   prompt?: string;
   selected?: string;
@@ -321,6 +322,8 @@ export class Ui extends BaseUi<Params> {
       const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
       const borderHighlight = args.uiParams.highlights?.floatingBorder ??
         "FloatBorder";
+      const cursorLineHighlight =
+        args.uiParams.highlights?.floatingCursorLine ?? "CursorLine";
 
       if (hasNvim) {
         const winOpts = {
@@ -400,7 +403,7 @@ export class Ui extends BaseUi<Params> {
           args.denops,
           this.popupId,
           "&winhighlight",
-          `Normal:${highlight},FloatBorder:${borderHighlight}`,
+          `Normal:${highlight},FloatBorder:${borderHighlight},CursorLine:${cursorLineHighlight}`,
         );
 
         await fn.setwinvar(
