@@ -319,7 +319,8 @@ export class Ui extends BaseUi<Params> {
     } else if (floating) {
       // statusline must be set for floating window
       const currentStatusline = await op.statusline.get(args.denops);
-      const highlight = args.uiParams.highlights?.floating ?? "NormalFloat";
+      const floatingHighlight = args.uiParams.highlights?.floating ??
+        "NormalFloat";
       const borderHighlight = args.uiParams.highlights?.floatingBorder ??
         "FloatBorder";
       const cursorLineHighlight =
@@ -355,7 +356,7 @@ export class Ui extends BaseUi<Params> {
           "pos": "topleft",
           "line": Number(args.uiParams.winRow) + 1,
           "col": Number(args.uiParams.winCol) + 1,
-          "highlight": highlight,
+          "highlight": floatingHighlight,
           "border": [],
           "borderchars": [],
           "borderhighlight": [borderHighlight],
@@ -403,7 +404,8 @@ export class Ui extends BaseUi<Params> {
           args.denops,
           this.popupId,
           "&winhighlight",
-          `Normal:${highlight},FloatBorder:${borderHighlight},CursorLine:${cursorLineHighlight}`,
+          `Normal:${floatingHighlight},FloatBorder:${borderHighlight},` +
+            `CursorLine:${cursorLineHighlight}`,
         );
 
         await fn.setwinvar(
@@ -419,6 +421,12 @@ export class Ui extends BaseUi<Params> {
           "&cursorline",
           true,
         );
+
+        if (cursorLineHighlight !== "CursorLine") {
+          await fn.win_execute(
+            args.denops, this.popupId,
+            `highlight! link CursorLine ${cursorLineHighlight}`);
+        }
       }
     } else if (args.uiParams.split === "no") {
       await args.denops.cmd(`silent keepalt buffer ${bufnr}`);

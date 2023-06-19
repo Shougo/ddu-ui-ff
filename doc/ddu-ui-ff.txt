@@ -346,7 +346,6 @@ highlights	(dictionary)
 		floatingCursorLine		(string)
 		Specify cursor line highlight of floating window
 		Default: "CursorLine"
-		NOTE: It is neovim only.
 
 		preview				(string)
 		Specify preview window highlight.
