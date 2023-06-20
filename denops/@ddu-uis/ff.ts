@@ -637,7 +637,7 @@ export class Ui extends BaseUi<Params> {
     parent: DduItem;
     children: DduItem[];
   }) {
-    // Search index.
+    // NOTE: treePath may be list.  So it must be compared by JSON.
     const searchPath = JSON.stringify(args.parent.treePath);
     const index = this.items.findIndex(
       (item: DduItem) =>
@@ -664,7 +664,7 @@ export class Ui extends BaseUi<Params> {
   override collapseItem(args: {
     item: DduItem;
   }) {
-    // Search index.
+    // NOTE: treePath may be list.  So it must be compared by JSON.
     const searchPath = JSON.stringify(args.item.treePath);
     const startIndex = this.items.findIndex(
       (item: DduItem) =>
