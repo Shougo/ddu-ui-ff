@@ -638,9 +638,10 @@ export class Ui extends BaseUi<Params> {
     children: DduItem[];
   }) {
     // Search index.
+    const searchPath = JSON.stringify(args.parent.treePath);
     const index = this.items.findIndex(
       (item: DduItem) =>
-        item.treePath === args.parent.treePath &&
+        JSON.stringify(item.treePath) === searchPath &&
         item.__sourceIndex === args.parent.__sourceIndex,
     );
 
@@ -664,9 +665,10 @@ export class Ui extends BaseUi<Params> {
     item: DduItem;
   }) {
     // Search index.
+    const searchPath = JSON.stringify(args.item.treePath);
     const startIndex = this.items.findIndex(
       (item: DduItem) =>
-        item.treePath === args.item.treePath &&
+        JSON.stringify(item.treePath) === searchPath &&
         item.__sourceIndex === args.item.__sourceIndex,
     );
     if (startIndex < 0) {
