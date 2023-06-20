@@ -9,14 +9,14 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.2.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.2.3/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.2.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.2.3/deps.ts";
 import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
 
 type DoActionParams = {
@@ -424,8 +424,10 @@ export class Ui extends BaseUi<Params> {
 
         if (cursorLineHighlight !== "CursorLine") {
           await fn.win_execute(
-            args.denops, this.popupId,
-            `highlight! link CursorLine ${cursorLineHighlight}`);
+            args.denops,
+            this.popupId,
+            `highlight! link CursorLine ${cursorLineHighlight}`,
+          );
         }
       }
     } else if (args.uiParams.split === "no") {
@@ -869,12 +871,11 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      const idx = await this.getIndex(args.denops);
-      if (idx < 0) {
+      const item = await this.getItem(args.denops);
+      if (!item) {
         return ActionFlags.None;
       }
 
-      const item = this.items[idx];
       const params = args.actionParams as ExpandItemParams;
 
       if (item.__expanded) {
@@ -897,19 +898,30 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
     }) => {
-      const idx = await this.getIndex(args.denops);
-      if (idx < 0) {
-        return ActionFlags.None;
-      }
+      const item = await this.getItem(args.denops);
 
-      const item = this.items[idx];
       const bufnr = await this.getBufnr(args.denops);
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item);
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item ?? {});
 
       const ft = await op.filetype.getLocal(args.denops);
       if (ft === "ddu-ff-filter") {
         // Set for filter window
-        await vars.b.set(args.denops, "ddu_ui_item", item);
+        await vars.b.set(args.denops, "ddu_ui_item", item ?? {});
+      }
+
+      return ActionFlags.None;
+    },
+    getItems: async (args: {
+      denops: Denops;
+      options: DduOptions;
+    }) => {
+      const bufnr = await this.getBufnr(args.denops);
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.items);
+
+      const ft = await op.filetype.getLocal(args.denops);
+      if (ft === "ddu-ff-filter") {
+        // Set for filter window
+        await vars.b.set(args.denops, "ddu_ui_items", this.items);
       }
 
       return ActionFlags.None;
@@ -1025,12 +1037,7 @@ export class Ui extends BaseUi<Params> {
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
     }) => {
-      const idx = await this.getIndex(args.denops);
-      if (idx < 0) {
-        return ActionFlags.None;
-      }
-
-      const item = this.items[idx];
+      const item = await this.getItem(args.denops);
       if (!item) {
         return ActionFlags.None;
       }
@@ -1052,12 +1059,7 @@ export class Ui extends BaseUi<Params> {
       uiParams: Params;
       actionParams: unknown;
     }) => {
-      const idx = await this.getIndex(args.denops);
-      if (idx < 0) {
-        return ActionFlags.None;
-      }
-
-      const item = this.items[idx];
+      const item = await this.getItem(args.denops);
       if (!item) {
         return ActionFlags.None;
       }
@@ -1407,14 +1409,8 @@ export class Ui extends BaseUi<Params> {
   }
 
   private async collapseItemAction(denops: Denops, options: DduOptions) {
-    const index = await this.getIndex(denops);
-    if (index < 0) {
-      return ActionFlags.None;
-    }
-
-    const closeItem = this.items[index];
-
-    if (!closeItem.isTree) {
+    const item = await this.getItem(denops);
+    if (!item || !item.isTree) {
       return ActionFlags.None;
     }
 
@@ -1422,7 +1418,7 @@ export class Ui extends BaseUi<Params> {
       "ddu#redraw_tree",
       options.name,
       "collapse",
-      [{ item: closeItem }],
+      [{ item }],
     );
 
     return ActionFlags.None;
