@@ -299,15 +299,17 @@ function s:do_auto_action() abort
         \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
   const bufnr = winid->winbufnr()
 
-  const text = bufnr->getbufline(getcurpos(winid)[1])[0]
-  if text != s:cursor_text
-    if s:auto_action.sync
-      call ddu#ui#sync_action(s:auto_action.name, s:auto_action.params)
-    else
-      call ddu#ui#do_action(s:auto_action.name, s:auto_action.params)
-    endif
-    let s:cursor_text = text
+  const text = bufnr->getbufline(getcurpos(winid)[1])->get(0, '')
+  if text ==# s:cursor_text
+    return
   endif
+
+  if s:auto_action.sync
+    call ddu#ui#sync_action(s:auto_action.name, s:auto_action.params)
+  else
+    call ddu#ui#do_action(s:auto_action.name, s:auto_action.params)
+  endif
+  let s:cursor_text = text
 endfunction
 function ddu#ui#ff#_reset_auto_action() abort
   silent! call timer_stop(s:debounce_timer)
