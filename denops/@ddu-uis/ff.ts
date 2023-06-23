@@ -80,6 +80,10 @@ type OnPreviewArguments = {
   previewWinId: number;
 };
 
+type PreviewExecuteParams = {
+  command: string;
+};
+
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
@@ -1053,6 +1057,14 @@ export class Ui extends BaseUi<Params> {
         await this.getBufnr(args.denops),
         item,
       );
+    },
+    previewExecute: async (args: {
+      denops: Denops;
+      actionParams: unknown;
+    }) => {
+      const command = (args.actionParams as PreviewExecuteParams).command;
+      await this.previewUi.execute(args.denops, command);
+      return ActionFlags.Persist;
     },
     previewPath: async (args: {
       denops: Denops;

@@ -151,6 +151,13 @@ preview
 
 		Preview the item in preview window.
 
+					*ddu-ui-ff-action-previewExecute*
+previewExecute
+		params:
+			{command}: 	Command to execute
+
+		Execute command in preview window.
+
 					*ddu-ui-ff-action-previewPath*
 previewPath
 

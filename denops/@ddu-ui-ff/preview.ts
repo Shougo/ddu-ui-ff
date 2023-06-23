@@ -59,6 +59,16 @@ export class PreviewUi {
     });
   }
 
+  async execute(
+    denops: Denops,
+    command: string,
+  ) {
+    if (this.previewWinId < 0) {
+      return;
+    }
+    await fn.win_execute(denops, this.previewWinId, command);
+  }
+
   async previewContents(
     denops: Denops,
     context: Context,
