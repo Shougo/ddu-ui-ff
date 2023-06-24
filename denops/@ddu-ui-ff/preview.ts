@@ -85,6 +85,17 @@ export class PreviewUi {
       return ActionFlags.None;
     }
 
+    // Adjustment for previewFloating.
+    if (
+      uiParams.previewFloating &&
+      uiParams.previewFloatingBorder !== "none"
+    ) {
+      if (uiParams.floatingBorder !== "none") {
+        uiParams.previewWidth -= 2;
+      }
+      uiParams.previewHeight -= 2;
+    }
+
     const previewContext: PreviewContext = {
       col: uiParams.previewCol,
       row: uiParams.previewRow,
