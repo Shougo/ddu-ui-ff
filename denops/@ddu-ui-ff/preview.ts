@@ -202,13 +202,13 @@ export class PreviewUi {
     previousWinId: number,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
-      await denops.call(
+      this.previewWinId = await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
         bufnr,
         previousWinId,
-      );
-      this.previewWinId = await fn.win_getid(denops) as number;
+        this.previewWinId,
+      ) as number;
     } else {
       await batch(denops, async (denops: Denops) => {
         await fn.win_gotoid(denops, this.previewWinId);
