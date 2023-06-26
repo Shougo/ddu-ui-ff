@@ -202,10 +202,18 @@ export class PreviewUi {
     previousWinId: number,
   ): Promise<ActionFlags> {
     if (this.previewWinId < 0) {
+      // Create new buffer
+      const previewBufnr = await fn.bufadd(denops, "");
+      await batch(denops, async (denops: Denops) => {
+        await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
+        await fn.setbufvar(denops, previewBufnr, "&swapfile", 0);
+        await fn.setbufvar(denops, previewBufnr, "&bufhidden", "hide");
+      });
       this.previewWinId = await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
         bufnr,
+        previewBufnr,
         previousWinId,
         this.previewWinId,
       ) as number;
