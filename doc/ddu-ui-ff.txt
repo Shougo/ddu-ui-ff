@@ -662,6 +662,18 @@ A: You can use "b:ddu_ui_name". >
 	  endif
 	endfunction
 
+Q: I want to define kind depend key mappings.
+
+A: You can use |ddu#ui#get_item()|. >
+
+	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
+	function s:ddu_ff_my_settings() abort
+	  nnoremap <buffer> e
+	  \ <Cmd>call ddu#ui#do_action('itemAction',
+	  \ ddu#ui#get_item()->get('kind', '') ==# 'file' ?
+	  \ {'name': 'edit'} : {'name': 'open'})<CR>
+	endfunction
+
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
 A: You can pass params like this. >
