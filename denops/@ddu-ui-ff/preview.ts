@@ -8,14 +8,15 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.2.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.2.7/types.ts";
 import {
   batch,
   Denops,
-  ensureObject,
+  ensure,
+  is,
   fn,
-} from "https://deno.land/x/ddu_vim@v3.2.3/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v5.0.0/buffer/mod.ts";
+} from "https://deno.land/x/ddu_vim@v3.2.7/deps.ts";
+import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../@ddu-uis/ff.ts";
 
 type PreviewParams = {
@@ -84,7 +85,7 @@ export class PreviewUi {
     item: DduItem,
   ): Promise<ActionFlags> {
     const prevId = await fn.win_getid(denops);
-    const previewParams = ensureObject(actionParams) as PreviewParams;
+    const previewParams = ensure(actionParams, is.Record) as PreviewParams;
 
     // Close if the target is the same as the previous one
     if (
