@@ -17,7 +17,7 @@ import {
   fn,
 } from "https://deno.land/x/ddu_vim@v3.2.7/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
-import { Params } from "../@ddu-uis/ff.ts";
+import { Params } from "../ff.ts";
 
 type PreviewParams = {
   syntaxLimitChars?: number;
