@@ -17,7 +17,7 @@ import {
   op,
   vars,
 } from "https://deno.land/x/ddu_vim@v3.2.7/deps.ts";
-import { PreviewUi } from "../@ddu-ui-ff/preview.ts";
+import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
   name?: string;
