@@ -362,3 +362,9 @@ function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
   call feedkeys(':' .. a:cmdline ..
         \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction
+
+function ddu#ui#ff#_restore_title() abort
+  if 'g:ddu#ui#ff#_save_title'->exists()
+    let &titlestring = g:ddu#ui#ff#_save_title
+  endif
+endfunction
