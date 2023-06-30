@@ -1252,20 +1252,6 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    // Restore options
-    const saveTitle = await vars.g.get(
-      args.denops,
-      "ddu#ui#ff#_save_title",
-      "",
-    );
-    if (saveTitle !== "") {
-      args.denops.call(
-        "nvim_set_option",
-        "titlestring",
-        saveTitle,
-      );
-    }
-
     // Restore mode
     if (this.saveMode === "i") {
       if (!args.cancel && args.uiParams.replaceCol > 0) {
@@ -1370,12 +1356,10 @@ export class Ui extends BaseUi<Params> {
         await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
       }
 
-      if (await fn.exists(denops, "##WinClosed")) {
-        await denops.cmd(
-          `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
-            " let &titlestring=g:ddu#ui#ff#_save_title",
-        );
-      }
+      await denops.cmd(
+        `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
+          " let &titlestring=g:ddu#ui#ff#_save_title",
+      );
 
       const titleString = `${header} %{${linenr}}%*${async}`;
       await vars.b.set(denops, "ddu_ui_ff_title", titleString);
