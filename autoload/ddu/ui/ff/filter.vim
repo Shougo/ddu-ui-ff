@@ -6,13 +6,13 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     call cursor('$'->line(), 0)
   else
     call s:init_buffer(a:name, bufname, a:params)
+  endif
 
-    " Set the current input
-    if '$'->getline() ==# ''
-      call setline('$', a:input)
-    else
-      call append('$', a:input)
-    endif
+  " Set the current input
+  if '$'->getline() ==# ''
+    call setline('$', a:input)
+  else
+    call append('$', a:input)
   endif
 
   call cursor('$'->line(), 0)
