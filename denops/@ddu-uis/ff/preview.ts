@@ -13,8 +13,8 @@ import {
   batch,
   Denops,
   ensure,
-  is,
   fn,
+  is,
 } from "https://deno.land/x/ddu_vim@v3.2.7/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../ff.ts";

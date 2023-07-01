@@ -547,7 +547,9 @@ export class Ui extends BaseUi<Params> {
               row: index + 1,
               prefix: getPrefix(item),
             };
-          }).filter((item) => item.highlights.length > 0),
+          }).filter((item, index) =>
+            item.highlights.length > 0 && !this.selectedItems.has(index)
+          ),
           [...this.selectedItems],
         );
       });
