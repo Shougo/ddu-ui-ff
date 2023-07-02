@@ -1090,6 +1090,8 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
+      await args.denops.call("ddu#pop", args.options.name);
+
       await this.closeBuffer({
         denops: args.denops,
         context: args.context,
@@ -1097,7 +1099,6 @@ export class Ui extends BaseUi<Params> {
         uiParams: args.uiParams,
         cancel: true,
       });
-      await args.denops.call("ddu#pop", args.options.name);
 
       return ActionFlags.None;
     },
