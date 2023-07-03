@@ -617,10 +617,91 @@ EXAMPLES					*ddu-ui-ff-examples*
 ==============================================================================
 FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
 
+FAQ 1:							|ddu-ui-ff-faq-1|
+	I want to toggle hidden files by mappings.
+
+FAQ 2:							|ddu-ui-ff-faq-2|
+	I want to call default action in the filter window.
+
+FAQ 3:							|ddu-ui-ff-faq-3|
+	I want to move the cursor in the filter window, while in insert mode.
+
+FAQ 4:							|ddu-ui-ff-faq-4|
+	I want to define |ddu-option-name| depend key mappings.
+
+FAQ 5:							|ddu-ui-ff-faq-5|
+	I want to define kind depend key mappings.
+
+FAQ 6:							|ddu-ui-ff-faq-6|
+	I want to pass params to the action when
+	|ddu-ui-ff-action-chooseAction|.
+
+FAQ 7:							|ddu-ui-ff-faq-7|
+	I want to use Vim syntax highlight in the buffer.
+
+FAQ 8:							|ddu-ui-ff-faq-8|
+	I want to custom the statusline.
+
+FAQ 9:							|ddu-ui-ff-faq-9|
+	I want to move to line quickly like denite.nvim's "quick-move"
+	feature.
+
+FAQ 10:							|ddu-ui-ff-faq-10|
+	Why ddu-ui-ff does not support Vim's popup window feature instead of
+	neovim's floating window feature?
+
+FAQ 11:							|ddu-ui-ff-faq-11|
+	|:close| does not move to the ddu-ui-ff window sometimes.
+
+FAQ 12:							|ddu-ui-ff-faq-12|
+	I want to toggle selected items in visual mode.
+
+FAQ 13:							|ddu-ui-ff-faq-13|
+	|ddu#ui#ff#execute()| does not execute |:redraw| automatically.
+
+FAQ 14:							|ddu-ui-ff-faq-14|
+	I want to use "ddu-ui-ff" in insert mode.
+
+FAQ 15:							|ddu-ui-ff-faq-15|
+	I want to use "ddu-ui-ff" in command line mode.
+
+FAQ 16:							|ddu-ui-ff-faq-16|
+	I want to switch sources without clear current filter input.
+
+FAQ 17:							|ddu-ui-ff-faq-17|
+	I want to use existing buffer to show preview.
+
+FAQ 18:							|ddu-ui-ff-faq-18|
+	":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1
+	-immediately" like commands are available?
+
+FAQ 19:							|ddu-ui-ff-faq-19|
+	I want to display cursor mark on the left of ddu window like
+	"telescope.nvim".
+
+FAQ 20:							|ddu-ui-ff-faq-20|
+	How do I set the floating title with list style ?
+
+FAQ 21:							|ddu-ui-ff-faq-21|
+	I want to align column when |ddu-ui-ff-param-prompt| is set.
+
+FAQ 22:							|ddu-ui-ff-faq-22|
+	When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction|
+	from insert mode of the filter window, it remains insert mode.
+
+FAQ 23:							|ddu-ui-ff-faq-23|
+	I cannot see what item is selected in the filter window.
+
+FAQ 24:							|ddu-ui-ff-faq-24|
+	I want to change preview cursor on the top.
+
+------------------------------------------------------------------------------
+							*ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
 
 A: Please set |ddu-ui-ff-param-startFilter|.
 
+							*ddu-ui-ff-faq-2*
 Q: I want to call default action in the filter window.
 
 A: >
@@ -629,7 +710,8 @@ A: >
 	  inoremap <buffer> <CR>
 	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
-
+<
+							*ddu-ui-ff-faq-3*
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
@@ -642,7 +724,8 @@ must force this behaviour. >
 	  inoremap <buffer> <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
-
+<
+							*ddu-ui-ff-faq-4*
 Q: I want to define |ddu-option-name| depend key mappings.
 
 A: You can use "b:ddu_ui_name". >
@@ -661,7 +744,8 @@ A: You can use "b:ddu_ui_name". >
 	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  endif
 	endfunction
-
+<
+							*ddu-ui-ff-faq-5*
 Q: I want to define kind depend key mappings.
 
 A: You can use |ddu#ui#get_item()|. >
@@ -673,7 +757,8 @@ A: You can use |ddu#ui#get_item()|. >
 	  \ ddu#ui#get_item()->get('kind', '') ==# 'file' ?
 	  \ {'name': 'edit'} : {'name': 'open'})<CR>
 	endfunction
-
+<
+							*ddu-ui-ff-faq-6*
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
 A: You can pass params like this. >
@@ -683,7 +768,8 @@ A: You can pass params like this. >
 	  \ <Cmd>call ddu#ui#do_action('itemAction',
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
-
+<
+							*ddu-ui-ff-faq-7*
 Q: I want to use Vim syntax highlight in the buffer.
 
 A: Please use |Syntax| autocmd.  |FileType| autocmd cannot change syntax
@@ -699,17 +785,20 @@ Or you can use "syntax/ddu-ff.vim" file instead. >
 	    runtime! syntax/vim.vim
 	  endif
 	endfunction
-
+<
+							*ddu-ui-ff-faq-8*
 Q: I want to custom the statusline.
 
 A: You can disable the original statusline by |ddu-ui-ff-param-statusline|.
 And you can get the status line information by "w:ddu_ui_ff_status" variable.
 
+							*ddu-ui-ff-faq-9*
 Q: I want to move to line quickly like denite.nvim's "quick-move" feature.
 
 A: Please use qselect.vim for it.
 https://github.com/Shougo/qselect.vim
 
+							*ddu-ui-ff-faq-10*
 Q: Why ddu-ui-ff does not support Vim's popup window feature instead of
 neovim's floating window feature?
 https://github.com/Shougo/ddu-ui-ff/issues/48
@@ -718,21 +807,25 @@ A: Because Vim's popup window feature is not focusable.
 ddu-ui-ff implementation depends on the feature.  So the support is not
 acceptable.
 
+							*ddu-ui-ff-faq-11*
 Q: |:close| does not move to the ddu-ui-ff window sometimes.
 
 A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
 
+							*ddu-ui-ff-faq-12*
 Q: I want to toggle selected items in visual mode.
 
 A: >
   xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
-
+<
+							*ddu-ui-ff-faq-13*
 Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 
 A: It is feature.  Because it increases screen flicker.
 You need to add |:redraw| command manually if needed.
 
+							*ddu-ui-ff-faq-14*
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
@@ -751,7 +844,8 @@ A: >
 	\     },
 	\   },
 	\ })<CR>
-
+<
+							*ddu-ui-ff-faq-15*
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
@@ -771,7 +865,8 @@ A: >
 	\     },
 	\   },
 	\ })<CR><Cmd>call setcmdline('')<CR><CR>
-
+<
+							*ddu-ui-ff-faq-16*
 Q: I want to switch sources without clear current filter input.
 
 A: >
@@ -781,11 +876,13 @@ A: >
 	\     #{ name: 'file' },
 	\   ],
 	\ })<CR>
-
+<
+							*ddu-ui-ff-faq-17*
 Q: I want to use existing buffer to show preview.
 
 A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 
+							*ddu-ui-ff-faq-18*
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
    like commands are available?
 
@@ -796,7 +893,8 @@ A: >
 	nnoremap <C-p>
 	\ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
 	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
-
+<
+							*ddu-ui-ff-faq-19*
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
@@ -813,7 +911,8 @@ A: >
 	  execute printf('sign place 100 line=%d name=cursor buffer=%s',
 	        \ '.'->line(), '%'->bufnr())
 	endfunction
-
+<
+							*ddu-ui-ff-faq-20*
 Q: How do I set the floating title with list style ?
 
 A: >
@@ -825,11 +924,13 @@ A: >
 	  \     }
 	  \   },
 	  \ })
-
+<
+							*ddu-ui-ff-faq-21*
 Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
+							*ddu-ui-ff-faq-22*
 Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
 insert mode of the filter window, it remains insert mode.
 
@@ -844,7 +945,7 @@ You must escape insert mode when leave from the filter window.
 	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 <
-
+							*ddu-ui-ff-faq-23*
 Q: I cannot see what item is selected in the filter window.
 
 A: You can set 'cursorline' option in ddu buffer.
@@ -854,7 +955,7 @@ A: You can set 'cursorline' option in ddu buffer.
 	  setlocal cursorline
 	endfunction
 <
-
+							*ddu-ui-ff-faq-24*
 Q: I want to change preview cursor on the top.
 
 A: >
