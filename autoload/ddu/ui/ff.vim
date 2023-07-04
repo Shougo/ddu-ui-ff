@@ -339,21 +339,6 @@ function ddu#ui#ff#_cursor(line, col) abort
   endif
 endfunction
 
-function ddu#ui#ff#_save_cursor() abort
-  const text = '.'->getline()
-
-  " NOTE: Skip save cursor if it is empty text.
-  " Because the items are empty
-  if text ==# '' && '$'->line() == 1
-    return
-  endif
-
-  let b:ddu_ui_ff_save_cursor = #{
-        \   pos: getcurpos(),
-        \   text: text,
-        \ }
-endfunction
-
 function ddu#ui#ff#_echo(msg) abort
   echo a:msg
 endfunction

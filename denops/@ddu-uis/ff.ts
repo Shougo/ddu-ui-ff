@@ -567,40 +567,7 @@ export class Ui extends BaseUi<Params> {
       this.viewItems = this.viewItems.reverse();
     }
 
-    // Save cursor when cursor moved
-    await args.denops.cmd(
-      `autocmd ${augroupName} CursorMoved <buffer>` +
-        " call ddu#ui#ff#_save_cursor()",
-    );
-
-    const saveCursor = await fn.getbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_ff_save_cursor",
-      { pos: [], text: "" },
-    ) as SaveCursor;
-    let currentText = "";
-    if (saveCursor.pos.length !== 0) {
-      const buflines = await fn.getbufline(
-        args.denops,
-        bufnr,
-        saveCursor.pos[1],
-      );
-      if (buflines.length !== 0) {
-        currentText = buflines[0];
-      }
-    }
-    if (
-      saveCursor.pos.length !== 0 && this.items.length !== 0 &&
-      currentText === saveCursor.text && !this.refreshed
-    ) {
-      // Restore the cursor
-      await args.denops.call(
-        "ddu#ui#ff#_cursor",
-        saveCursor.pos[1],
-        saveCursor.pos[2],
-      );
-    } else if (hasAutoAction) {
+    if (hasAutoAction) {
       // Call auto action
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
