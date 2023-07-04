@@ -595,8 +595,8 @@ export class Ui extends BaseUi<Params> {
       }
     }
     if (
-      saveCursor.pos.length !== 0 && this.items.length !== 0 &&
-      currentText === saveCursor.text && !this.refreshed
+      saveCursor.pos.length !== 0 && currentText === saveCursor.text &&
+      !this.refreshed && args.options.resume
     ) {
       // Restore the cursor
       await args.denops.call(
