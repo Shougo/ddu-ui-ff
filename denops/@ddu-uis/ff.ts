@@ -146,6 +146,10 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
+    if (await op.filetype.getLocal(args.denops) === "ddu-ff-filter") {
+      // NOTE: saveMode is ignored in filter window
+      this.saveMode = "n";
+    }
     if (this.saveMode === "c") {
       this.saveMode = await fn.getcmdtype(args.denops) as string;
       if (this.saveMode === ":") {
