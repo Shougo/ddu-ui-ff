@@ -763,6 +763,14 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
+    closePreviewWindow: async (args: {
+      denops: Denops;
+      context: Context;
+      uiParams: Params;
+    }) => {
+      await this.previewUi.close(args.denops, args.context, args.uiParams);
+      return ActionFlags.None;
+    },
     cursorNext: async (args: {
       denops: Denops;
       uiParams: Params;

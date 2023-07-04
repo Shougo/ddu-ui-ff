@@ -72,6 +72,10 @@ clearSelectAllItems
 closeFilterWindow
 		Close the filter window and move to the parent UI window.
 
+					*ddu-ui-ff-action-closePreviewWindow*
+closePreviewWindow
+		Close the preview window.
+
 					*ddu-ui-ff-action-collapseItem*
 collapseItem
 		Collapse the item tree.
