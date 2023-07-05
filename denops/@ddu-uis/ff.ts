@@ -118,6 +118,7 @@ export type Params = {
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "botright" | "topleft";
+  startAutoAction: boolean;
   startFilter: boolean;
   statusline: boolean;
   winCol: number;
@@ -141,9 +142,11 @@ export class Ui extends BaseUi<Params> {
   private prevInput = "";
   private previewUi = new PreviewUi();
   private popupId = -1;
+  private enabledAutoAction = false;
 
   override async onInit(args: {
     denops: Denops;
+    uiParams: Params;
   }): Promise<void> {
     this.saveMode = await fn.mode(args.denops);
     if (await op.filetype.getLocal(args.denops) === "ddu-ff-filter") {
@@ -162,6 +165,7 @@ export class Ui extends BaseUi<Params> {
     }
     this.filterBufnr = -1;
     this.items = [];
+    this.enabledAutoAction = args.uiParams.startAutoAction;
   }
 
   override async onBeforeAction(args: {
@@ -287,7 +291,6 @@ export class Ui extends BaseUi<Params> {
 
     const floating = args.uiParams.split === "floating";
     const hasNvim = args.denops.meta.host === "nvim";
-    const hasAutoAction = "name" in args.uiParams.autoAction;
     const winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.items.length, 1)
@@ -448,20 +451,7 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    await batch(args.denops, async (denops: Denops) => {
-      await denops.call("ddu#ui#ff#_reset_auto_action");
-      if (hasAutoAction) {
-        const autoAction = Object.assign(
-          { delay: 100, params: {}, sync: true },
-          args.uiParams.autoAction,
-        );
-        await denops.call(
-          "ddu#ui#ff#_set_auto_action",
-          winid,
-          autoAction,
-        );
-      }
-    });
+    await this.setAutoAction(args.denops, args.uiParams, winid);
 
     if (args.uiParams.autoResize) {
       await fn.win_execute(
@@ -604,7 +594,9 @@ export class Ui extends BaseUi<Params> {
         saveCursor.pos[1],
         saveCursor.pos[2],
       );
-    } else if (hasAutoAction) {
+    }
+
+    if (this.enabledAutoAction) {
       // Call auto action
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
@@ -1132,6 +1124,29 @@ export class Ui extends BaseUi<Params> {
 
       return Promise.resolve(ActionFlags.Redraw);
     },
+    toggleAutoAction: async (args: {
+      denops: Denops;
+      context: Context;
+      uiParams: Params;
+    }) => {
+      // Toggle
+      this.enabledAutoAction = !this.enabledAutoAction;
+
+      const winid =
+        (args.uiParams.split === "floating" && args.denops.meta.host !== "nvim")
+          ? this.popupId
+          : await fn.bufwinid(args.denops, await this.getBufnr(args.denops));
+      await this.setAutoAction(args.denops, args.uiParams, winid);
+
+      if (this.enabledAutoAction) {
+        // Call auto action
+        await args.denops.call("ddu#ui#ff#_do_auto_action");
+      } else {
+        await this.previewUi.close(args.denops, args.context, args.uiParams);
+      }
+
+      return ActionFlags.None;
+    },
     toggleSelectItem: async (args: {
       denops: Denops;
       options: DduOptions;
@@ -1205,6 +1220,7 @@ export class Ui extends BaseUi<Params> {
       replaceCol: 0,
       split: "horizontal",
       splitDirection: "botright",
+      startAutoAction: false,
       startFilter: false,
       statusline: true,
       winCol: 0,
@@ -1525,6 +1541,26 @@ export class Ui extends BaseUi<Params> {
     return this.items.findIndex(
       (item: DduItem) => item === viewItem,
     );
+  }
+
+  private async setAutoAction(denops: Denops, uiParams: Params, winId: number) {
+    const hasAutoAction = "name" in uiParams.autoAction &&
+      this.enabledAutoAction;
+
+    await batch(denops, async (denops: Denops) => {
+      await denops.call("ddu#ui#ff#_reset_auto_action");
+      if (hasAutoAction) {
+        const autoAction = Object.assign(
+          { delay: 100, params: {}, sync: true },
+          uiParams.autoAction,
+        );
+        await denops.call(
+          "ddu#ui#ff#_set_auto_action",
+          winId,
+          autoAction,
+        );
+      }
+    });
   }
 }
 

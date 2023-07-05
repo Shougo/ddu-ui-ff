@@ -179,6 +179,10 @@ refreshItems
 toggleAllItems
 		Toggle selected state for the all items.
 
+					*ddu-ui-ff-action-toggleAutoAction*
+toggleAutoAction
+		Toggle auto action state(enabled/disabled).
+
 					*ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected state for cursor item.
@@ -198,6 +202,8 @@ PARAMS						*ddu-ui-ff-params*
 autoAction	(dictionary)
 		If it is specified, the UI action is executed when the cursor
 		is moved. It has the following keys.
+		NOTE: If you want to enable autoAction when UI started, you
+		must set |ddu-ui-ff-param-startAutoAction|.
 
 		delay				(number)	(Optional)
 		Time in milliseconds to delay the auto action.
@@ -541,11 +547,17 @@ splitDirection	(string)
 
 		Default: "botright"
 
+					*ddu-ui-ff-param-startAutoAction*
+startAutoAction	(boolean)
+		If it is true, |ddu-ui-ff-param-autoAction| is fired
+		automatically.
+		Note: It must be set before UI initialization.
+
+		Default: v:false
+
 						*ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically.
-		NOTE: If it is enabled and |ddu-ui-ff-param-autoAction| is
-		set, The restore cursor feature is disabled.
 
 		Default: v:false
 
@@ -975,6 +987,10 @@ A: >
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.07.05
+* "startAutoAction" is required if you want to enable autoAction when UI
+  initialized.
 
 2023.06.11
 * Does not restore to normal mode automatically.  It should be configured by
