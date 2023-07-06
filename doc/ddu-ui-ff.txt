@@ -468,9 +468,14 @@ previewSplit	(string)
 
 		Following values are available:
 
-		"horizontal": horizontal split
-		"vertical": vertical split
-		"no": no split
+		"horizontal":
+			horizontal split, |ddu-ui-ff-param-winWidth| is
+			used.
+		"vertical":
+			vertical split, |ddu-ui-ff-param-winHeight| is
+			used.
+		"no":
+			no split
 
 		Default: "horizontal"
 
