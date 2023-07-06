@@ -210,7 +210,8 @@ export class Ui extends BaseUi<Params> {
     await vars.g.set(args.denops, "ddu#ui#ff#_in_action", false);
   }
 
-  override refreshItems(args: {
+  override async refreshItems(args: {
+    denops: Denops;
     context: Context;
     items: DduItem[];
   }): Promise<void> {
@@ -220,6 +221,16 @@ export class Ui extends BaseUi<Params> {
     this.items = args.items.slice(0, 1000);
     this.selectedItems.clear();
     this.refreshed = true;
+
+    // Clear saved cursor
+    const bufnr = await fn.bufnr(args.denops, this.bufferName);
+    if (bufnr > 0) {
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor", {
+        pos: [],
+        text: "",
+      });
+    }
+
     return Promise.resolve();
   }
 
@@ -514,6 +525,12 @@ export class Ui extends BaseUi<Params> {
           : "");
     };
 
+    // Save cursor when cursor moved
+    await args.denops.cmd(
+      `autocmd ${augroupName} CursorMoved <buffer>` +
+        " call ddu#ui#ff#_save_cursor()",
+    );
+
     // Update main buffer
     try {
       const checkRefreshed = args.context.input !== this.prevInput ||
@@ -561,12 +578,6 @@ export class Ui extends BaseUi<Params> {
       this.viewItems = this.viewItems.reverse();
     }
 
-    // Save cursor when cursor moved
-    await args.denops.cmd(
-      `autocmd ${augroupName} CursorMoved <buffer>` +
-        " call ddu#ui#ff#_save_cursor()",
-    );
-
     const saveCursor = await fn.getbufvar(
       args.denops,
       bufnr,
@@ -585,8 +596,7 @@ export class Ui extends BaseUi<Params> {
       }
     }
     if (
-      saveCursor.pos.length !== 0 && currentText === saveCursor.text &&
-      !this.refreshed && args.options.resume
+      saveCursor.pos.length !== 0 && currentText === saveCursor.text
     ) {
       // Restore the cursor
       await args.denops.call(
