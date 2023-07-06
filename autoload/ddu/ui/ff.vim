@@ -140,18 +140,16 @@ function ddu#ui#ff#_open_preview_window(
 
   if a:params.previewSplit ==# 'vertical'
     if a:params.previewFloating
-      if a:params.split ==# 'floating'
-        let win_row = a:params.previewRow > 0 ?
+      let win_row = a:params.previewRow > 0 ?
               \ a:params.previewRow : pos[0] - 1
-        let win_col = a:params.previewCol > 0 ?
+      let win_col = a:params.previewCol > 0 ?
               \ a:params.previewCol : pos[1] - 1
-      else
-        let win_row = pos[0] - 1
-        let win_col = pos[1] - 1
-      endif
-      let win_col += win_width
-      if (win_col + preview_width) > &columns
-        let win_col -= preview_width
+
+      if a:params.previewRow <= 0 && win_row <= preview_height
+        let win_col += win_width
+        if (win_col + preview_width) > &columns
+          let win_col -= preview_width
+        endif
       endif
 
       if has('nvim')
