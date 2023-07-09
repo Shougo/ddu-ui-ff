@@ -453,7 +453,9 @@ export class Ui extends BaseUi<Params> {
         }
       }
     } else if (args.uiParams.split === "no") {
-      await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
+      if (winid < 0) {
+        await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
+      }
     } else {
       await args.denops.call(
         "ddu#util#print_error",
