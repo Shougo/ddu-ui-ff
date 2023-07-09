@@ -152,6 +152,10 @@ function ddu#ui#ff#_open_preview_window(
         endif
       endif
 
+      if a:params.previewCol <= 0 && a:params.previewFloatingBorder !=# 'none'
+        let preview_width -= 1
+      endif
+
       if has('nvim')
         const winid = nvim_open_win(a:preview_bufnr, v:true, #{
               \   relative: 'editor',
@@ -199,6 +203,10 @@ function ddu#ui#ff#_open_preview_window(
               \ a:params.previewRow : pos[0] - 1
       let win_col = a:params.previewCol > 0 ?
               \ a:params.previewCol : pos[1] - 1
+
+      if a:params.previewRow <= 0 && a:params.previewFloatingBorder !=# 'none'
+        let preview_height -= 1
+      endif
 
       if has('nvim')
         if a:params.previewRow <= 0 && win_row <= preview_height
