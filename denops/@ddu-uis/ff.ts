@@ -755,6 +755,7 @@ export class Ui extends BaseUi<Params> {
     },
     chooseAction: async (args: {
       denops: Denops;
+      context: Context;
       options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
@@ -767,6 +768,7 @@ export class Ui extends BaseUi<Params> {
         items,
       );
 
+      await this.previewUi.close(args.denops, args.context, args.uiParams);
       await this.closeFilterWindow(args.denops);
 
       await args.denops.call("ddu#start", {
