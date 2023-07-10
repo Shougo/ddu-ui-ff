@@ -208,6 +208,11 @@ function ddu#ui#ff#_open_preview_window(
         let preview_height -= 1
       endif
 
+      if a:params.previewRow <= 0 && a:params.filterFloatingPosition ==# 'top'
+        let preview_height -= 1
+        let win_row -= 1
+      endif
+
       if has('nvim')
         if a:params.previewRow <= 0 && win_row <= preview_height
           let win_row += win_height + 1
