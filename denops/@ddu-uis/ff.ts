@@ -631,6 +631,8 @@ export class Ui extends BaseUi<Params> {
       } else {
         await args.denops.cmd("stopinsert");
       }
+    } else {
+      await fn.win_gotoid(args.denops, winid);
     }
 
     this.refreshed = false;
