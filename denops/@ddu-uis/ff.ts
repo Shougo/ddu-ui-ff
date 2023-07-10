@@ -9,14 +9,14 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.2.7/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.1/types.ts";
 import {
   batch,
   Denops,
   fn,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.2.7/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.1/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -527,12 +527,6 @@ export class Ui extends BaseUi<Params> {
           : "");
     };
 
-    // Save cursor when cursor moved
-    await args.denops.cmd(
-      `autocmd ${augroupName} CursorMoved <buffer>` +
-        " call ddu#ui#ff#_save_cursor()",
-    );
-
     // Update main buffer
     try {
       const checkRefreshed = args.context.input !== this.prevInput ||
@@ -574,6 +568,17 @@ export class Ui extends BaseUi<Params> {
       );
       return;
     }
+
+    if (!initialized || cursorPos > 0) {
+      // Save current cursor
+      await args.denops.call("ddu#ui#ff#_save_cursor");
+    }
+
+    // Save cursor when cursor moved
+    await args.denops.cmd(
+      `autocmd ${augroupName} CursorMoved <buffer>` +
+        " call ddu#ui#ff#_save_cursor()",
+    );
 
     this.viewItems = Array.from(this.items);
     if (args.uiParams.reversed) {
