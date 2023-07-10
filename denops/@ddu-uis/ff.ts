@@ -618,7 +618,7 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
 
-    if (this.filterBufnr < 0 || winid < 0) {
+    if (winid < 0) {
       const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
       if (startFilter) {
         this.filterBufnr = await args.denops.call(
