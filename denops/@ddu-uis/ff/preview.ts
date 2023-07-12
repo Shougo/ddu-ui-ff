@@ -73,6 +73,11 @@ export class PreviewUi {
     await fn.win_execute(denops, this.previewWinId, command);
   }
 
+  isAlreadyPreviewed(item: DduItem): boolean {
+    return this.previewWinId > 0 &&
+      JSON.stringify(item) === JSON.stringify(this.previewedTarget);
+  }
+
   async previewContents(
     denops: Denops,
     context: Context,
@@ -87,17 +92,12 @@ export class PreviewUi {
     bufnr: number,
     item: DduItem,
   ): Promise<ActionFlags> {
-    const prevId = await fn.win_getid(denops);
-    const previewParams = ensure(actionParams, is.Record) as PreviewParams;
-
-    // Close if the target is the same as the previous one
-    if (
-      this.previewWinId > 0 &&
-      JSON.stringify(item) === JSON.stringify(this.previewedTarget)
-    ) {
-      await this.close(denops, context, uiParams);
+    if (this.isAlreadyPreviewed(item)) {
       return ActionFlags.None;
     }
+
+    const prevId = await fn.win_getid(denops);
+    const previewParams = ensure(actionParams, is.Record) as PreviewParams;
 
     const previewContext: PreviewContext = {
       col: uiParams.previewCol,

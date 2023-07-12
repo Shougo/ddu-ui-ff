@@ -1168,6 +1168,40 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
+    togglePreview: async (args: {
+      denops: Denops;
+      context: Context;
+      options: DduOptions;
+      uiParams: Params;
+      actionParams: unknown;
+      getPreviewer: (
+        denops: Denops,
+        item: DduItem,
+        actionParams: BaseActionParams,
+        previewContext: PreviewContext,
+      ) => Promise<Previewer | undefined>;
+    }) => {
+      const item = await this.getItem(args.denops);
+      if (!item) {
+        return ActionFlags.None;
+      }
+
+      // Close if the target is the same as the previous one
+      if (this.previewUi.isAlreadyPreviewed(item)) {
+        await this.previewUi.close(args.denops, args.context, args.uiParams);
+        return ActionFlags.None;
+      }
+
+      return this.previewUi.previewContents(
+        args.denops,
+        args.context,
+        args.uiParams,
+        args.actionParams,
+        args.getPreviewer,
+        await this.getBufnr(args.denops),
+        item,
+      );
+    },
     toggleSelectItem: async (args: {
       denops: Denops;
       options: DduOptions;

@@ -183,6 +183,10 @@ toggleAllItems
 toggleAutoAction
 		Toggle auto action state(enabled/disabled).
 
+					*ddu-ui-ff-action-togglePreview*
+togglePreview
+		Toggle |ddu-ui-ff-action-preview| for cursor item.
+
 					*ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected state for cursor item.
@@ -993,6 +997,9 @@ A: >
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.07.12
+* "preview" action does not toggle.
 
 2023.07.05
 * "startAutoAction" is required if you want to enable autoAction when UI
