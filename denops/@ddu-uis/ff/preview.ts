@@ -51,10 +51,13 @@ export class PreviewUi {
       }
       this.previewWinId = -1;
     }
+  }
+
+  async removePreviewedBuffers(denops: Denops) {
     await batch(denops, async (denops) => {
       for (const bufnr of this.previewBufnrs) {
         await denops.cmd(
-          `if bufexists(${bufnr}) | silent bwipeout! ${bufnr} | endif`,
+          `if bufexists(${bufnr}) && winbufnr(${bufnr}) < 0 | silent bwipeout! ${bufnr} | endif`,
         );
       }
     });

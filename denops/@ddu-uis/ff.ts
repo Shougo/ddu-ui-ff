@@ -613,11 +613,6 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    if (this.enabledAutoAction) {
-      // Call auto action
-      await args.denops.call("ddu#ui#ff#_do_auto_action");
-    }
-
     if (winid < 0) {
       const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
       if (startFilter) {
@@ -633,6 +628,11 @@ export class Ui extends BaseUi<Params> {
       }
     } else if (await fn.bufwinid(args.denops, this.filterBufnr) < 0) {
       await fn.win_gotoid(args.denops, winid);
+    }
+
+    if (this.enabledAutoAction) {
+      // Call auto action
+      await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
 
     this.refreshed = false;
@@ -1259,6 +1259,7 @@ export class Ui extends BaseUi<Params> {
     cancel: boolean;
   }): Promise<void> {
     await this.previewUi.close(args.denops, args.context, args.uiParams);
+    await this.previewUi.removePreviewedBuffers(args.denops);
     await this.closeFilterWindow(args.denops);
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
     await args.denops.call("ddu#ui#ff#_restore_title");
