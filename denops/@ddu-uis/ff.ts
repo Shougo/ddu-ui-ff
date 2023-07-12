@@ -722,6 +722,11 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     tabNr: number;
   }): Promise<boolean> {
+    // NOTE: Vim's floating window cannot find from buffer list.
+    if (this.popupId > 0) {
+      return true;
+    }
+
     const bufnr = await this.getBufnr(args.denops);
     if (args.tabNr > 0) {
       return (await fn.tabpagebuflist(args.denops, args.tabNr) as number[])
