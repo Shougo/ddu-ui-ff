@@ -15,6 +15,7 @@ import {
   ensure,
   fn,
   is,
+  op,
 } from "https://deno.land/x/ddu_vim@v3.4.1/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../ff.ts";
@@ -27,7 +28,7 @@ export class PreviewUi {
   private previewWinId = -1;
   private previewedTarget?: DduItem;
   private matchIds: Record<number, number> = {};
-  private previewBufnrs: Set<number> = new Set();
+  private previewedBufnrs: Set<number> = new Set();
 
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
@@ -55,7 +56,7 @@ export class PreviewUi {
 
   async removePreviewedBuffers(denops: Denops) {
     await batch(denops, async (denops) => {
-      for (const bufnr of this.previewBufnrs) {
+      for (const bufnr of this.previewedBufnrs) {
         await denops.cmd(
           `if bufexists(${bufnr}) && winbufnr(${bufnr}) < 0 | silent bwipeout! ${bufnr} | endif`,
         );
@@ -179,8 +180,7 @@ export class PreviewUi {
       }
     }
 
-    const previewBufnr = await fn.bufnr(denops);
-    this.previewBufnrs.add(previewBufnr);
+    this.previewedBufnrs.add(await fn.bufnr(denops));
     this.previewedTarget = item;
     await fn.win_gotoid(denops, prevId);
 
@@ -348,21 +348,13 @@ export class PreviewUi {
   }
 
   private async jump(denops: Denops, previewer: Previewer) {
-    await batch(denops, async (denops: Denops) => {
-      const hasPattern = "pattern" in previewer && previewer.pattern;
-      const hasLineNr = "lineNr" in previewer && previewer.lineNr;
-
-      if (hasPattern) {
-        await fn.search(denops, previewer.pattern, "w");
-      }
-      if (hasLineNr && previewer.lineNr) {
-        await fn.cursor(denops, [previewer.lineNr, 0]);
-      }
-      if (hasPattern || hasLineNr) {
-        await denops.cmd("normal! zv");
-        await denops.cmd("normal! zz");
-      }
-    });
+    const pattern = "pattern" in previewer && previewer.pattern
+      ? previewer.pattern
+      : "";
+    const lineNr = "lineNr" in previewer && previewer.lineNr
+      ? previewer.lineNr
+      : 0;
+    await denops.call("ddu#ui#ff#_jump", this.previewWinId, pattern, lineNr);
   }
 
   private async highlight(
@@ -374,22 +366,35 @@ export class PreviewUi {
     // Clear the previous highlight
     await this.clearHighlight(denops);
 
+    const ns = denops.meta.host === "nvim"
+      ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
+      : 0;
+
     const winid = this.previewWinId;
     if (previewer?.lineNr) {
-      this.matchIds[winid] = await fn.matchaddpos(denops, hlName, [
-        previewer.lineNr,
-      ]) as number;
+      await denops.call(
+        "ddu#ui#ff#_highlight",
+        hlName,
+        "lineNr",
+        1,
+        ns,
+        bufnr,
+        previewer?.lineNr,
+        1,
+        await op.columns.get(denops),
+      );
     } else if (previewer?.pattern) {
       this.matchIds[winid] = await fn.matchadd(
         denops,
         hlName,
         previewer.pattern,
+        -1,
+        {
+          window: winid,
+        },
       ) as number;
     }
 
-    const ns = denops.meta.host === "nvim"
-      ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
-      : 0;
     await batch(denops, async (denops) => {
       if (!previewer.highlights) {
         return;
@@ -419,7 +424,6 @@ export class PreviewUi {
 
     if (this.matchIds[winid] > 0) {
       await fn.matchdelete(denops, this.matchIds[winid], winid);
-      this.matchIds[winid] = -1;
     }
     if (denops.meta.host === "nvim") {
       const ns = await denops.call(
@@ -432,6 +436,9 @@ export class PreviewUi {
         "prop_clear",
         1,
         await denops.call("line", "$", winid),
+        {
+          bufnr: await fn.winbufnr(denops, winid),
+        },
       );
     }
   }

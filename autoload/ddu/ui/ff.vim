@@ -374,3 +374,20 @@ function ddu#ui#ff#_restore_title() abort
     let &titlestring = g:ddu#ui#ff#_save_title
   endif
 endfunction
+
+function ddu#ui#ff#_jump(winid, pattern, linenr) abort
+  if a:pattern !=# ''
+    call win_execute(a:winid,
+          \ printf('call search(%d, %s, "w")', string(a:pattern)))
+  endif
+
+  if a:linenr > 0
+    call win_execute(a:winid,
+          \ printf('call cursor(%d, 0)', a:linenr))
+  endif
+
+  if a:pattern !=# '' || a:linenr > 0
+    call win_execute(a:winid, 'normal! zv')
+    call win_execute(a:winid, 'normal! zz')
+  endif
+endfunction
