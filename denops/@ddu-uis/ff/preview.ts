@@ -8,7 +8,7 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.4.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.2/types.ts";
 import {
   batch,
   Denops,
@@ -16,7 +16,7 @@ import {
   fn,
   is,
   op,
-} from "https://deno.land/x/ddu_vim@v3.4.1/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.2/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../ff.ts";
 
@@ -273,10 +273,19 @@ export class PreviewUi {
 
     const limit = actionParams.syntaxLimitChars ?? 400000;
     if (text.join("\n").length < limit) {
-      if (previewer.syntax) {
-        await fn.setbufvar(denops, previewBufnr, "&syntax", previewer.syntax);
+      if (previewer.filetype) {
+        await fn.setbufvar(
+          denops,
+          previewBufnr,
+          "&filetype",
+          previewer.filetype,
+        );
       } else if (previewer.kind === "buffer") {
         await fn.win_execute(denops, this.previewWinId, "filetype detect");
+      }
+
+      if (previewer.syntax) {
+        await fn.setbufvar(denops, previewBufnr, "&syntax", previewer.syntax);
       }
     }
 
