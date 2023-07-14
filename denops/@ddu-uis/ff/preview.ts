@@ -304,6 +304,7 @@ export class PreviewUi {
         uiParams.highlights?.preview ?? "Search",
       );
     }
+
     return ActionFlags.Persist;
   }
 
@@ -334,34 +335,34 @@ export class PreviewUi {
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
   ): Promise<[err: true | undefined, contents: string[]]> {
-    if (previewer.kind === "buffer") {
-      try {
-        const bufferPath = previewer?.expr ?? previewer?.path;
-        if (
-          previewer.path && await exists(previewer.path) &&
-          !(await isDirectory(previewer.path))
-        ) {
-          const data = Deno.readFileSync(previewer.path);
-          const contents = new TextDecoder().decode(data).split("\n");
-          return [, contents];
-        } else if (bufferPath && await fn.bufexists(denops, bufferPath)) {
-          // Use buffer instead.
-          const bufnr = await fn.bufnr(denops, bufferPath);
-          await fn.bufload(denops, bufnr);
-          const contents = await fn.getbufline(denops, bufnr, 1, "$");
-          return [, contents];
-        } else {
-          throw new Error(`"${previewer.path}" cannot be opened.`);
-        }
-      } catch (e: unknown) {
-        const contents = [
-          "Error",
-          `${(e as Error)?.message ?? e}`,
-        ];
-        return [true, contents];
+    if (previewer.kind !== "buffer") {
+      return [undefined, previewer.contents];
+    }
+
+    try {
+      const bufferPath = previewer?.expr ?? previewer?.path;
+      if (
+        previewer.path && await exists(previewer.path) &&
+        !(await isDirectory(previewer.path))
+      ) {
+        const data = Deno.readFileSync(previewer.path);
+        const contents = new TextDecoder().decode(data).split("\n");
+        return [undefined, contents];
+      } else if (bufferPath && await fn.bufexists(denops, bufferPath)) {
+        // Use buffer instead.
+        const bufnr = await fn.bufnr(denops, bufferPath);
+        await fn.bufload(denops, bufnr);
+        const contents = await fn.getbufline(denops, bufnr, 1, "$");
+        return [undefined, contents];
+      } else {
+        throw new Error(`"${previewer.path}" cannot be opened.`);
       }
-    } else {
-      return [, previewer.contents];
+    } catch (e: unknown) {
+      const contents = [
+        "Error",
+        `${(e as Error)?.message ?? e}`,
+      ];
+      return [true, contents];
     }
   }
 
