@@ -407,6 +407,7 @@ export class PreviewUi {
         denops,
         hlName,
         previewer.pattern,
+        1,
         -1,
         {
           window: winid,

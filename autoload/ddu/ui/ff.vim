@@ -378,7 +378,7 @@ endfunction
 function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   if a:pattern !=# ''
     call win_execute(a:winid,
-          \ printf('call search(%d, %s, "w")', string(a:pattern)))
+          \ printf('call search(%s, "w")', string(a:pattern)))
   endif
 
   if a:linenr > 0
