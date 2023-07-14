@@ -242,8 +242,8 @@ export class PreviewUi {
     const bufname = await this.getPreviewBufferName(denops, previewer, item);
     const exists = await fn.bufexists(denops, bufname);
     let previewBufnr = await fn.bufnr(denops, bufname);
-    const text = await this.getContents(denops, previewer);
-    if (!exists || previewer.kind === "nofile") {
+    const [err, contents] = await this.getContents(denops, previewer);
+    if (err || !exists || previewer.kind === "nofile") {
       // Create new buffer
       previewBufnr = await fn.bufadd(denops, bufname);
       await batch(denops, async (denops: Denops) => {
@@ -253,7 +253,7 @@ export class PreviewUi {
         await fn.setbufvar(denops, previewBufnr, "&modeline", 1);
 
         await fn.bufload(denops, previewBufnr);
-        await replace(denops, previewBufnr, text);
+        await replace(denops, previewBufnr, contents);
       });
     }
 
@@ -272,7 +272,7 @@ export class PreviewUi {
     }
 
     const limit = actionParams.syntaxLimitChars ?? 400000;
-    if (text.join("\n").length < limit) {
+    if (!err && contents.join("\n").length < limit) {
       if (previewer.filetype) {
         await fn.setbufvar(
           denops,
@@ -296,12 +296,14 @@ export class PreviewUi {
       }
     });
 
-    await this.highlight(
-      denops,
-      previewer,
-      previewBufnr,
-      uiParams.highlights?.preview ?? "Search",
-    );
+    if (!err) {
+      await this.highlight(
+        denops,
+        previewer,
+        previewBufnr,
+        uiParams.highlights?.preview ?? "Search",
+      );
+    }
     return ActionFlags.Persist;
   }
 
@@ -331,28 +333,35 @@ export class PreviewUi {
   private async getContents(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
-  ): Promise<string[]> {
+  ): Promise<[err: true | undefined, contents: string[]]> {
     if (previewer.kind === "buffer") {
-      const bufferPath = previewer?.expr ?? previewer?.path;
-      if (
-        previewer.path && await exists(previewer.path) &&
-        !(await isDirectory(previewer.path))
-      ) {
-        const data = Deno.readFileSync(previewer.path);
-        return new TextDecoder().decode(data).split("\n");
-      } else if (bufferPath && await fn.bufexists(denops, bufferPath)) {
-        // Use buffer instead.
-        const bufnr = await fn.bufnr(denops, bufferPath);
-        await fn.bufload(denops, bufnr);
-        return await fn.getbufline(denops, bufnr, 1, "$");
-      } else {
-        return [
+      try {
+        const bufferPath = previewer?.expr ?? previewer?.path;
+        if (
+          previewer.path && await exists(previewer.path) &&
+          !(await isDirectory(previewer.path))
+        ) {
+          const data = Deno.readFileSync(previewer.path);
+          const contents = new TextDecoder().decode(data).split("\n");
+          return [, contents];
+        } else if (bufferPath && await fn.bufexists(denops, bufferPath)) {
+          // Use buffer instead.
+          const bufnr = await fn.bufnr(denops, bufferPath);
+          await fn.bufload(denops, bufnr);
+          const contents = await fn.getbufline(denops, bufnr, 1, "$");
+          return [, contents];
+        } else {
+          throw new Error(`"${previewer.path}" cannot be opened.`);
+        }
+      } catch (e: unknown) {
+        const contents = [
           "Error",
-          `"${previewer.path}" cannot be opened.`,
+          `${(e as Error)?.message ?? e}`,
         ];
+        return [true, contents];
       }
     } else {
-      return previewer.contents;
+      return [, previewer.contents];
     }
   }
 
