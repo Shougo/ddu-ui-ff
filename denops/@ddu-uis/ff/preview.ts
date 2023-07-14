@@ -101,10 +101,10 @@ export class PreviewUi {
     const previewParams = ensure(actionParams, is.Record) as PreviewParams;
 
     const previewContext: PreviewContext = {
-      col: uiParams.previewCol,
-      row: uiParams.previewRow,
-      width: uiParams.previewWidth,
-      height: uiParams.previewHeight,
+      col: Number(uiParams.previewCol),
+      row: Number(uiParams.previewRow),
+      width: Number(uiParams.previewWidth),
+      height: Number(uiParams.previewHeight),
       isFloating: uiParams.previewFloating,
       split: uiParams.previewSplit,
     };

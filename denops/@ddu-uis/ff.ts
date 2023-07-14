@@ -18,6 +18,7 @@ import {
   vars,
 } from "https://deno.land/x/ddu_vim@v3.4.2/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
+import { ensure, is } from "https://deno.land/x/unknownutil@v3.2.0/mod.ts";
 
 type DoActionParams = {
   name?: string;
@@ -104,16 +105,16 @@ export type Params = {
   maxDisplayItems: number;
   maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
-  previewCol: number;
+  previewCol: number | string;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
   previewFloatingTitle: FloatingTitle;
   previewFloatingTitlePos: "left" | "center" | "right";
   previewFloatingZindex: number;
-  previewHeight: number;
-  previewRow: number;
+  previewHeight: number | string;
+  previewRow: number | string;
   previewSplit: "horizontal" | "vertical" | "no";
-  previewWidth: number;
+  previewWidth: number | string;
   previewWindowOptions: WindowOption[];
   prompt: string;
   replaceCol: number;
@@ -123,10 +124,10 @@ export type Params = {
   startAutoAction: boolean;
   startFilter: boolean;
   statusline: boolean;
-  winCol: number;
-  winHeight: number;
-  winRow: number;
-  winWidth: number;
+  winCol: number | string;
+  winHeight: number | string;
+  winRow: number | string;
+  winWidth: number | string;
 };
 
 export class Ui extends BaseUi<Params> {
@@ -300,7 +301,12 @@ export class Ui extends BaseUi<Params> {
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
 
-    await this.setDefaultParams(args.denops, args.uiParams);
+    await this.resolveWindowPositionParams(
+      args.denops,
+      "win",
+      args.uiParams,
+      args.context,
+    );
 
     const floating = args.uiParams.split === "floating";
     const hasNvim = args.denops.meta.host === "nvim";
@@ -1050,7 +1056,12 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      await this.setDefaultParams(args.denops, args.uiParams);
+      await this.resolveWindowPositionParams(
+        args.denops,
+        "win",
+        args.uiParams,
+        args.context,
+      );
 
       this.filterBufnr = await args.denops.call(
         "ddu#ui#ff#filter#_open",
@@ -1081,6 +1092,13 @@ export class Ui extends BaseUi<Params> {
       if (!item) {
         return ActionFlags.None;
       }
+
+      await this.resolveWindowPositionParams(
+        args.denops,
+        "preview",
+        args.uiParams,
+        args.context,
+      );
 
       return this.previewUi.previewContents(
         args.denops,
@@ -1199,6 +1217,13 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
+      await this.resolveWindowPositionParams(
+        args.denops,
+        "preview",
+        args.uiParams,
+        args.context,
+      );
+
       return this.previewUi.previewContents(
         args.denops,
         args.context,
@@ -1287,10 +1312,10 @@ export class Ui extends BaseUi<Params> {
       startAutoAction: false,
       startFilter: false,
       statusline: true,
-      winCol: 0,
+      winCol: "(&columns - uiParams.winWidth) / 2",
       winHeight: 20,
-      winRow: 0,
-      winWidth: 0,
+      winRow: "&lines / 2 - 10",
+      winWidth: "&columns / 2",
     };
   }
 
@@ -1567,18 +1592,53 @@ export class Ui extends BaseUi<Params> {
     });
   }
 
-  private async setDefaultParams(denops: Denops, uiParams: Params) {
-    const columns = await op.columns.getGlobal(denops);
-    if (uiParams.winWidth === 0) {
-      uiParams.winWidth = Math.trunc(columns / 2);
-    }
-    if (uiParams.winRow === 0) {
-      uiParams.winRow = Math.trunc(
-        (await denops.call("eval", "&lines") as number) / 2 - 10,
+  private async resolveWindowPositionParams(
+    denops: Denops,
+    prefix: "win" | "preview",
+    uiParams: Params,
+    context: Record<string, unknown>,
+  ) {
+    const defaults = this.params();
+    context = {
+      itemCount: this.items.length,
+      uiParams,
+      ...context,
+    };
+    const posKeys = ["Height", "Width", "Row", "Col"] as const;
+    for (const key of posKeys) {
+      const name = `${prefix}${key}` as const;
+      uiParams[name] = await this.evalNumberParam(
+        denops,
+        name,
+        uiParams[name],
+        defaults[name],
+        context,
       );
     }
-    if (uiParams.winCol === 0) {
-      uiParams.winCol = Math.trunc((columns - uiParams.winWidth) / 2);
+  }
+
+  private async evalNumberParam(
+    denops: Denops,
+    name: string,
+    expr: number | string,
+    defaultExpr: number | string,
+    context: Record<string, unknown>,
+  ): Promise<number> {
+    if (is.Number(expr)) {
+      return expr;
+    }
+    try {
+      return ensure(await denops.eval(expr, context), is.Number);
+    } catch (e) {
+      await errorException(
+        denops,
+        e,
+        `[ddu-ui-ff] invalid expression in option: ${name}`,
+      );
+      // Fallback to default param.
+      return is.Number(defaultExpr)
+        ? defaultExpr
+        : await denops.eval(defaultExpr, context) as number;
     }
   }
 
