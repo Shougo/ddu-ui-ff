@@ -401,6 +401,20 @@ immediateAction (string)
 
 		Default: ""
 
+					*ddu-ui-ff-param-maxDisplayItems*
+maxDisplayItems (number)
+		The maximum number of displayed items.
+		NOTE: If you increase the param, the UI will be slower.
+
+		Default: 1000
+
+					*ddu-ui-ff-param-maxHighlightItems*
+maxHighlightItems (number)
+		The maximum number of highlighted items.
+		NOTE: If you increase the param, the UI will be slower.
+
+		Default: 100
+
 						*ddu-ui-ff-param-onPreview*
 onPreview	(function)
 		It is called when |ddu-ui-ff-action-preview| is fired.
@@ -998,6 +1012,9 @@ A: >
 
 ==============================================================================
 COMPATIBILITY					*ddu-ui-ff-compatibility*
+
+2023.07.15
+* Only highlight items of "maxHighlightItems" to improve the performance.
 
 2023.07.12
 * "preview" action does not toggle.

@@ -101,6 +101,8 @@ export type Params = {
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
+  maxDisplayItems: number;
+  maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
   previewCol: number;
   previewFloating: boolean;
@@ -213,12 +215,12 @@ export class Ui extends BaseUi<Params> {
   override async refreshItems(args: {
     denops: Denops;
     context: Context;
+    uiParams: Params;
     items: DduItem[];
   }): Promise<void> {
-    // NOTE: Use only 1000 items
     this.prevLength = this.items.length;
     this.prevInput = args.context.input;
-    this.items = args.items.slice(0, 1000);
+    this.items = args.items.slice(0, args.uiParams.maxDisplayItems);
     this.selectedItems.clear();
     this.refreshed = true;
 
@@ -554,7 +556,7 @@ export class Ui extends BaseUi<Params> {
               row: index + 1,
               prefix: getPrefix(item),
             };
-          }).filter((item, index) =>
+          }).slice(0, args.uiParams.maxHighlightItems).filter((item, index) =>
             item.highlights.length > 0 && !this.selectedItems.has(index)
           ),
           [...this.selectedItems],
@@ -1255,6 +1257,8 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
+      maxDisplayItems: 1000,
+      maxHighlightItems: 100,
       onPreview: (_) => {
         return Promise.resolve();
       },
