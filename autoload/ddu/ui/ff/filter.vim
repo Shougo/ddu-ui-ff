@@ -31,14 +31,14 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   " Disable backspace eol.
   let s:save_backspace = &backspace
   set backspace-=eol
-  autocmd ddu-ff-filter BufLeave <buffer> ++once
-        \ let &backspace = s:save_backspace
 
   " Disable whichwrap.
   let s:save_whichwrap = &whichwrap
   set whichwrap=
-  autocmd ddu-ff-filter BufLeave <buffer> ++once
-        \ let &whichwrap = s:save_whichwrap
+
+  autocmd ddu-ff-filter WinClosed,BufLeave <buffer> ++once
+        \ : let &backspace = s:save_backspace
+        \ | let &whichwrap = s:save_whichwrap
 
   if !has('nvim') && a:params.split ==# 'floating'
     " Vim's popup does not support enter the window
