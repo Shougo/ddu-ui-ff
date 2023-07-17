@@ -8,6 +8,11 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     call s:init_buffer(a:name, bufname, a:params)
   endif
 
+  if !&l:modifiable
+    " Something wrong.
+    return
+  endif
+
   " Set the current input
   if '$'->getline() ==# ''
     call setline('$', a:input)
