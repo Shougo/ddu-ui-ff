@@ -306,6 +306,7 @@ export class Ui extends BaseUi<Params> {
 
     args.uiParams = await this.resolveParams(
       args.denops,
+      args.options,
       args.uiParams,
       args.context,
     );
@@ -1060,6 +1061,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const uiParams = await this.resolveParams(
         args.denops,
+        args.options,
         args.uiParams,
         args.context,
       );
@@ -1096,6 +1098,7 @@ export class Ui extends BaseUi<Params> {
 
       const uiParams = await this.resolveParams(
         args.denops,
+        args.options,
         args.uiParams,
         args.context,
       );
@@ -1219,6 +1222,7 @@ export class Ui extends BaseUi<Params> {
 
       const uiParams = await this.resolveParams(
         args.denops,
+        args.options,
         args.uiParams,
         args.context,
       );
@@ -1603,12 +1607,15 @@ export class Ui extends BaseUi<Params> {
 
   private async resolveParams(
     denops: Denops,
+    options: DduOptions,
     uiParams: Params,
     context: Record<string, unknown>,
   ): Promise<Params> {
     const defaults = this.params();
 
     context = {
+      sources: options.sources.map(
+        (source) => is.String(source) ? source : source.name),
       itemCount: this.items.length,
       uiParams,
       ...context,
