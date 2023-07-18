@@ -654,7 +654,8 @@ expression context:
 	bufName		(string)
 	bufNr		(number)
 	itemCount	(number)
-	uiParams	(dictionary)
+	sources		(string[])
+	uiParams	(|ddu-ui-ff-params|)
 	winId		(number)
 
 An example of floating the UI window on the left side and the preview window
