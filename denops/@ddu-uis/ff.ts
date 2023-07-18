@@ -64,6 +64,8 @@ type FloatingTitle =
 
 type WindowOption = [string, number | string];
 
+type ExprNumber = string | number;
+
 type SaveCursor = {
   pos: number[];
   text: string;
@@ -105,16 +107,16 @@ export type Params = {
   maxDisplayItems: number;
   maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
-  previewCol: number | string;
+  previewCol: ExprNumber;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
   previewFloatingTitle: FloatingTitle;
   previewFloatingTitlePos: "left" | "center" | "right";
   previewFloatingZindex: number;
-  previewHeight: number | string;
-  previewRow: number | string;
+  previewHeight: ExprNumber;
+  previewRow: ExprNumber;
   previewSplit: "horizontal" | "vertical" | "no";
-  previewWidth: number | string;
+  previewWidth: ExprNumber;
   previewWindowOptions: WindowOption[];
   prompt: string;
   replaceCol: number;
@@ -124,10 +126,10 @@ export type Params = {
   startAutoAction: boolean;
   startFilter: boolean;
   statusline: boolean;
-  winCol: number | string;
-  winHeight: number | string;
-  winRow: number | string;
-  winWidth: number | string;
+  winCol: ExprNumber;
+  winHeight: ExprNumber;
+  winRow: ExprNumber;
+  winWidth: ExprNumber;
 };
 
 export class Ui extends BaseUi<Params> {
@@ -301,9 +303,8 @@ export class Ui extends BaseUi<Params> {
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
 
-    await this.resolveWindowPositionParams(
+    await this.resolveParams(
       args.denops,
-      "win",
       args.uiParams,
       args.context,
     );
@@ -1056,9 +1057,8 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      await this.resolveWindowPositionParams(
+      await this.resolveParams(
         args.denops,
-        "win",
         args.uiParams,
         args.context,
       );
@@ -1093,9 +1093,8 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await this.resolveWindowPositionParams(
+      await this.resolveParams(
         args.denops,
-        "preview",
         args.uiParams,
         args.context,
       );
@@ -1217,9 +1216,8 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await this.resolveWindowPositionParams(
+      await this.resolveParams(
         args.denops,
-        "preview",
         args.uiParams,
         args.context,
       );
@@ -1592,22 +1590,31 @@ export class Ui extends BaseUi<Params> {
     });
   }
 
-  private async resolveWindowPositionParams(
+  private async resolveParams(
     denops: Denops,
-    prefix: "win" | "preview",
     uiParams: Params,
     context: Record<string, unknown>,
   ) {
     const defaults = this.params();
+
     context = {
       itemCount: this.items.length,
       uiParams,
       ...context,
     };
-    const posKeys = ["Height", "Width", "Row", "Col"] as const;
-    for (const key of posKeys) {
-      const name = `${prefix}${key}` as const;
-      uiParams[name] = await this.evalNumberParam(
+
+    const keys = [
+      "previewCol",
+      "previewHeight",
+      "previewRow",
+      "previewWidth",
+      "winCol",
+      "winHeight",
+      "winRow",
+      "winWidth",
+    ] as const;
+    for (const name of keys) {
+      uiParams[name] = await this.evalExprParam(
         denops,
         name,
         uiParams[name],
@@ -1617,16 +1624,17 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  private async evalNumberParam(
+  private async evalExprParam(
     denops: Denops,
     name: string,
-    expr: number | string,
-    defaultExpr: number | string,
+    expr: ExprNumber,
+    defaultExpr: ExprNumber,
     context: Record<string, unknown>,
   ): Promise<number> {
-    if (is.Number(expr)) {
+    if (!is.String(expr)) {
       return expr;
     }
+
     try {
       return ensure(await denops.eval(expr, context), is.Number);
     } catch (e) {
@@ -1635,10 +1643,11 @@ export class Ui extends BaseUi<Params> {
         e,
         `[ddu-ui-ff] invalid expression in option: ${name}`,
       );
+
       // Fallback to default param.
-      return is.Number(defaultExpr)
-        ? defaultExpr
-        : await denops.eval(defaultExpr, context) as number;
+      return is.String(defaultExpr)
+        ? await denops.eval(defaultExpr, context) as number
+        : defaultExpr;
     }
   }
 
