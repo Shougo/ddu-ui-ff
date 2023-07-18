@@ -10,7 +10,7 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
 
   if !&l:modifiable
     " Something wrong.
-    return '%'->bufnr()
+    setlocal modifiable
   endif
 
   " Set the current input
