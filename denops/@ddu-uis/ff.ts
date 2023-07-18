@@ -1321,7 +1321,7 @@ export class Ui extends BaseUi<Params> {
       startAutoAction: false,
       startFilter: false,
       statusline: true,
-      winCol: "(&columns - uiParams.winWidth) / 2",
+      winCol: "(&columns - eval(uiParams.winWidth)) / 2",
       winHeight: 20,
       winRow: "&lines / 2 - 10",
       winWidth: "&columns / 2",
