@@ -18,7 +18,7 @@ import {
   vars,
 } from "https://deno.land/x/ddu_vim@v3.4.2/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
-import { ensure, is } from "https://deno.land/x/unknownutil@v3.2.0/mod.ts";
+import { is } from "https://deno.land/x/unknownutil@v3.2.0/mod.ts";
 
 type DoActionParams = {
   name?: string;
@@ -93,6 +93,7 @@ export type Params = {
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
+  exprParams: (keyof Params)[];
   filterFloatingPosition: "top" | "bottom";
   filterFloatingTitle: FloatingTitle;
   filterFloatingTitlePos: "left" | "center" | "right";
@@ -303,7 +304,7 @@ export class Ui extends BaseUi<Params> {
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
 
-    await this.resolveParams(
+    args.uiParams = await this.resolveParams(
       args.denops,
       args.uiParams,
       args.context,
@@ -1057,7 +1058,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      await this.resolveParams(
+      const uiParams = await this.resolveParams(
         args.denops,
         args.uiParams,
         args.context,
@@ -1070,7 +1071,7 @@ export class Ui extends BaseUi<Params> {
         args.uiParams.split === "floating"
           ? this.popupId
           : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
-        args.uiParams,
+        uiParams,
       ) as number;
 
       return ActionFlags.None;
@@ -1093,7 +1094,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await this.resolveParams(
+      const uiParams = await this.resolveParams(
         args.denops,
         args.uiParams,
         args.context,
@@ -1102,7 +1103,7 @@ export class Ui extends BaseUi<Params> {
       return this.previewUi.previewContents(
         args.denops,
         args.context,
-        args.uiParams,
+        uiParams,
         args.actionParams,
         args.getPreviewer,
         await this.getBufnr(args.denops),
@@ -1216,7 +1217,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await this.resolveParams(
+      const uiParams = await this.resolveParams(
         args.denops,
         args.uiParams,
         args.context,
@@ -1225,7 +1226,7 @@ export class Ui extends BaseUi<Params> {
       return this.previewUi.previewContents(
         args.denops,
         args.context,
-        args.uiParams,
+        uiParams,
         args.actionParams,
         args.getPreviewer,
         await this.getBufnr(args.denops),
@@ -1269,6 +1270,16 @@ export class Ui extends BaseUi<Params> {
       cursorPos: -1,
       displaySourceName: "no",
       displayTree: false,
+      exprParams: [
+        "previewCol",
+        "previewRow",
+        "previewHeight",
+        "previewWidth",
+        "winCol",
+        "winRow",
+        "winHeight",
+        "winWidth",
+      ],
       filterFloatingPosition: "top",
       filterSplitDirection: "topleft",
       filterFloatingTitle: "",
@@ -1594,7 +1605,7 @@ export class Ui extends BaseUi<Params> {
     denops: Denops,
     uiParams: Params,
     context: Record<string, unknown>,
-  ) {
+  ): Promise<Params> {
     const defaults = this.params();
 
     context = {
@@ -1603,40 +1614,40 @@ export class Ui extends BaseUi<Params> {
       ...context,
     };
 
-    const keys = [
-      "previewCol",
-      "previewHeight",
-      "previewRow",
-      "previewWidth",
-      "winCol",
-      "winHeight",
-      "winRow",
-      "winWidth",
-    ] as const;
-    for (const name of keys) {
-      uiParams[name] = await this.evalExprParam(
-        denops,
-        name,
-        uiParams[name],
-        defaults[name],
-        context,
-      );
+    const params = Object.assign(uiParams);
+    for (const name of uiParams.exprParams) {
+      if (name in uiParams) {
+        params[name] = await this.evalExprParam(
+          denops,
+          name,
+          params[name],
+          defaults[name],
+          context,
+        );
+      } else {
+        await denops.call(
+          "ddu#util#print_error",
+          `Invalid expr param: ${name}`,
+        );
+      }
     }
+
+    return params;
   }
 
   private async evalExprParam(
     denops: Denops,
     name: string,
-    expr: ExprNumber,
-    defaultExpr: ExprNumber,
+    expr: string | unknown,
+    defaultExpr: string | unknown,
     context: Record<string, unknown>,
-  ): Promise<number> {
+  ): Promise<unknown> {
     if (!is.String(expr)) {
       return expr;
     }
 
     try {
-      return ensure(await denops.eval(expr, context), is.Number);
+      return await denops.eval(expr, context);
     } catch (e) {
       await errorException(
         denops,
@@ -1646,7 +1657,7 @@ export class Ui extends BaseUi<Params> {
 
       // Fallback to default param.
       return is.String(defaultExpr)
-        ? await denops.eval(defaultExpr, context) as number
+        ? await denops.eval(defaultExpr, context)
         : defaultExpr;
     }
   }

@@ -262,6 +262,23 @@ displayTree	(boolean)
 
 		Default: v:false
 
+						*ddu-ui-ff-param-exprParams*
+exprParams	(string[])
+		Evaluate params list.
+		If the param is string, it is evaluated as
+		|ddu-ui-ff-params-expression|.
+
+		Default: [
+		  "previewCol",
+		  "previewRow",
+		  "previewHeight",
+		  "previewWidth",
+		  "winCol",
+		  "winRow",
+		  "winHeight",
+		  "winWidth",
+		]
+
 					*ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
@@ -426,8 +443,6 @@ onPreview	(function)
 previewCol	(number)
 		Set the column position of the preview window if
 		|ddu-ui-ff-param-previewFloating| is v:true.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: 0
 
@@ -474,8 +489,6 @@ previewHeight	(number)
 		|ddu-ui-ff-action-preview|.
 		If |ddu-ui-ff-param-previewFloating|, set the height of the
 		floating window.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: 10
 
@@ -483,8 +496,6 @@ previewHeight	(number)
 previewRow	(number)
 		Set the row position of the preview window if
 		|ddu-ui-ff-param-previewFloating| is v:true.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: 0
 
@@ -511,8 +522,6 @@ previewWidth	(number)
 		|ddu-ui-ff-action-preview|.
 		If |ddu-ui-ff-param-previewFloating|, set the width of the
 		floating window.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: 80
 
@@ -606,8 +615,6 @@ statusline	(boolean)
 winCol		(number | string)
 		Set the column position of the window if
 		|ddu-ui-ff-param-split| is "floating".
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: "(&columns - uiParams.winWidth) / 2"
 
@@ -617,8 +624,6 @@ winHeight	(number | string)
 		"horizontal".
 		If |ddu-ui-ff-param-split| is "floating",
 		set the height of the floating window.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: 20
 
@@ -627,8 +632,6 @@ winRow		(number | string)
 		Set the row position of the window if |ddu-ui-ff-param-split|
 		is "floating".
 		If it is 1, the filter window position is always top.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: "&lines / 2 - 10"
 
@@ -638,8 +641,6 @@ winWidth	(number | string)
 		"vertical".
 		If |ddu-ui-ff-param-split| is "floating", set the width of
 		the floating window.
-		If it is string, it is evaluated as
-		|ddu-ui-ff-params-expression|.
 
 		Default: "&columns / 2"
 
