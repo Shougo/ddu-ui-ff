@@ -3,7 +3,7 @@
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS					*ddu-ui-ff-contents*
+CONTENTS                                                  *ddu-ui-ff-contents*
 
 Introduction		|ddu-ui-ff-introduction|
 Install			|ddu-ui-ff-install|
@@ -18,13 +18,13 @@ Compatibility		|ddu-ui-ff-compatibility|
 
 
 ==============================================================================
-INTRODUCTION					*ddu-ui-ff-introduction*
+INTRODUCTION                                          *ddu-ui-ff-introduction*
 
 This UI is standard fuzzy finder.
 
 
 ==============================================================================
-INSTALL						*ddu-ui-ff-install*
+INSTALL                                                    *ddu-ui-ff-install*
 
 Please install both "ddu.vim" and "denops.vim".
 
@@ -33,69 +33,69 @@ https://github.com/vim-denops/denops.vim
 
 
 ==============================================================================
-INTERFACE					*ddu-ui-ff-interface*
+INTERFACE                                                *ddu-ui-ff-interface*
 
 
 ------------------------------------------------------------------------------
-FUNCTIONS					*ddu-ui-ff-functions*
+FUNCTIONS                                                *ddu-ui-ff-functions*
 
-						*ddu#ui#ff#do_action()*
+                                                       *ddu#ui#ff#do_action()*
 ddu#ui#ff#do_action({action-name}[, {params}])
 		It is deprecated.  Please use |ddu#ui#do_action()|
 		instead.
 
-						*ddu#ui#ff#multi_actions()*
+                                                   *ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 		It is deprecated.  Please use |ddu#ui#multi_actions()|
 		instead.
 
-						*ddu#ui#ff#execute()*
+                                                         *ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
 		NOTE: It does not execute |:redraw| automatically.
 		You need to execute |:redraw| if needed.
 
 ------------------------------------------------------------------------------
-ACTIONS						*ddu-ui-ff-actions*
+ACTIONS                                                    *ddu-ui-ff-actions*
 
-					*ddu-ui-ff-action-chooseAction*
+                                               *ddu-ui-ff-action-chooseAction*
 chooseAction
 		Choose and fire the action by ddu UI.
 
 		NOTE: "ddu-source-action" is required.
 		https://github.com/Shougo/ddu-source-action
 
-					*ddu-ui-ff-action-clearSelectAllItems*
+                                        *ddu-ui-ff-action-clearSelectAllItems*
 clearSelectAllItems
 		Clear all selected items.
 
-					*ddu-ui-ff-action-closeFilterWindow*
+                                          *ddu-ui-ff-action-closeFilterWindow*
 closeFilterWindow
 		Close the filter window and move to the parent UI window.
 
-					*ddu-ui-ff-action-closePreviewWindow*
+                                         *ddu-ui-ff-action-closePreviewWindow*
 closePreviewWindow
 		Close the preview window.
 
-					*ddu-ui-ff-action-collapseItem*
+                                               *ddu-ui-ff-action-collapseItem*
 collapseItem
 		Collapse the item tree.
 
-					*ddu-ui-ff-action-cursorNext*
+                                                 *ddu-ui-ff-action-cursorNext*
 cursorNext
 		params:
 			{count}: Move count
 
 		Move the cursor to the next.
 
-					*ddu-ui-ff-action-cursorPrevious*
+                                             *ddu-ui-ff-action-cursorPrevious*
 cursorPrevious
 		params:
 			{count}: Move count
 
 		Move the cursor to the previous.
 
-					*ddu-ui-ff-action-expandItem*
+                                                 *ddu-ui-ff-action-expandItem*
 expandItem
 		params:
 			{mode}: The supported values are:
@@ -110,19 +110,19 @@ expandItem
 
 		Expand the item tree.
 
-						*ddu-ui-ff-action-getItem*
+                                                    *ddu-ui-ff-action-getItem*
 getItem
 		Set cursor item to "b:ddu_ui_item" variable.
 
-					*ddu-ui-ff-action-getSelectedItems*
+                                           *ddu-ui-ff-action-getSelectedItems*
 getSelectedItems
 		Set selected items to "b:ddu_ui_selected_items" variable.
 
-						*ddu-ui-ff-action-inputAction*
+                                                *ddu-ui-ff-action-inputAction*
 inputAction
 		Choose and fire the action by |input()|.
 
-						*ddu-ui-ff-action-itemAction*
+                                                 *ddu-ui-ff-action-itemAction*
 itemAction
 		params:
 			{name}: Action name
@@ -135,15 +135,15 @@ itemAction
 
 		NOTE: You cannot mix multiple kinds/sources.
 
-					*ddu-ui-ff-action-leaveFilterWindow*
+                                          *ddu-ui-ff-action-leaveFilterWindow*
 leaveFilterWindow
 		Move to the parent UI window.
 
-					*ddu-ui-ff-action-openFilterWindow*
+                                           *ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
 		Open the filter window.
 
-					*ddu-ui-ff-action-preview*
+                                                    *ddu-ui-ff-action-preview*
 preview
 		params:
 			{syntaxLimitChars}: 	Max number of chars to apply
@@ -157,43 +157,43 @@ preview
 
 		Preview the item in preview window.
 
-					*ddu-ui-ff-action-previewExecute*
+                                             *ddu-ui-ff-action-previewExecute*
 previewExecute
 		params:
 			{command}: 	Command to execute
 
 		Execute command in preview window.
 
-					*ddu-ui-ff-action-previewPath*
+                                                *ddu-ui-ff-action-previewPath*
 previewPath
 
 		Preview the item path in echo area.
 
-						*ddu-ui-ff-action-quit*
+                                                       *ddu-ui-ff-action-quit*
 quit
 		Quit the UI window.
 
-					*ddu-ui-ff-action-refreshItems*
+                                               *ddu-ui-ff-action-refreshItems*
 refreshItems
 		Refresh the items.
 
-					*ddu-ui-ff-action-toggleAllItems*
+                                             *ddu-ui-ff-action-toggleAllItems*
 toggleAllItems
 		Toggle selected state for the all items.
 
-					*ddu-ui-ff-action-toggleAutoAction*
+                                           *ddu-ui-ff-action-toggleAutoAction*
 toggleAutoAction
 		Toggle auto action state(enabled/disabled).
 
-					*ddu-ui-ff-action-togglePreview*
+                                              *ddu-ui-ff-action-togglePreview*
 togglePreview
 		Toggle |ddu-ui-ff-action-preview| for cursor item.
 
-					*ddu-ui-ff-action-toggleSelectItem*
+                                           *ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected state for cursor item.
 
-					*ddu-ui-ff-action-updateOptions*
+                                              *ddu-ui-ff-action-updateOptions*
 updateOptions
 		params:
 			{option-name}: Option name and value
@@ -202,9 +202,9 @@ updateOptions
 		Refer to |ddu-options| about options.
 
 ==============================================================================
-PARAMS						*ddu-ui-ff-params*
+PARAMS                                                      *ddu-ui-ff-params*
 
-						*ddu-ui-ff-param-autoAction*
+                                                  *ddu-ui-ff-param-autoAction*
 autoAction	(dictionary)
 		If it is specified, the UI action is executed when the cursor
 		is moved. It has the following keys.
@@ -232,20 +232,20 @@ autoAction	(dictionary)
 
 		Default: v:true
 
-						*ddu-ui-ff-param-autoResize*
+                                                  *ddu-ui-ff-param-autoResize*
 autoResize	(boolean)
 		Auto resize the window height automatically.
 
 		Default: v:false
 
-						*ddu-ui-ff-param-cursorPos*
+                                                   *ddu-ui-ff-param-cursorPos*
 cursorPos	(number)
 		Select {number} candidate.  It is 0 origin.
 		If you set the option, cursor restore feature is disabled.
 
 		Default: -1
 
-					*ddu-ui-ff-param-displaySourceName*
+                                           *ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are
 		available:
@@ -256,13 +256,13 @@ displaySourceName	(string)
 
 		Default: "no"
 
-						*ddu-ui-ff-param-displayTree*
+                                                 *ddu-ui-ff-param-displayTree*
 displayTree	(boolean)
 		Display tree structure.
 
 		Default: v:false
 
-						*ddu-ui-ff-param-exprParams*
+                                                  *ddu-ui-ff-param-exprParams*
 exprParams	(string[])
 		Evaluate params list.
 		If the param is string, it is evaluated as
@@ -279,7 +279,7 @@ exprParams	(string[])
 		  "winWidth",
 		]
 
-					*ddu-ui-ff-param-floatingBorder*
+                                              *ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
 		|ddu-ui-ff-param-split| is "floating".
@@ -298,14 +298,14 @@ floatingBorder		(string | list)
 
 		Default: "none"
 
-					*ddu-ui-ff-param-floatingTitle*
+                                               *ddu-ui-ff-param-floatingTitle*
 floatingTitle		(string | list)
 		Specify the title of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
 
 		Default: ""
 
-					*ddu-ui-ff-param-floatingTitlePos*
+                                            *ddu-ui-ff-param-floatingTitlePos*
 floatingTitlePos	(string)
 		Specify the title position of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
@@ -314,7 +314,7 @@ floatingTitlePos	(string)
 
 		Default: "left"
 
-				*ddu-ui-ff-param-filterFloatingPosition*
+                                      *ddu-ui-ff-param-filterFloatingPosition*
 filterFloatingPosition	(string)
 		Specify the filter floating window position as {position}.
 
@@ -328,7 +328,7 @@ filterFloatingPosition	(string)
 
 		Default: "top"
 
-					*ddu-ui-ff-param-filterFloatingTitle*
+                                         *ddu-ui-ff-param-filterFloatingTitle*
 filterFloatingTitle	(string | list)
 		Specify the title of the filter floating window with border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
@@ -337,7 +337,7 @@ filterFloatingTitle	(string | list)
 
 		Default: ""
 
-				*ddu-ui-ff-param-filterFloatingTitlePos*
+                                      *ddu-ui-ff-param-filterFloatingTitlePos*
 filterFloatingTitlePos	(string)
 		Specify the title position of the filter floating window with
 		border if |ddu-ui-ff-param-floatingBorder| is not "none".
@@ -346,7 +346,7 @@ filterFloatingTitlePos	(string)
 
 		Default: "left"
 
-					*ddu-ui-ff-param-filterSplitDirection*
+                                        *ddu-ui-ff-param-filterSplitDirection*
 filterSplitDirection	(string)
 		Specify the filter window direction as {direction}.
 
@@ -359,14 +359,14 @@ filterSplitDirection	(string)
 
 		Default: "topleft"
 
-					*ddu-ui-ff-param-filterUpdateTime*
+                                            *ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
 		Specify the update time in the filter window.
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
 
-					*ddu-ui-ff-param-highlights*
+                                                  *ddu-ui-ff-param-highlights*
 highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.
 		It can contain following keys
@@ -401,14 +401,14 @@ highlights	(dictionary)
 
 		Default: {}
 
-						*ddu-ui-ff-param-ignoreEmpty*
+                                                 *ddu-ui-ff-param-ignoreEmpty*
 ignoreEmpty	(boolean)
 		Don't open the UI window if the items are empty.
 		NOTE: It works only if the UI window is not visible.
 
 		Default: v:false
 
-					*ddu-ui-ff-param-immediateAction*
+                                             *ddu-ui-ff-param-immediateAction*
 immediateAction (string)
 		If it is not empty and the number of item is exactly one, it
 		runs |ddu-ui-ff-action-itemAction| immediately.
@@ -419,40 +419,40 @@ immediateAction (string)
 
 		Default: ""
 
-					*ddu-ui-ff-param-maxDisplayItems*
+                                             *ddu-ui-ff-param-maxDisplayItems*
 maxDisplayItems (number)
 		The maximum number of displayed items.
 		NOTE: If you increase the param, the UI will be slower.
 
 		Default: 1000
 
-					*ddu-ui-ff-param-maxHighlightItems*
+                                           *ddu-ui-ff-param-maxHighlightItems*
 maxHighlightItems (number)
 		The maximum number of highlighted items.
 		NOTE: If you increase the param, the UI will be slower.
 
 		Default: 100
 
-						*ddu-ui-ff-param-onPreview*
+                                                   *ddu-ui-ff-param-onPreview*
 onPreview	(function)
 		It is called when |ddu-ui-ff-action-preview| is fired.
 		NOTE: The function must be registered by
 		|denops#callback#register()|.
 
-						*ddu-ui-ff-param-previewCol*
+                                                  *ddu-ui-ff-param-previewCol*
 previewCol	(number)
 		Set the column position of the preview window if
 		|ddu-ui-ff-param-previewFloating| is v:true.
 
 		Default: 0
 
-					*ddu-ui-ff-param-previewFloating*
+                                             *ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.
 
 		Default: v:false
 
-				*ddu-ui-ff-param-previewFloatingBorder*
+                                       *ddu-ui-ff-param-previewFloatingBorder*
 previewFloatingBorder		(string | list)
 		Specify the style of the preview window border if
 		|ddu-ui-ff-param-previewFloating| is v:true.
@@ -461,14 +461,14 @@ previewFloatingBorder		(string | list)
 
 		Default: "none"
 
-					*ddu-ui-ff-param-previewFloatingTitle*
+                                        *ddu-ui-ff-param-previewFloatingTitle*
 previewFloatingTitle	(string | list)
 		Specify the title of the preview floating window with border
 		if |ddu-ui-ff-param-previewFloatingBorder| is not "none".
 
 		Default: ""
 
-				*ddu-ui-ff-param-previewFloatingTitlePos*
+                                     *ddu-ui-ff-param-previewFloatingTitlePos*
 previewFloatingTitlePos	(string)
 		Specify the title position of the preview floating window with
 		border if |ddu-ui-ff-param-previewFloatingBorder| is not
@@ -476,14 +476,14 @@ previewFloatingTitlePos	(string)
 
 		Default: "left"
 
-				*ddu-ui-ff-param-previewFloatingZindex*
+                                       *ddu-ui-ff-param-previewFloatingZindex*
 previewFloatingZindex		(number)
 		Specify the style of the preview window zindex if
 		|ddu-ui-ff-param-split| is "floating".
 
 		Default: 100
 
-					*ddu-ui-ff-param-previewHeight*
+                                               *ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in
 		|ddu-ui-ff-action-preview|.
@@ -492,14 +492,14 @@ previewHeight	(number)
 
 		Default: 10
 
-						*ddu-ui-ff-param-previewRow*
+                                                  *ddu-ui-ff-param-previewRow*
 previewRow	(number)
 		Set the row position of the preview window if
 		|ddu-ui-ff-param-previewFloating| is v:true.
 
 		Default: 0
 
-					*ddu-ui-ff-param-previewSplit*
+                                                *ddu-ui-ff-param-previewSplit*
 previewSplit	(string)
 		Specify preview split mode in |ddu-ui-ff-action-preview|.
 
@@ -516,7 +516,7 @@ previewSplit	(string)
 
 		Default: "horizontal"
 
-						*ddu-ui-ff-param-previewWidth*
+                                                *ddu-ui-ff-param-previewWidth*
 previewWidth	(number)
 		Set the width of the |preview-window| in
 		|ddu-ui-ff-action-preview|.
@@ -525,7 +525,7 @@ previewWidth	(number)
 
 		Default: 80
 
-					*ddu-ui-ff-param-previewWindowOptions*
+                                        *ddu-ui-ff-param-previewWindowOptions*
 previewWindowOptions	(list)
 		Set the window options of the |preview-window| in
 		|ddu-ui-ff-action-preview|.
@@ -544,14 +544,14 @@ previewWindowOptions	(list)
 			["&wrap", 0],
 		]
 
-						*ddu-ui-ff-param-prompt*
+                                                      *ddu-ui-ff-param-prompt*
 prompt		(string)
 		Specify the prompt in the filter window.
 		NOTE: It must be one or two width characters.
 
 		Default: ""
 
-						*ddu-ui-ff-param-replaceCol*
+                                                  *ddu-ui-ff-param-replaceCol*
 replaceCol	(number)
 		Set the column position of the replace current text after
 		actions.
@@ -559,7 +559,7 @@ replaceCol	(number)
 
 		Default: 0
 
-						*ddu-ui-ff-param-reversed*
+                                                    *ddu-ui-ff-param-reversed*
 reversed	(boolean)
 		Display the items in reversed order.
 		NOTE: It may increase screen flicker.  Because the cursor must
@@ -567,7 +567,7 @@ reversed	(boolean)
 
 		Default: v:false
 
-						*ddu-ui-ff-param-split*
+                                                       *ddu-ui-ff-param-split*
 split		(string)
 		Specify split mode.
 
@@ -583,13 +583,13 @@ split		(string)
 
 		Default: "horizontal"
 
-					*ddu-ui-ff-param-splitDirection*
+                                              *ddu-ui-ff-param-splitDirection*
 splitDirection	(string)
 		Specify split direction.
 
 		Default: "botright"
 
-					*ddu-ui-ff-param-startAutoAction*
+                                             *ddu-ui-ff-param-startAutoAction*
 startAutoAction	(boolean)
 		If it is true, |ddu-ui-ff-param-autoAction| is fired
 		automatically.
@@ -597,28 +597,28 @@ startAutoAction	(boolean)
 
 		Default: v:false
 
-						*ddu-ui-ff-param-startFilter*
+                                                 *ddu-ui-ff-param-startFilter*
 startFilter	(boolean)
 		If it is true, the filter window is opened automatically when
 		initialized UI.
 
 		Default: v:false
 
-						*ddu-ui-ff-param-statusline*
+                                                  *ddu-ui-ff-param-statusline*
 statusline	(boolean)
 		If it is true, the original 'statusline' value is set on the
 		buffer.
 
 		Default: v:true
 
-						*ddu-ui-ff-param-winCol*
+                                                      *ddu-ui-ff-param-winCol*
 winCol		(number | string)
 		Set the column position of the window if
 		|ddu-ui-ff-param-split| is "floating".
 
 		Default: "(&columns - eval(uiParams.winWidth)) / 2"
 
-						*ddu-ui-ff-param-winHeight*
+                                                   *ddu-ui-ff-param-winHeight*
 winHeight	(number | string)
 		Set the height of the window if |ddu-ui-ff-param-split| is
 		"horizontal".
@@ -627,7 +627,7 @@ winHeight	(number | string)
 
 		Default: 20
 
-						*ddu-ui-ff-param-winRow*
+                                                      *ddu-ui-ff-param-winRow*
 winRow		(number | string)
 		Set the row position of the window if |ddu-ui-ff-param-split|
 		is "floating".
@@ -635,7 +635,7 @@ winRow		(number | string)
 
 		Default: "&lines / 2 - 10"
 
-						*ddu-ui-ff-param-winwidth*
+                                                    *ddu-ui-ff-param-winwidth*
 winWidth	(number | string)
 		Set the width of the window if |ddu-ui-ff-param-split| is
 		"vertical".
@@ -681,7 +681,7 @@ on the right side of the screen: >
 <
 
 ==============================================================================
-EXAMPLES					*ddu-ui-ff-examples*
+EXAMPLES                                                  *ddu-ui-ff-examples*
 >
 	call ddu#custom#patch_global(#{
 	    \   ui: 'ff',
@@ -790,12 +790,12 @@ FAQ 24:							|ddu-ui-ff-faq-24|
 	I want to change preview cursor on the top.
 
 ------------------------------------------------------------------------------
-							*ddu-ui-ff-faq-1*
+                                                             *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
 
 A: Please set |ddu-ui-ff-param-startFilter|.
 
-							*ddu-ui-ff-faq-2*
+                                                             *ddu-ui-ff-faq-2*
 Q: I want to call default action in the filter window.
 
 A: >
@@ -805,7 +805,7 @@ A: >
 	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 <
-							*ddu-ui-ff-faq-3*
+                                                             *ddu-ui-ff-faq-3*
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
@@ -819,7 +819,7 @@ must force this behaviour. >
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
 <
-							*ddu-ui-ff-faq-4*
+                                                             *ddu-ui-ff-faq-4*
 Q: I want to define |ddu-option-name| depend key mappings.
 
 A: You can use "b:ddu_ui_name". >
@@ -839,7 +839,7 @@ A: You can use "b:ddu_ui_name". >
 	  endif
 	endfunction
 <
-							*ddu-ui-ff-faq-5*
+                                                             *ddu-ui-ff-faq-5*
 Q: I want to define kind depend key mappings.
 
 A: You can use |ddu#ui#get_item()|. >
@@ -852,7 +852,7 @@ A: You can use |ddu#ui#get_item()|. >
 	  \ {'name': 'edit'} : {'name': 'open'})<CR>
 	endfunction
 <
-							*ddu-ui-ff-faq-6*
+                                                             *ddu-ui-ff-faq-6*
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
 A: You can pass params like this. >
@@ -863,7 +863,7 @@ A: You can pass params like this. >
 	  \ {'params': eval(input('params: '))})<CR>
 	endfunction
 <
-							*ddu-ui-ff-faq-7*
+                                                             *ddu-ui-ff-faq-7*
 Q: I want to use Vim syntax highlight in the buffer.
 
 A: Please use |Syntax| autocmd.  |FileType| autocmd cannot change syntax
@@ -880,19 +880,19 @@ Or you can use "syntax/ddu-ff.vim" file instead. >
 	  endif
 	endfunction
 <
-							*ddu-ui-ff-faq-8*
+                                                             *ddu-ui-ff-faq-8*
 Q: I want to custom the statusline.
 
 A: You can disable the original statusline by |ddu-ui-ff-param-statusline|.
 And you can get the status line information by "w:ddu_ui_ff_status" variable.
 
-							*ddu-ui-ff-faq-9*
+                                                             *ddu-ui-ff-faq-9*
 Q: I want to move to line quickly like denite.nvim's "quick-move" feature.
 
 A: Please use qselect.vim for it.
 https://github.com/Shougo/qselect.vim
 
-							*ddu-ui-ff-faq-10*
+                                                            *ddu-ui-ff-faq-10*
 Q: Why ddu-ui-ff does not support Vim's popup window feature instead of
 neovim's floating window feature?
 https://github.com/Shougo/ddu-ui-ff/issues/48
@@ -901,25 +901,25 @@ A: Because Vim's popup window feature is not focusable.
 ddu-ui-ff implementation depends on the feature.  So the support is not
 acceptable.
 
-							*ddu-ui-ff-faq-11*
+                                                            *ddu-ui-ff-faq-11*
 Q: |:close| does not move to the ddu-ui-ff window sometimes.
 
 A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
 
-							*ddu-ui-ff-faq-12*
+                                                            *ddu-ui-ff-faq-12*
 Q: I want to toggle selected items in visual mode.
 
 A: >
   xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 <
-							*ddu-ui-ff-faq-13*
+                                                            *ddu-ui-ff-faq-13*
 Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 
 A: It is feature.  Because it increases screen flicker.
 You need to add |:redraw| command manually if needed.
 
-							*ddu-ui-ff-faq-14*
+                                                            *ddu-ui-ff-faq-14*
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
@@ -939,7 +939,7 @@ A: >
 	\   },
 	\ })<CR>
 <
-							*ddu-ui-ff-faq-15*
+                                                            *ddu-ui-ff-faq-15*
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
@@ -960,7 +960,7 @@ A: >
 	\   },
 	\ })<CR><Cmd>call setcmdline('')<CR><CR>
 <
-							*ddu-ui-ff-faq-16*
+                                                            *ddu-ui-ff-faq-16*
 Q: I want to switch sources without clear current filter input.
 
 A: >
@@ -971,12 +971,12 @@ A: >
 	\   ],
 	\ })<CR>
 <
-							*ddu-ui-ff-faq-17*
+                                                            *ddu-ui-ff-faq-17*
 Q: I want to use existing buffer to show preview.
 
 A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 
-							*ddu-ui-ff-faq-18*
+                                                            *ddu-ui-ff-faq-18*
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
    like commands are available?
 
@@ -988,7 +988,7 @@ A: >
 	\ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
 	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
 <
-							*ddu-ui-ff-faq-19*
+                                                            *ddu-ui-ff-faq-19*
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
@@ -1006,7 +1006,7 @@ A: >
 	        \ '.'->line(), '%'->bufnr())
 	endfunction
 <
-							*ddu-ui-ff-faq-20*
+                                                            *ddu-ui-ff-faq-20*
 Q: How do I set the floating title with list style ?
 
 A: >
@@ -1019,12 +1019,12 @@ A: >
 	  \   },
 	  \ })
 <
-							*ddu-ui-ff-faq-21*
+                                                            *ddu-ui-ff-faq-21*
 Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
-							*ddu-ui-ff-faq-22*
+                                                            *ddu-ui-ff-faq-22*
 Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
 insert mode of the filter window, it remains insert mode.
 
@@ -1039,7 +1039,7 @@ You must escape insert mode when leave from the filter window.
 	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 <
-							*ddu-ui-ff-faq-23*
+                                                            *ddu-ui-ff-faq-23*
 Q: I cannot see what item is selected in the filter window.
 
 A: You can set 'cursorline' option in ddu buffer.
@@ -1049,7 +1049,7 @@ A: You can set 'cursorline' option in ddu buffer.
 	  setlocal cursorline
 	endfunction
 <
-							*ddu-ui-ff-faq-24*
+                                                            *ddu-ui-ff-faq-24*
 Q: I want to change preview cursor on the top.
 
 A: >
@@ -1064,7 +1064,7 @@ A: >
 	      \ })
 
 ==============================================================================
-COMPATIBILITY					*ddu-ui-ff-compatibility*
+COMPATIBILITY                                        *ddu-ui-ff-compatibility*
 
 2023.07.15
 * Only highlight items of "maxHighlightItems" to improve the performance.
