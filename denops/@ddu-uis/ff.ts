@@ -1615,7 +1615,8 @@ export class Ui extends BaseUi<Params> {
 
     context = {
       sources: options.sources.map(
-        (source) => is.String(source) ? source : source.name),
+        (source) => is.String(source) ? source : source.name,
+      ),
       itemCount: this.items.length,
       uiParams,
       ...context,
