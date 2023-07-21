@@ -357,7 +357,7 @@ filterSplitDirection	(string)
 
 		NOTE: To use "floating", you need to use neovim.
 
-		Default: "topleft"
+		Default: "aboveleft"
 
                                             *ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
@@ -587,7 +587,7 @@ split		(string)
 splitDirection	(string)
 		Specify split direction.
 
-		Default: "botright"
+		Default: "belowright"
 
                                              *ddu-ui-ff-param-startAutoAction*
 startAutoAction	(boolean)

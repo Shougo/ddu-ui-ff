@@ -97,7 +97,7 @@ export type Params = {
   filterFloatingPosition: "top" | "bottom";
   filterFloatingTitle: FloatingTitle;
   filterFloatingTitlePos: "left" | "center" | "right";
-  filterSplitDirection: "botright" | "topleft" | "floating";
+  filterSplitDirection: "belowright" | "aboveleft" | "floating";
   filterUpdateTime: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
@@ -123,7 +123,7 @@ export type Params = {
   replaceCol: number;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
-  splitDirection: "botright" | "topleft";
+  splitDirection: "belowright" | "aboveleft";
   startAutoAction: boolean;
   startFilter: boolean;
   statusline: boolean;
@@ -386,7 +386,7 @@ export class Ui extends BaseUi<Params> {
         }
       } else {
         const winOpts = {
-          "pos": "topleft",
+          "pos": "aboveleft",
           "line": Number(args.uiParams.winRow) + 1,
           "col": Number(args.uiParams.winCol) + 1,
           "highlight": floatingHighlight,
@@ -1285,7 +1285,7 @@ export class Ui extends BaseUi<Params> {
         "winWidth",
       ],
       filterFloatingPosition: "top",
-      filterSplitDirection: "topleft",
+      filterSplitDirection: "aboveleft",
       filterFloatingTitle: "",
       filterFloatingTitlePos: "left",
       filterUpdateTime: 0,
@@ -1321,7 +1321,7 @@ export class Ui extends BaseUi<Params> {
       reversed: false,
       replaceCol: 0,
       split: "horizontal",
-      splitDirection: "botright",
+      splitDirection: "belowright",
       startAutoAction: false,
       startFilter: false,
       statusline: true,

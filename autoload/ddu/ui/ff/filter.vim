@@ -138,7 +138,8 @@ function s:init_buffer(name, bufname, params) abort
   if has('nvim') && is_floating
     call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
   else
-    const direction = is_floating ? 'botright' : a:params.filterSplitDirection
+    const direction = is_floating ?
+          \ 'belowright' : a:params.filterSplitDirection
     silent execute direction 'sbuffer' bufnr
   endif
 
