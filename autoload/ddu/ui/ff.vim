@@ -170,7 +170,7 @@ function ddu#ui#ff#_open_preview_window(
               \ })
       else
         let winopts = #{
-              \   pos: 'aboveleft',
+              \   pos: 'topleft',
               \   line: win_row + 1,
               \   col: win_col + 1,
               \   border: [],
@@ -238,7 +238,7 @@ function ddu#ui#ff#_open_preview_window(
           let win_row -= preview_height + 2
         endif
         let winopts = #{
-              \   pos: 'aboveleft',
+              \   pos: 'topleft',
               \   line: win_row + 1,
               \   col: win_col + 1,
               \   border: [],

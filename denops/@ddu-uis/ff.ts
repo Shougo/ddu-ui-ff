@@ -386,7 +386,7 @@ export class Ui extends BaseUi<Params> {
         }
       } else {
         const winOpts = {
-          "pos": "aboveleft",
+          "pos": "topleft",
           "line": Number(args.uiParams.winRow) + 1,
           "col": Number(args.uiParams.winCol) + 1,
           "highlight": floatingHighlight,
