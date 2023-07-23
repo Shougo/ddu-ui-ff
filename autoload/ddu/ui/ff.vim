@@ -272,7 +272,7 @@ function ddu#ui#ff#_open_preview_window(
   endif
 
   if a:params.previewSplit !=# 'no'
-    call setwinvar(winid, 'previewwindow', v:true)
+    call setwinvar(winid, '&previewwindow', v:true)
   endif
 
   return winid
