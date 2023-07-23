@@ -1478,38 +1478,29 @@ export class Ui extends BaseUi<Params> {
       (this.items.length !== context.maxItems
         ? ` ${this.items.length}/${context.maxItems}`
         : "");
-    const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
     const async = `${context.done ? "" : " [async]"}`;
-    const laststatus = await op.laststatus.get(denops);
 
-    if (hasNvim && (floating || laststatus === 0)) {
+    if (floating || await op.laststatus.get(denops) === 0) {
       if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
-        const saveTitle = await denops.call(
-          "nvim_get_option",
-          "titlestring",
-        ) as string;
-        await vars.g.set(denops, "ddu#ui#ff#_save_title", saveTitle);
+        await vars.g.set(denops, "ddu#ui#ff#_save_title",
+                         await op.titlestring.get(denops));
       }
 
       await denops.cmd(
         `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
           " call ddu#ui#ff#_restore_title()",
       );
-
-      const titleString = `${header} %{${linenr}}%*${async}`;
-      await vars.b.set(denops, "ddu_ui_ff_title", titleString);
-
-      await denops.call(
-        "nvim_set_option",
-        "titlestring",
-        titleString,
-      );
       await denops.cmd(
         `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
-          " let &titlestring = " +
-          "getbufvar(str2nr(expand('<abuf>')), 'ddu_ui_ff_title')",
+          " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))"
       );
+
+      const titleString = `${header}${async}`;
+      await vars.b.set(denops, "ddu_ui_ff_title", titleString);
+
+      await denops.call("ddu#ui#ff#_set_title", bufnr);
     } else {
+      const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
       await fn.setwinvar(
         denops,
         await fn.bufwinnr(denops, bufnr),

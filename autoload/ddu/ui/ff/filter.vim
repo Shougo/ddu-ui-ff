@@ -62,6 +62,10 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     call feedkeys('A', 'n')
   endif
 
+  if 'g:ddu#ui#ff#_save_title'->exists()
+    call ddu#ui#ff#_set_title(a:parent_id->winbufnr(), a:parent_id)
+  endif
+
   let s:filter_prev_input = '.'->getline()
   let s:filter_updatetime = a:params.filterUpdateTime
   let g:ddu#ui#ff#_filter_parent_winid = a:parent_id

@@ -340,6 +340,10 @@ function ddu#ui#ff#_cursor(line, col) abort
     call win_execute(winid,
           \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
 
+    if 'g:ddu#ui#ff#_save_title'->exists()
+      call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
+    endif
+
     " NOTE: CursorMoved autocmd does not work when win_execute()
     call ddu#ui#ff#_do_auto_action()
   endif
@@ -370,9 +374,22 @@ function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
 endfunction
 
 function ddu#ui#ff#_restore_title() abort
-  if 'g:ddu#ui#ff#_save_title'->exists()
-    let &titlestring = g:ddu#ui#ff#_save_title
+  if !('g:ddu#ui#ff#_save_title'->exists())
+    return
   endif
+
+  let &titlestring = g:ddu#ui#ff#_save_title
+endfunction
+function ddu#ui#ff#_set_title(bufnr, winid=win_getid()) abort
+  const title = getbufvar(a:bufnr, 'ddu_ui_ff_title', '')
+  if title ==# '' || &titlestring ==# title
+    return
+  endif
+
+  const linenr = "printf('%'.(len(line('$', "
+        \ .. a:winid .. "))).'d/%d',line('.', "
+        \ .. a:winid .. "),line('$', " .. a:winid .. "))"
+  let &titlestring = printf('%s %%{%s}', title, linenr)
 endfunction
 
 function ddu#ui#ff#_jump(winid, pattern, linenr) abort
