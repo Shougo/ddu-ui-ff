@@ -64,6 +64,11 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
 
   if 'g:ddu#ui#ff#_save_title'->exists()
     call ddu#ui#ff#_set_title(a:parent_id->winbufnr(), a:parent_id)
+
+    autocmd ddu-ff-filter WinEnter,BufEnter <buffer>
+          \ call ddu#ui#ff#_set_title(
+          \   g:ddu#ui#ff#_filter_parent_winid->winbufnr(),
+          \   g:ddu#ui#ff#_filter_parent_winid)
   endif
 
   let s:filter_prev_input = '.'->getline()
