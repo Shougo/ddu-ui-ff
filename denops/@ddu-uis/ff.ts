@@ -123,7 +123,7 @@ export type Params = {
   replaceCol: number;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "no";
-  splitDirection: "belowright" | "aboveleft";
+  splitDirection: "belowright" | "aboveleft" | "topleft" | "botright";
   startAutoAction: boolean;
   startFilter: boolean;
   statusline: boolean;
@@ -1321,7 +1321,7 @@ export class Ui extends BaseUi<Params> {
       reversed: false,
       replaceCol: 0,
       split: "horizontal",
-      splitDirection: "belowright",
+      splitDirection: "botright",
       startAutoAction: false,
       startFilter: false,
       statusline: true,
@@ -1482,8 +1482,11 @@ export class Ui extends BaseUi<Params> {
 
     if (floating || await op.laststatus.get(denops) === 0) {
       if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
-        await vars.g.set(denops, "ddu#ui#ff#_save_title",
-                         await op.titlestring.get(denops));
+        await vars.g.set(
+          denops,
+          "ddu#ui#ff#_save_title",
+          await op.titlestring.get(denops),
+        );
       }
 
       await denops.cmd(
@@ -1492,7 +1495,7 @@ export class Ui extends BaseUi<Params> {
       );
       await denops.cmd(
         `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
-          " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))"
+          " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))",
       );
 
       const titleString = `${header}${async}`;

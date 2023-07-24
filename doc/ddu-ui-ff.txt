@@ -587,7 +587,7 @@ split		(string)
 splitDirection	(string)
 		Specify split direction.
 
-		Default: "belowright"
+		Default: "botright"
 
                                              *ddu-ui-ff-param-startAutoAction*
 startAutoAction	(boolean)
@@ -645,7 +645,7 @@ winWidth	(number | string)
 		Default: "&columns / 2"
 
 ==============================================================================
-PARAMS EXPRESSION				*ddu-ui-ff-params-expression*
+PARAMS EXPRESSION                                *ddu-ui-ff-params-expression*
 
 If the parameter value is a string, it can be evaluated as a Vim |expression|.
 Expressions must not have side effects.  The following variables exist in the
