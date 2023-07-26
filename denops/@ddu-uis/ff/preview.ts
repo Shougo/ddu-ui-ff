@@ -204,12 +204,12 @@ export class PreviewUi {
         this.previewWinId,
       ) as number;
     } else {
-      await batch(denops, async (denops: Denops) => {
-        await fn.win_gotoid(denops, this.previewWinId);
-        // NOTE: Use enew! to ignore E948
-        await denops.cmd("enew!");
-      });
+      await fn.win_gotoid(denops, this.previewWinId);
     }
+
+    // NOTE: ":terminal" overwrites current buffer.
+    // NOTE: Use enew! to ignore E948
+    await denops.cmd("enew!");
 
     if (denops.meta.host === "nvim") {
       await denops.call("termopen", previewer.cmds);
