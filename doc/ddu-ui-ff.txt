@@ -120,7 +120,7 @@ getSelectedItems
 
                                                 *ddu-ui-ff-action-inputAction*
 inputAction
-		Choose and fire the action by |input()|.
+		Prompt for a name using |input()| and fire the action with it.
 
                                                  *ddu-ui-ff-action-itemAction*
 itemAction
