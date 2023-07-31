@@ -1453,7 +1453,6 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions,
     uiParams: Params,
     bufnr: number,
-    hasNvim: boolean,
     floating: boolean,
     augroupName: string,
   ): Promise<void> {
