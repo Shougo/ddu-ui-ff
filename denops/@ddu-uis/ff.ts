@@ -508,7 +508,6 @@ export class Ui extends BaseUi<Params> {
       args.options,
       args.uiParams,
       bufnr,
-      hasNvim,
       floating,
       augroupName,
     );

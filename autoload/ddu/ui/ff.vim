@@ -18,8 +18,13 @@ function ddu#ui#ff#execute(command) abort
 
   call win_execute(winid, a:command)
 
+  if 'g:ddu#ui#ff#_save_title'->exists()
+    call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
+  endif
+
   if getcurpos(winid) != prev_curpos
     " NOTE: CursorMoved autocmd does not work when win_execute()
+    doautocmd CursorMoved
     call ddu#ui#ff#_do_auto_action()
   endif
 endfunction
@@ -321,6 +326,7 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   let s:auto_action = a:auto_action
 
   call win_gotoid(a:winid)
+
   " NOTE: In action execution, auto action should be skipped
   augroup ddu-ui-auto_action
     autocmd CursorMoved <buffer> ++nested
@@ -328,6 +334,7 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
           \ |   call ddu#ui#ff#_do_auto_action()
           \ | endif
   augroup END
+
   call win_gotoid(prev_winid)
 endfunction
 
@@ -336,16 +343,8 @@ function ddu#ui#ff#_cursor(line, col) abort
         \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     call cursor(a:line, a:col)
   else
-    const winid = g:ddu#ui#ff#_filter_parent_winid
-    call win_execute(winid,
+    call ddu#ui#ff#execute(
           \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
-
-    if 'g:ddu#ui#ff#_save_title'->exists()
-      call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
-    endif
-
-    " NOTE: CursorMoved autocmd does not work when win_execute()
-    call ddu#ui#ff#_do_auto_action()
   endif
 endfunction
 
