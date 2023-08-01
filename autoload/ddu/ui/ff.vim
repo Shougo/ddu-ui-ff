@@ -25,7 +25,7 @@ function ddu#ui#ff#execute(command) abort
   if getcurpos(winid) != prev_curpos
     " NOTE: CursorMoved autocmd does not work when win_execute()
 
-    call s:stop_debounce_timer('s:debounce_cursor_moved_timer')
+    call ddu#ui#ff#_stop_debounce_timer('s:debounce_cursor_moved_timer')
 
     let s:debounce_cursor_moved_timer = timer_start(
           \ 100, { -> s:do_cursor_moved(winid) })
@@ -290,7 +290,7 @@ endfunction
 let s:cursor_text = ''
 let s:auto_action = {}
 function ddu#ui#ff#_do_auto_action() abort
-  call s:stop_debounce_timer('s:debounce_auto_action_timer')
+  call ddu#ui#ff#_stop_debounce_timer('s:debounce_auto_action_timer')
 
   if empty(s:auto_action)
     return
@@ -303,7 +303,7 @@ function ddu#ui#ff#_reset_auto_action() abort
   let s:cursor_text = ''
   let s:auto_action = {}
 
-  call s:stop_debounce_timer('s:debounce_auto_action_timer')
+  call ddu#ui#ff#_stop_debounce_timer('s:debounce_auto_action_timer')
 
   augroup ddu-ui-auto_action
     autocmd!
@@ -396,6 +396,13 @@ function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   endif
 endfunction
 
+function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
+  if a:timer_name->exists()
+    silent! call timer_stop({a:timer_name})
+    unlet {a:timer_name}
+  endif
+endfunction
+
 function s:do_cursor_moved(winid) abort
   const prev_winid = win_getid()
   try
@@ -424,11 +431,4 @@ function s:do_auto_action() abort
     call ddu#ui#do_action(s:auto_action.name, s:auto_action.params)
   endif
   let s:cursor_text = text
-endfunction
-
-function s:stop_debounce_timer(timer_name) abort
-  if a:timer_name->exists()
-    silent! call timer_stop({a:timer_name})
-    unlet {a:timer_name}
-  endif
 endfunction

@@ -8,10 +8,10 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     call s:init_buffer(a:name, bufname, a:params)
   endif
 
-  if !&l:modifiable
+  while !&l:modifiable
     " Something wrong.
-    setlocal modifiable
-  endif
+    call s:init_buffer(a:name, bufname, a:params)
+  endwhile
 
   " Set the current input
   if '$'->getline() ==# ''
@@ -171,6 +171,7 @@ function s:init_buffer(name, bufname, params) abort
   if '+statuscolumn'->exists()
     setlocal statuscolumn=
   endif
+  setlocal modifiable
 
   resize 1
 
@@ -213,18 +214,15 @@ endfunction
 
 function s:check_update() abort
   if s:filter_updatetime > 0
-    if 's:update_timer'->exists()
-      call timer_stop(s:update_timer)
-    endif
-    let s:update_timer = timer_start(
+    call ddu#ui#ff#_stop_debounce_timer('s:debounce_filter_update_timer')
+
+    let s:debounce_filter_update_timer = timer_start(
           \ s:filter_updatetime, { -> s:check_redraw() })
   else
     call s:check_redraw()
   endif
 endfunction
 function s:check_redraw() abort
-  unlet! s:update_timer
-
   const input = '.'->getline()
 
   if &l:filetype !=# 'ddu-ff-filter' || input ==# s:filter_prev_input
