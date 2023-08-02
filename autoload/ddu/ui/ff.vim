@@ -280,9 +280,11 @@ function ddu#ui#ff#_open_preview_window(
     const winid = win_getid()
   endif
 
+  " Set options
   if a:params.previewSplit !=# 'no'
     call setwinvar(winid, '&previewwindow', v:true)
   endif
+  call setwinvar(winid, '&cursorline', v:false)
 
   return winid
 endfunction

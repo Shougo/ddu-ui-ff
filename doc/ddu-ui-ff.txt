@@ -438,6 +438,7 @@ onPreview	(function)
 		It is called when |ddu-ui-ff-action-preview| is fired.
 		NOTE: The function must be registered by
 		|denops#callback#register()|.
+		NOTE: Current window may not be the preview window.
 
                                                   *ddu-ui-ff-param-previewCol*
 previewCol	(number)
