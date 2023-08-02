@@ -168,6 +168,7 @@ export class PreviewUi {
           {
             context,
             item,
+            previewWinId: this.previewWinId,
           },
         );
       } else {
