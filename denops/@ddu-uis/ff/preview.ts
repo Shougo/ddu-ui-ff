@@ -8,7 +8,7 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.4.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.5/types.ts";
 import {
   batch,
   Denops,
@@ -16,7 +16,7 @@ import {
   fn,
   is,
   op,
-} from "https://deno.land/x/ddu_vim@v3.4.3/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.4.5/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../ff.ts";
 
@@ -312,7 +312,9 @@ export class PreviewUi {
     if (previewer.kind === "buffer") {
       if (previewer.expr) {
         const bufname = await fn.bufname(denops, previewer.expr);
-        if (!bufname.length) {
+        if (previewer.useExisting) {
+          return bufname;
+        } else if (!bufname.length) {
           return `ddu-ff:no-name:${previewer.expr}`;
         } else {
           return `ddu-ff:${bufname}`;
