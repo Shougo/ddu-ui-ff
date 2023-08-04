@@ -240,13 +240,13 @@ export class PreviewUi {
       return ActionFlags.None;
     }
 
-    const bufname = await this.getPreviewBufferName(denops, previewer, item);
-    const exists = await fn.bufexists(denops, bufname);
-    let previewBufnr = await fn.bufnr(denops, bufname);
+    const buffer = await this.getPreviewBuffer(denops, previewer, item);
+    const exists = await fn.bufexists(denops, buffer.bufnr);
+    let previewBufnr = buffer.bufnr;
     const [err, contents] = await this.getContents(denops, previewer);
     if (err || !exists || previewer.kind === "nofile") {
       // Create new buffer
-      previewBufnr = await fn.bufadd(denops, bufname);
+      previewBufnr = await fn.bufadd(denops, buffer.bufname);
       await batch(denops, async (denops: Denops) => {
         await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
         await fn.setbufvar(denops, previewBufnr, "&swapfile", 0);
@@ -304,29 +304,48 @@ export class PreviewUi {
     return ActionFlags.Persist;
   }
 
-  private async getPreviewBufferName(
+  private async getPreviewBuffer(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     item: DduItem,
-  ): Promise<string> {
+  ): Promise<{
+    bufname: string;
+    bufnr: number;
+  }> {
+    let bufname = "";
     if (previewer.kind === "buffer") {
       if (previewer.expr) {
-        const bufname = await fn.bufname(denops, previewer.expr);
+        const name = await fn.bufname(denops, previewer.expr);
         if (previewer.useExisting) {
-          return bufname;
-        } else if (!bufname.length) {
-          return `ddu-ff:no-name:${previewer.expr}`;
+          if (typeof previewer.expr === "string") {
+            return {
+              bufname: previewer.expr,
+              bufnr: await fn.bufnr(denops, previewer.expr),
+            };
+          } else {
+            return {
+              bufname: name,
+              bufnr: previewer.expr,
+            };
+          }
+        } else if (!name.length) {
+          bufname = `ddu-ff:no-name:${previewer.expr}`;
         } else {
-          return `ddu-ff:${bufname}`;
+          bufname = `ddu-ff:${name}`;
         }
       } else {
-        return `ddu-ff:${previewer.path}`;
+        bufname = `ddu-ff:${previewer.path}`;
       }
     } else if (previewer.kind === "nofile") {
-      return `ddu-ff:preview`;
+      bufname = `ddu-ff:preview`;
     } else {
-      return `ddu-ff:${item.word}`;
+      bufname = `ddu-ff:${item.word}`;
     }
+
+    return {
+      bufname,
+      bufnr: await fn.bufnr(denops, bufname),
+    };
   }
 
   private async getContents(
