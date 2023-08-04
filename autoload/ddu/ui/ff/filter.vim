@@ -8,10 +8,12 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     call s:init_buffer(a:name, bufname, a:params)
   endif
 
-  while !&l:modifiable
-    " Something wrong.
-    call s:init_buffer(a:name, bufname, a:params)
-  endwhile
+  if !&l:modifiable
+    " NOTE: Something wrong.  Close UI window.
+    call ddu#util#print_error('Failed to open filter window.')
+    call ddu#ui_sync_action(a:name, 'quit')
+    return
+  endif
 
   " Set the current input
   if '$'->getline() ==# ''
@@ -171,7 +173,6 @@ function s:init_buffer(name, bufname, params) abort
   if '+statuscolumn'->exists()
     setlocal statuscolumn=
   endif
-  setlocal modifiable
 
   resize 1
 
@@ -180,7 +181,7 @@ function s:init_buffer(name, bufname, params) abort
   const highlight = a:params.highlights->get('filterText', '')
   if highlight !=# ''
     execute 'highlight link FilterText' highlight
-    syntax match   FilterText      '^.*$'
+    syntax match FilterText '^.*$'
   endif
 endfunction
 
