@@ -12,7 +12,7 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     " NOTE: Something wrong.  Close UI window.
     call ddu#util#print_error('Failed to open filter window.')
     call ddu#ui_sync_action(a:name, 'quit')
-    return
+    return bufname->bufnr()
   endif
 
   " Set the current input
