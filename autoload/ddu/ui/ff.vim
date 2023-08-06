@@ -203,6 +203,7 @@ function ddu#ui#ff#_open_preview_window(
     else
       call win_gotoid(winnr)
       execute 'silent rightbelow vertical sbuffer' a:preview_bufnr
+      setlocal winfixwidth
       execute 'vert resize ' .. preview_width
       const winid = win_getid()
     endif
@@ -277,6 +278,7 @@ function ddu#ui#ff#_open_preview_window(
 
       call win_gotoid(winnr)
       execute 'silent aboveleft sbuffer' a:preview_bufnr
+      setlocal winfixheight
       execute 'resize ' .. preview_height
       const winid = win_getid()
     endif
