@@ -313,7 +313,8 @@ export class Ui extends BaseUi<Params> {
 
     const floating = args.uiParams.split === "floating";
     const hasNvim = args.denops.meta.host === "nvim";
-    const winHeight = args.uiParams.autoResize &&
+    const winWidth = Number(args.uiParams.winWidth);
+    let winHeight = args.uiParams.autoResize &&
         this.items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.items.length, 1)
       : Number(args.uiParams.winHeight);
@@ -323,11 +324,25 @@ export class Ui extends BaseUi<Params> {
 
     const direction = args.uiParams.splitDirection;
     if (args.uiParams.split === "horizontal") {
+      // NOTE: If winHeight is bigger than `&lines / 2`, it will be resized.
+      const maxWinHeight = Math.floor(
+        await op.lines.getGlobal(args.denops) * 4 / 10,
+      );
+      if (winHeight > maxWinHeight) {
+        winHeight = maxWinHeight;
+      }
+
       if (winid >= 0) {
         await fn.win_execute(
           args.denops,
           winid,
           `resize ${winHeight}`,
+        );
+        await fn.setwinvar(
+          args.denops,
+          winid,
+          "&winheight",
+          winHeight,
         );
       } else {
         const header = `silent keepalt ${direction} `;
@@ -340,13 +355,13 @@ export class Ui extends BaseUi<Params> {
         await fn.win_execute(
           args.denops,
           winid,
-          `vertical resize ${args.uiParams.winWidth}`,
+          `vertical resize ${winWidth}`,
         );
       } else {
         const header = `silent keepalt vertical ${direction} `;
         await args.denops.cmd(
           header +
-            `sbuffer +vertical\\ resize\\ ${args.uiParams.winWidth} ${bufnr}`,
+            `sbuffer +vertical\\ resize\\ ${winWidth} ${bufnr}`,
         );
       }
     } else if (floating) {
@@ -364,7 +379,7 @@ export class Ui extends BaseUi<Params> {
           "relative": "editor",
           "row": Number(args.uiParams.winRow),
           "col": Number(args.uiParams.winCol),
-          "width": Number(args.uiParams.winWidth),
+          "width": winWidth,
           "height": winHeight,
           "border": args.uiParams.floatingBorder,
           "title": args.uiParams.floatingTitle,

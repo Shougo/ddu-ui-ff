@@ -490,6 +490,8 @@ previewHeight	(number)
 		|ddu-ui-ff-action-preview|.
 		If |ddu-ui-ff-param-previewFloating|, set the height of the
 		floating window.
+		NOTE: If |ddu-ui-ff-param-previewSplit| is "horizontal", the
+		value must be less than `&lines - 2`.
 
 		Default: 10
 
@@ -625,6 +627,8 @@ winHeight	(number | string)
 		"horizontal".
 		If |ddu-ui-ff-param-split| is "floating",
 		set the height of the floating window.
+		NOTE: If |ddu-ui-ff-param-split| is "horizontal", the value
+		must be less than `&lines - 2`.
 
 		Default: 20
 
