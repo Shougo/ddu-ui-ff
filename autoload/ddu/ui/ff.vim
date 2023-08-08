@@ -109,6 +109,7 @@ function ddu#ui#ff#_highlight(
       call prop_type_add(a:prop_type, #{
             \   highlight: a:highlight,
             \   priority: a:priority,
+            \   override: v:true,
             \ })
     endif
   endif
