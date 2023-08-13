@@ -121,6 +121,10 @@ function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \   title: a:params.filterFloatingTitle,
         \   title_pos: a:params.filterFloatingTitlePos,
         \ }
+  if !has('nvim-0.9.0')
+    call remove(params, 'title')
+    call remove(params, 'title_pos')
+  endif
 
   if a:bufnr->bufwinid() > 0
     call nvim_win_set_config(a:bufnr->bufwinid(), params)
