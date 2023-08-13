@@ -167,7 +167,7 @@ function ddu#ui#ff#_open_preview_window(
       endif
 
       if has('nvim')
-        const winid = nvim_open_win(a:preview_bufnr, v:true, #{
+        const winopts = #{
               \   relative: 'editor',
               \   row: win_row,
               \   col: win_col,
@@ -177,7 +177,12 @@ function ddu#ui#ff#_open_preview_window(
               \   title: a:params.previewFloatingTitle,
               \   title_pos: a:params.previewFloatingTitlePos,
               \   zindex: a:params.previewFloatingZindex,
-              \ })
+              \ }
+        if !has('nvim-0.9.0')
+          call remove(winopts, 'title')
+          call remove(winopts, 'title_pos')
+        endif
+        const winid = nvim_open_win(a:preview_bufnr, v:true, winopts)
       else
         let winopts = #{
               \   pos: 'topleft',
@@ -232,7 +237,7 @@ function ddu#ui#ff#_open_preview_window(
           const anchor = 'SW'
         endif
 
-        const winid = nvim_open_win(a:preview_bufnr, v:true, #{
+        let winopts = #{
               \   relative: 'editor',
               \   anchor: anchor,
               \   row: win_row,
@@ -243,7 +248,12 @@ function ddu#ui#ff#_open_preview_window(
               \   title: a:params.previewFloatingTitle,
               \   title_pos: a:params.previewFloatingTitlePos,
               \   zindex: a:params.previewFloatingZindex,
-              \ })
+              \ }
+        if !has('nvim-0.9.0')
+          call remove(winopts, 'title')
+          call remove(winopts, 'title_pos')
+        endif
+        const winid = nvim_open_win(a:preview_bufnr, v:true, winopts)
       else
         if a:params.previewRow <= 0
           let win_row -= preview_height + 2

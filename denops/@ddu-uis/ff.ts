@@ -47,6 +47,17 @@ type AutoAction = {
   sync?: boolean;
 };
 
+type FloatingOpts = {
+  relative: "editor" | "win" | "cursor" | "mouse";
+  row: number;
+  col: number;
+  width: number;
+  height: number;
+  border?: FloatingBorder;
+  title?: FloatingTitle;
+  title_pos?: "left" | "center" | "right";
+};
+
 type FloatingBorder =
   | "none"
   | "single"
@@ -375,7 +386,7 @@ export class Ui extends BaseUi<Params> {
         args.uiParams.highlights?.floatingCursorLine ?? "CursorLine";
 
       if (hasNvim) {
-        const winOpts = {
+        const winOpts: FloatingOpts = {
           "relative": "editor",
           "row": Number(args.uiParams.winRow),
           "col": Number(args.uiParams.winCol),
@@ -385,6 +396,10 @@ export class Ui extends BaseUi<Params> {
           "title": args.uiParams.floatingTitle,
           "title_pos": args.uiParams.floatingTitlePos,
         };
+        if (!await fn.has(args.denops, "nvim-0.9.0")) {
+          delete winOpts.title;
+          delete winOpts.title_pos;
+        }
         if (winid >= 0) {
           await args.denops.call(
             "nvim_win_set_config",
