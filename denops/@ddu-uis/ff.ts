@@ -892,14 +892,18 @@ export class Ui extends BaseUi<Params> {
       } else {
         cursorPos[1] += count;
       }
-      if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
-        await fn.setbufvar(
-          args.denops,
-          bufnr,
-          "ddu_ui_ff_cursor_pos",
-          cursorPos,
-        );
+      if (0 < cursorPos[1]) {
+        cursorPos[1] = 0;
+      } else if (cursorPos[1] > this.viewItems.length) {
+        cursorPos[1] = this.viewItems.length;
       }
+
+      await fn.setbufvar(
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        cursorPos,
+      );
 
       // Change real cursor
       await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
@@ -1114,7 +1118,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
-      getPreviewer: (
+      getPreviewer?: (
         denops: Denops,
         item: DduItem,
         actionParams: BaseActionParams,
@@ -1138,9 +1142,9 @@ export class Ui extends BaseUi<Params> {
         args.context,
         uiParams,
         args.actionParams,
-        args.getPreviewer,
         await this.getBufnr(args.denops),
         item,
+        args.getPreviewer,
       );
     },
     previewExecute: async (args: {
@@ -1232,7 +1236,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
-      getPreviewer: (
+      getPreviewer?: (
         denops: Denops,
         item: DduItem,
         actionParams: BaseActionParams,
@@ -1262,9 +1266,9 @@ export class Ui extends BaseUi<Params> {
         args.context,
         uiParams,
         args.actionParams,
-        args.getPreviewer,
         await this.getBufnr(args.denops),
         item,
+        args.getPreviewer,
       );
     },
     toggleSelectItem: async (args: {

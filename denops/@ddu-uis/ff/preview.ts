@@ -84,16 +84,16 @@ export class PreviewUi {
     context: Context,
     uiParams: Params,
     actionParams: unknown,
-    getPreviewer: (
+    bufnr: number,
+    item: DduItem,
+    getPreviewer?: (
       denops: Denops,
       item: DduItem,
       actionParams: BaseActionParams,
       previewContext: PreviewContext,
     ) => Promise<Previewer | undefined>,
-    bufnr: number,
-    item: DduItem,
   ): Promise<ActionFlags> {
-    if (this.isAlreadyPreviewed(item)) {
+    if (this.isAlreadyPreviewed(item) || !getPreviewer) {
       return ActionFlags.None;
     }
 
@@ -114,7 +114,6 @@ export class PreviewUi {
       actionParams as BaseActionParams,
       previewContext,
     );
-
     if (!previewer) {
       return ActionFlags.None;
     }
