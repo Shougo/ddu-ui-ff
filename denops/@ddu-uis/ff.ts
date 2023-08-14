@@ -28,6 +28,7 @@ type DoActionParams = {
 
 type CursorActionParams = {
   count?: number;
+  loop?: boolean;
 };
 
 type HighlightGroup = {
@@ -625,12 +626,6 @@ export class Ui extends BaseUi<Params> {
     if (args.uiParams.reversed) {
       this.viewItems = this.viewItems.reverse();
     }
-    await fn.setbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_ff_max_cursor",
-      this.viewItems.length,
-    );
 
     const saveCursor = await fn.getbufvar(
       args.denops,
@@ -891,6 +886,7 @@ export class Ui extends BaseUi<Params> {
 
       const params = args.actionParams as CursorActionParams;
       const count = params.count ?? 1;
+      const loop = params.loop ?? false;
       if (count === 0) {
         return ActionFlags.Persist;
       }
@@ -902,9 +898,9 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] += count;
       }
       if (cursorPos[1] <= 0) {
-        cursorPos[1] = 1;
+        cursorPos[1] = loop ? this.viewItems.length : 1;
       } else if (cursorPos[1] > this.viewItems.length) {
-        cursorPos[1] = this.viewItems.length;
+        cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
 
       await fn.setbufvar(
@@ -937,6 +933,7 @@ export class Ui extends BaseUi<Params> {
 
       const params = args.actionParams as CursorActionParams;
       const count = params.count ?? 1;
+      const loop = params.loop ?? false;
       if (count === 0) {
         return ActionFlags.Persist;
       }
@@ -948,9 +945,9 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] -= count;
       }
       if (cursorPos[1] <= 0) {
-        cursorPos[1] = 1;
+        cursorPos[1] = loop ? this.viewItems.length : 1;
       } else if (cursorPos[1] > this.viewItems.length) {
-        cursorPos[1] = this.viewItems.length;
+        cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
 
       await fn.setbufvar(

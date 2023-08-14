@@ -44,14 +44,6 @@ ddu#ui#ff#do_action({action-name}[, {params}])
 		It is deprecated.  Please use |ddu#ui#do_action()|
 		instead.
 
-                                                      *ddu#ui#ff#get_cursor()*
-ddu#ui#ff#get_cursor()
-		Get current cursor position.
-
-                                                      *ddu#ui#ff#max_cursor()*
-ddu#ui#ff#max_cursor()
-		Get maximum cursor position.
-
                                                    *ddu#ui#ff#multi_actions()*
 ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
 		It is deprecated.  Please use |ddu#ui#multi_actions()|
@@ -93,6 +85,7 @@ collapseItem
 cursorNext
 		params:
 			{count}: Move count
+			{loop}: Loop the cursor
 
 		Move the cursor to the next.
 
@@ -100,6 +93,7 @@ cursorNext
 cursorPrevious
 		params:
 			{count}: Move count
+			{loop}: Loop the cursor
 
 		Move the cursor to the previous.
 
@@ -839,16 +833,11 @@ NOTE: It does not support |ddu-ui-ff-param-reversed|.
 	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
 	  inoremap <buffer> <C-j>
-	      \ <Cmd>call ddu#ui#do_action('cursorNext', #{
-	      \   count: ddu#ui#ff#get_cursor()->get(1, 1) ==#
-	      \          ddu#ui#ff#max_cursor()
-	      \          ? -1 * (ddu#ui#ff#max_cursor() - 1) : 1
-	      \ })<CR>
+	      \ <Cmd>call ddu#ui#do_action('cursorNext',
+	      \ #{ loop: v:true })<CR>
 	  inoremap <buffer> <C-k>
-	      \ <Cmd>call ddu#ui#do_action('cursorPrevious', #{
-	      \   count: ddu#ui#ff#get_cursor()->get(1, 1) ==# 1
-	      \          ? -1 * ddu#ui#ff#max_cursor() : 1
-	      \ })<CR>
+	      \ <Cmd>call ddu#ui#do_action('cursorPrevious',
+	      \ #{ loop: v:true })<CR>
 	endfunction
 <
                                                              *ddu-ui-ff-faq-4*
