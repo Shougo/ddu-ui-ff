@@ -625,6 +625,12 @@ export class Ui extends BaseUi<Params> {
     if (args.uiParams.reversed) {
       this.viewItems = this.viewItems.reverse();
     }
+    await fn.setbufvar(
+      args.denops,
+      bufnr,
+      "ddu_ui_ff_max_cursor",
+      this.viewItems.length,
+    );
 
     const saveCursor = await fn.getbufvar(
       args.denops,
@@ -885,6 +891,9 @@ export class Ui extends BaseUi<Params> {
 
       const params = args.actionParams as CursorActionParams;
       const count = params.count ?? 1;
+      if (count === 0) {
+        return ActionFlags.Persist;
+      }
 
       // Move to the next
       if (args.uiParams.reversed) {
@@ -892,8 +901,8 @@ export class Ui extends BaseUi<Params> {
       } else {
         cursorPos[1] += count;
       }
-      if (0 < cursorPos[1]) {
-        cursorPos[1] = 0;
+      if (cursorPos[1] <= 0) {
+        cursorPos[1] = 1;
       } else if (cursorPos[1] > this.viewItems.length) {
         cursorPos[1] = this.viewItems.length;
       }
@@ -928,6 +937,9 @@ export class Ui extends BaseUi<Params> {
 
       const params = args.actionParams as CursorActionParams;
       const count = params.count ?? 1;
+      if (count === 0) {
+        return ActionFlags.Persist;
+      }
 
       // Move to the previous
       if (args.uiParams.reversed) {
@@ -935,14 +947,18 @@ export class Ui extends BaseUi<Params> {
       } else {
         cursorPos[1] -= count;
       }
-      if (0 < cursorPos[1] && cursorPos[1] <= this.viewItems.length) {
-        await fn.setbufvar(
-          args.denops,
-          bufnr,
-          "ddu_ui_ff_cursor_pos",
-          cursorPos,
-        );
+      if (cursorPos[1] <= 0) {
+        cursorPos[1] = 1;
+      } else if (cursorPos[1] > this.viewItems.length) {
+        cursorPos[1] = this.viewItems.length;
       }
+
+      await fn.setbufvar(
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        cursorPos,
+      );
 
       // Change real cursor
       await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);

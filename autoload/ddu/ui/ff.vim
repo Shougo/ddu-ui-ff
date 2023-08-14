@@ -32,6 +32,18 @@ function ddu#ui#ff#execute(command) abort
   endif
 endfunction
 
+function ddu#ui#ff#get_cursor() abort
+  return (&l:filetype ==# 'ddu-ff'
+        \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())) ?
+        \ getcurpos() : getcurpos(g:ddu#ui#ff#_filter_parent_winid)
+endfunction
+function ddu#ui#ff#max_cursor() abort
+  const bufnr = (&l:filetype ==# 'ddu-ff'
+        \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())) ?
+        \ '%'->bufnr() : g:ddu#ui#ff#_filter_parent_winid->winbufnr()
+  return getbufvar(bufnr, 'ddu_ui_ff_max_cursor', 0)
+endfunction
+
 function ddu#ui#ff#_update_buffer(
       \ params, bufnr, winid, lines, refreshed, pos) abort
   const max_lines = a:lines->len()
