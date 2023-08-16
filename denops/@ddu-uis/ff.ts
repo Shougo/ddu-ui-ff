@@ -338,12 +338,6 @@ export class Ui extends BaseUi<Params> {
           winid,
           `resize ${winHeight}`,
         );
-        await fn.setwinvar(
-          args.denops,
-          winid,
-          "&winheight",
-          winHeight,
-        );
       } else {
         const header = `silent keepalt ${direction} `;
         await args.denops.cmd(
