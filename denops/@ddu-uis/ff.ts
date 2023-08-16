@@ -1066,6 +1066,13 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
+      actionParams: unknown;
+      getPreviewer?: (
+        denops: Denops,
+        item: DduItem,
+        actionParams: BaseActionParams,
+        previewContext: PreviewContext,
+      ) => Promise<Previewer | undefined>;
     }) => {
       const uiParams = await this.resolveParams(
         args.denops,
@@ -1073,16 +1080,38 @@ export class Ui extends BaseUi<Params> {
         args.uiParams,
         args.context,
       );
+      const reopenPreview = this.previewUi.visible() &&
+        uiParams.split === "horizontal" && uiParams.previewSplit === "vertical";
+
+      if (reopenPreview) {
+        await this.previewUi.close(args.denops, args.context, uiParams);
+      }
 
       this.filterBufnr = await args.denops.call(
         "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
-        args.uiParams.split === "floating"
+        uiParams.split === "floating"
           ? this.popupId
           : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
         uiParams,
       ) as number;
+
+      if (reopenPreview) {
+        const item = await this.getItem(args.denops);
+        if (!item || !args.getPreviewer) {
+          return ActionFlags.None;
+        }
+        return this.previewUi.previewContents(
+          args.denops,
+          args.context,
+          uiParams,
+          args.actionParams,
+          args.getPreviewer,
+          await this.getBufnr(args.denops),
+          item,
+        );
+      }
 
       return ActionFlags.None;
     },
