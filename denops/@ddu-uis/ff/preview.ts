@@ -58,7 +58,7 @@ export class PreviewUi {
     await batch(denops, async (denops) => {
       for (const bufnr of this.previewedBufnrs) {
         await denops.cmd(
-          `if bufexists(${bufnr}) && winbufnr(${bufnr}) < 0 | silent bwipeout! ${bufnr} | endif`,
+          `if bufexists(${bufnr}) && bufwinnr(${bufnr}) < 0 | silent bwipeout! ${bufnr} | endif`,
         );
       }
     });
