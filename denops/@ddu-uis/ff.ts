@@ -1533,9 +1533,12 @@ export class Ui extends BaseUi<Params> {
       name: options.name,
       maxItems: context.maxItems,
     };
+    const winid = (floating && denops.meta.host !== "nvim")
+      ? this.popupId
+      : await fn.bufwinid(denops, bufnr);
     await fn.setwinvar(
       denops,
-      await fn.bufwinnr(denops, bufnr),
+      winid,
       "ddu_ui_ff_status",
       statusState,
     );
@@ -1576,7 +1579,7 @@ export class Ui extends BaseUi<Params> {
       const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
       await fn.setwinvar(
         denops,
-        await fn.bufwinnr(denops, bufnr),
+        winid,
         "&statusline",
         header + " %#LineNR#%{" + linenr + "}%*" + async,
       );
