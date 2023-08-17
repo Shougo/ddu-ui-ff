@@ -79,6 +79,10 @@ export class PreviewUi {
       JSON.stringify(item) === JSON.stringify(this.previewedTarget);
   }
 
+  visible(): boolean {
+    return this.previewWinId > 0;
+  }
+
   async previewContents(
     denops: Denops,
     context: Context,
@@ -194,7 +198,7 @@ export class PreviewUi {
     bufnr: number,
     previousWinId: number,
   ): Promise<ActionFlags> {
-    if (this.previewWinId < 0) {
+    if (!this.visible()) {
       this.previewWinId = await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
@@ -475,10 +479,6 @@ export class PreviewUi {
         },
       );
     }
-  }
-
-  visible(): boolean {
-    return this.previewWinId > 0;
   }
 }
 
