@@ -1135,14 +1135,15 @@ export class Ui extends BaseUi<Params> {
         if (!item || !args.getPreviewer) {
           return ActionFlags.None;
         }
+
         return this.previewUi.previewContents(
           args.denops,
           args.context,
           uiParams,
           args.actionParams,
-          args.getPreviewer,
           await this.getBufnr(args.denops),
           item,
+          args.getPreviewer,
         );
       }
 
