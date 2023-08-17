@@ -33,7 +33,7 @@ export class PreviewUi {
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
-    if (this.previewWinId > 0 && (await fn.winnr(denops, "$")) !== 1) {
+    if (this.visible() && (await fn.winnr(denops, "$")) !== 1) {
       if (uiParams.previewFloating && denops.meta.host !== "nvim") {
         await denops.call("popup_close", this.previewWinId);
       } else {
@@ -68,14 +68,14 @@ export class PreviewUi {
     denops: Denops,
     command: string,
   ) {
-    if (this.previewWinId < 0) {
+    if (!this.visible()) {
       return;
     }
     await fn.win_execute(denops, this.previewWinId, command);
   }
 
   isAlreadyPreviewed(item: DduItem): boolean {
-    return this.previewWinId > 0 &&
+    return this.visible() &&
       JSON.stringify(item) === JSON.stringify(this.previewedTarget);
   }
 
@@ -451,10 +451,10 @@ export class PreviewUi {
   }
 
   async clearHighlight(denops: Denops) {
-    const winid = this.previewWinId;
-    if (winid <= 0) {
+    if (!this.visible()) {
       return;
     }
+    const winid = this.previewWinId;
 
     if (this.matchIds[winid] > 0) {
       await fn.matchdelete(denops, this.matchIds[winid], winid);
@@ -475,6 +475,10 @@ export class PreviewUi {
         },
       );
     }
+  }
+
+  visible(): boolean {
+    return this.previewWinId > 0;
   }
 }
 
