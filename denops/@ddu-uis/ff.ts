@@ -283,10 +283,10 @@ export class Ui extends BaseUi<Params> {
 
     this.bufferName = `ddu-ff-${args.options.name}`;
 
-    const existsUI = await fn.bufwinid(
-      args.denops,
-      await fn.bufnr(args.denops, this.bufferName),
-    ) > 0;
+    const existsUI = await this.winId({
+      denops: args.denops,
+      uiParams: args.uiParams,
+    }) > 0;
 
     if (!existsUI) {
       if (args.uiParams.ignoreEmpty && this.items.length === 0) {
@@ -330,9 +330,10 @@ export class Ui extends BaseUi<Params> {
         this.items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.items.length, 1)
       : Number(args.uiParams.winHeight);
-    const winid = (floating && !hasNvim)
-      ? this.popupId
-      : await fn.bufwinid(args.denops, bufnr);
+    const winid = await this.winId({
+      denops: args.denops,
+      uiParams: args.uiParams,
+    });
 
     const direction = args.uiParams.splitDirection;
     if (args.uiParams.split === "horizontal") {
@@ -569,12 +570,16 @@ export class Ui extends BaseUi<Params> {
         (this.prevLength > 0 && this.items.length < this.prevLength) ||
         (args.uiParams.reversed && this.items.length !== this.prevLength);
       // NOTE: Use batch for screen flicker when highlight items.
+      const winid = await this.winId({
+        denops: args.denops,
+        uiParams: args.uiParams,
+      });
       await batch(args.denops, async (denops: Denops) => {
         await denops.call(
           "ddu#ui#ff#_update_buffer",
           args.uiParams,
           bufnr,
-          floating ? this.popupId : await fn.bufwinid(args.denops, bufnr),
+          winid,
           this.items.map((c) => getPrefix(c) + (c.display ?? c.word)),
           args.uiParams.cursorPos >= 0 || (this.refreshed && checkRefreshed),
           cursorPos,
@@ -656,7 +661,10 @@ export class Ui extends BaseUi<Params> {
           "ddu#ui#ff#filter#_open",
           args.options.name,
           args.context.input,
-          floating ? this.popupId : await fn.bufwinid(args.denops, bufnr),
+          await this.winId({
+            denops: args.denops,
+            uiParams: args.uiParams,
+          }),
           args.uiParams,
         ) as number;
       } else {
@@ -775,10 +783,15 @@ export class Ui extends BaseUi<Params> {
 
   override async winId(args: {
     denops: Denops;
-    context: Context;
-    options: DduOptions;
     uiParams: Params;
   }): Promise<number> {
+    // NOTE: In Vim popup window, win_findbuf()/winbufnr() does not work.
+    if (
+      args.uiParams.split === "floating" && args.denops.meta.host !== "nvim"
+    ) {
+      return this.popupId;
+    }
+
     const bufnr = await this.getBufnr(args.denops);
     const winIds = await fn.win_findbuf(args.denops, bufnr) as number[];
     return winIds.length > 0 ? winIds[0] : -1;
@@ -1124,9 +1137,10 @@ export class Ui extends BaseUi<Params> {
         "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
-        uiParams.split === "floating"
-          ? this.popupId
-          : await fn.bufwinid(args.denops, await this.getBufnr(args.denops)),
+        await this.winId({
+          denops: args.denops,
+          uiParams: args.uiParams,
+        }),
         uiParams,
       ) as number;
 
@@ -1252,10 +1266,10 @@ export class Ui extends BaseUi<Params> {
       // Toggle
       this.enabledAutoAction = !this.enabledAutoAction;
 
-      const winid =
-        (args.uiParams.split === "floating" && args.denops.meta.host !== "nvim")
-          ? this.popupId
-          : await fn.bufwinid(args.denops, await this.getBufnr(args.denops));
+      const winid = await this.winId({
+        denops: args.denops,
+        uiParams: args.uiParams,
+      });
       await this.setAutoAction(args.denops, args.uiParams, winid);
 
       if (this.enabledAutoAction) {
@@ -1527,6 +1541,11 @@ export class Ui extends BaseUi<Params> {
     floating: boolean,
     augroupName: string,
   ): Promise<void> {
+    const winid = await this.winId({
+      denops,
+      uiParams,
+    });
+
     const statusState = {
       done: context.done,
       input: context.input,
@@ -1535,7 +1554,7 @@ export class Ui extends BaseUi<Params> {
     };
     await fn.setwinvar(
       denops,
-      await fn.bufwinnr(denops, bufnr),
+      winid,
       "ddu_ui_ff_status",
       statusState,
     );
@@ -1576,7 +1595,7 @@ export class Ui extends BaseUi<Params> {
       const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
       await fn.setwinvar(
         denops,
-        await fn.bufwinnr(denops, bufnr),
+        winid,
         "&statusline",
         header + " %#LineNR#%{" + linenr + "}%*" + async,
       );
@@ -1584,11 +1603,13 @@ export class Ui extends BaseUi<Params> {
   }
 
   private async closeFilterWindow(denops: Denops): Promise<void> {
-    if (this.filterBufnr > 0) {
-      const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
-      if (filterWinNr > 0) {
-        await denops.cmd(`silent! close! ${filterWinNr}`);
-      }
+    if (this.filterBufnr <= 0) {
+      return;
+    }
+
+    const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
+    if (filterWinNr > 0) {
+      await denops.cmd(`silent! close! ${filterWinNr}`);
     }
   }
 
@@ -1637,7 +1658,10 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params,
     bufnr: number,
   ): Promise<void> {
-    const winid = await fn.bufwinid(denops, bufnr);
+    const winid = await this.winId({
+      denops,
+      uiParams,
+    });
     const existsStatusColumn = await fn.exists(denops, "+statuscolumn");
 
     await batch(denops, async (denops: Denops) => {
