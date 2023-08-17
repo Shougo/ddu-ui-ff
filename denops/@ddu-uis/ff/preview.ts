@@ -8,7 +8,7 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.5.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.5.1/types.ts";
 import {
   batch,
   Denops,
@@ -16,7 +16,7 @@ import {
   fn,
   is,
   op,
-} from "https://deno.land/x/ddu_vim@v3.5.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.5.1/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v5.0.1/buffer/mod.ts";
 import { Params } from "../ff.ts";
 
@@ -215,12 +215,18 @@ export class PreviewUi {
     // NOTE: Use enew! to ignore E948
     await denops.cmd("enew!");
 
+    const opts: Record<string, unknown> = {};
+    if (previewer.cwd) {
+      opts.cwd = previewer.cwd;
+    }
+
     if (denops.meta.host === "nvim") {
-      await denops.call("termopen", previewer.cmds);
+      await denops.call("termopen", previewer.cmds, opts);
     } else {
       await denops.call("term_start", previewer.cmds, {
-        "curwin": true,
-        "term_kill": "kill",
+        ...opts,
+        curwin: true,
+        term_kill: "kill",
       });
     }
 
