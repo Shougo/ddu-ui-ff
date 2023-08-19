@@ -61,7 +61,7 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   if mode() ==# 'i'
     startinsert!
   else
-    call feedkeys('A', 'n')
+    call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'n')
   endif
 
   if 'g:ddu#ui#ff#_save_title'->exists()
