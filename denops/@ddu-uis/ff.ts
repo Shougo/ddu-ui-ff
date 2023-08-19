@@ -1426,7 +1426,7 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     await this.previewUi.close(args.denops, args.context, args.uiParams);
     await this.previewUi.removePreviewedBuffers(args.denops);
-    await this.closeFilterWindow(args.denops);
+    const closedFilterWindow = await this.closeFilterWindow(args.denops);
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
     await args.denops.call("ddu#ui#ff#_restore_title");
 
@@ -1504,6 +1504,8 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
+    } else if (closedFilterWindow) {
+      await args.denops.call("ddu#ui#ff#_stop_insert");
     }
 
     await args.denops.call("ddu#event", args.options.name, "close");
@@ -1602,15 +1604,17 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  private async closeFilterWindow(denops: Denops): Promise<void> {
+  private async closeFilterWindow(denops: Denops): Promise<boolean> {
     if (this.filterBufnr <= 0) {
-      return;
+      return false;
     }
 
     const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
     if (filterWinNr > 0) {
       await denops.cmd(`silent! close! ${filterWinNr}`);
     }
+
+    return filterWinNr > 0;
   }
 
   private async moveParentWindow(

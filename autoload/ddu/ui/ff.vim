@@ -428,6 +428,14 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
   endif
 endfunction
 
+function ddu#ui#ff#_stop_insert() abort
+  if mode() ==# 'i'
+    stopinsert
+  else
+    call feedkeys("\<ESC>", 'n')
+  endif
+endfunction
+
 function s:do_cursor_moved(winid) abort
   const prev_winid = win_getid()
   try
