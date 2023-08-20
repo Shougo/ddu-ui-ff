@@ -1003,11 +1003,11 @@ Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
 
 A: >
 	nnoremap <C-n>
-	\ <Cmd>call ddu#ui_action('files', 'cursorNext')<CR>
-	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
+	      \ <Cmd>call ddu#ui#multi_actions(
+	      \   ['cursorNext', 'itemAction'], 'files')<CR>
 	nnoremap <C-p>
-	\ <Cmd>call ddu#ui_action('files', 'cursorPrevious')<CR>
-	\ <Cmd>call ddu#ui_action('files', 'itemAction')<CR>
+	      \ <Cmd>call ddu#ui#multi_actions(
+	      \   ['cursorPrevious', 'itemAction'], 'files')<CR>
 <
                                                             *ddu-ui-ff-faq-19*
 Q: I want to display cursor mark on the left of ddu window like

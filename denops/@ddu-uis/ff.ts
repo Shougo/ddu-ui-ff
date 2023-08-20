@@ -316,6 +316,10 @@ export class Ui extends BaseUi<Params> {
     const bufnr = initialized ||
       await this.initBuffer(args.denops, this.bufferName);
 
+    const augroupName = `ddu-ui-ff-${bufnr}`;
+    await args.denops.cmd(`augroup ${augroupName}`);
+    await args.denops.cmd(`autocmd! ${augroupName}`);
+
     args.uiParams = await this.resolveParams(
       args.denops,
       args.options,
@@ -525,10 +529,6 @@ export class Ui extends BaseUi<Params> {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
 
-    const augroupName = `ddu-ui-ff-${bufnr}`;
-    await args.denops.cmd(`augroup ${augroupName}`);
-    await args.denops.cmd(`autocmd! ${augroupName}`);
-
     await this.setStatusline(
       args.denops,
       args.context,
@@ -615,12 +615,6 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("ddu#ui#ff#_save_cursor");
     }
 
-    // Save cursor when cursor moved
-    await args.denops.cmd(
-      `autocmd ${augroupName} CursorMoved <buffer>` +
-        " call ddu#ui#ff#_save_cursor()",
-    );
-
     this.viewItems = Array.from(this.items);
     if (args.uiParams.reversed) {
       this.viewItems = this.viewItems.reverse();
@@ -653,6 +647,12 @@ export class Ui extends BaseUi<Params> {
         saveCursor.pos[2],
       );
     }
+
+    // Save cursor when cursor moved
+    await args.denops.cmd(
+      `autocmd ${augroupName} CursorMoved <buffer>` +
+        " call ddu#ui#ff#_save_cursor()",
+    );
 
     if (winid < 0) {
       const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
@@ -917,6 +917,12 @@ export class Ui extends BaseUi<Params> {
         cursorPos,
       );
 
+      await args.denops.call(
+        "ddu#ui#ff#_save_cursor",
+        bufnr,
+        cursorPos,
+      );
+
       // Change real cursor
       await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
 
@@ -961,6 +967,12 @@ export class Ui extends BaseUi<Params> {
         args.denops,
         bufnr,
         "ddu_ui_ff_cursor_pos",
+        cursorPos,
+      );
+
+      await args.denops.call(
+        "ddu#ui#ff#_save_cursor",
+        bufnr,
         cursorPos,
       );
 
@@ -1684,7 +1696,7 @@ export class Ui extends BaseUi<Params> {
         await fn.setwinvar(denops, winid, "&statuscolumn", "");
       }
 
-      await fn.setbufvar(denops, bufnr, "&bufhidden", "unload");
+      await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");
       await fn.setbufvar(denops, bufnr, "&buftype", "nofile");
       await fn.setbufvar(denops, bufnr, "&filetype", "ddu-ff");
       await fn.setbufvar(denops, bufnr, "&swapfile", 0);

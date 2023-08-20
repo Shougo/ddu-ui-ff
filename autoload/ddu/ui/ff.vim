@@ -361,19 +361,19 @@ function ddu#ui#ff#_cursor(line, col) abort
   endif
 endfunction
 
-function ddu#ui#ff#_save_cursor() abort
-  const text = '.'->getline()
+function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
+  const text = getbufline(a:bufnr, a:pos[1])
 
   " NOTE: Skip save cursor if it is empty text.
   " Because the items are empty
-  if text ==# '' && '$'->line() == 1
+  if empty(text) || text[0] ==# ''
     return
   endif
 
-  let b:ddu_ui_ff_save_cursor = #{
-        \   pos: getcurpos(),
-        \   text: text,
-        \ }
+  call setbufvar(a:bufnr, 'ddu_ui_ff_save_cursor', #{
+        \   pos: a:pos,
+        \   text: text[0],
+        \ })
 endfunction
 
 function ddu#ui#ff#_echo(msg) abort
