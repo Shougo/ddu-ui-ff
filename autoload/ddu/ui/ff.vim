@@ -374,6 +374,7 @@ function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
         \   pos: a:pos,
         \   text: text[0],
         \ })
+  call setbufvar(a:bufnr, 'ddu_ui_ff_cursor_pos', a:pos)
 endfunction
 
 function ddu#ui#ff#_echo(msg) abort

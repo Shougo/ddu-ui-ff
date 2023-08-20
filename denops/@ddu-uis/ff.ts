@@ -910,13 +910,6 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
 
-      await fn.setbufvar(
-        args.denops,
-        bufnr,
-        "ddu_ui_ff_cursor_pos",
-        cursorPos,
-      );
-
       await args.denops.call(
         "ddu#ui#ff#_save_cursor",
         bufnr,
@@ -962,13 +955,6 @@ export class Ui extends BaseUi<Params> {
       } else if (cursorPos[1] > this.viewItems.length) {
         cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
-
-      await fn.setbufvar(
-        args.denops,
-        bufnr,
-        "ddu_ui_ff_cursor_pos",
-        cursorPos,
-      );
 
       await args.denops.call(
         "ddu#ui#ff#_save_cursor",
