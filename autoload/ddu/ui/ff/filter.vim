@@ -130,10 +130,7 @@ function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
     call nvim_win_set_config(a:bufnr->bufwinid(), params)
     const id = a:bufnr->bufwinid()
   else
-    " statusline must be set for floating window
-    const statusline = &l:statusline
     const id = nvim_open_win(a:bufnr, v:true, params)
-    call setwinvar(id, '&statusline', statusline)
   endif
 
   const highlight = a:params.highlights->get('floating', 'NormalFloat')
