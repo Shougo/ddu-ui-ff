@@ -13,6 +13,7 @@ import {
 import {
   batch,
   Denops,
+  equal,
   fn,
   is,
   op,
@@ -77,11 +78,6 @@ type FloatingTitle =
 type WindowOption = [string, number | string];
 
 type ExprNumber = string | number;
-
-type SaveCursor = {
-  pos: number[];
-  text: string;
-};
 
 type ExpandItemParams = {
   mode?: "toggle";
@@ -243,10 +239,7 @@ export class Ui extends BaseUi<Params> {
     // Clear saved cursor
     const bufnr = await fn.bufnr(args.denops, this.bufferName);
     if (bufnr > 0) {
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor", {
-        pos: [],
-        text: "",
-      });
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor_item", {});
     }
 
     return Promise.resolve();
@@ -256,11 +249,14 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     item: DduItem;
   }) {
-    const pos = this.items.findIndex((item) => item === args.item);
+    const pos = this.items.findIndex((item) => equal(item, args.item));
 
     if (pos > 0) {
       await fn.cursor(args.denops, pos + 1, 0);
-      await args.denops.cmd("normal! zz");
+      await args.denops.cmd("normal! zb");
+
+      const bufnr = await fn.bufnr(args.denops, this.bufferName);
+      await this.saveCursor(args.denops, bufnr, pos + 1);
     }
   }
 
@@ -552,8 +548,8 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const cursorPos = args.uiParams.cursorPos >= 0 && this.refreshed
-      ? args.uiParams.cursorPos
+    const cursorPos = Number(args.uiParams.cursorPos) >= 0 && this.refreshed
+      ? Number(args.uiParams.cursorPos)
       : 0;
 
     const getPrefix = (item: DduItem) => {
@@ -610,42 +606,28 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    if (!initialized || cursorPos > 0) {
-      // Save current cursor
-      await args.denops.call("ddu#ui#ff#_save_cursor");
-    }
-
     this.viewItems = Array.from(this.items);
     if (args.uiParams.reversed) {
       this.viewItems = this.viewItems.reverse();
     }
 
-    const saveCursor = await fn.getbufvar(
+    const saveItem = await fn.getbufvar(
       args.denops,
       bufnr,
-      "ddu_ui_ff_save_cursor",
-      { pos: [], text: "" },
-    ) as SaveCursor;
-    let currentText = "";
-    if (saveCursor.pos.length !== 0) {
-      const buflines = await fn.getbufline(
-        args.denops,
-        bufnr,
-        saveCursor.pos[1],
-      );
-      if (buflines.length !== 0) {
-        currentText = buflines[0];
-      }
+      "ddu_ui_ff_save_cursor_item",
+      {},
+    ) as DduItem;
+
+    if (!initialized || cursorPos > 0) {
+      // Save current cursor
+      await this.saveCursor(args.denops, bufnr, cursorPos + 1);
     }
-    if (
-      saveCursor.pos.length !== 0 && currentText === saveCursor.text
-    ) {
-      // Restore the cursor
-      await args.denops.call(
-        "ddu#ui#ff#_cursor",
-        saveCursor.pos[1],
-        saveCursor.pos[2],
-      );
+
+    if (cursorPos <= 0 && saveItem.word) {
+      this.searchItem({
+        denops: args.denops,
+        item: saveItem,
+      });
     }
 
     // Save cursor when cursor moved
@@ -910,11 +892,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
 
-      await args.denops.call(
-        "ddu#ui#ff#_save_cursor",
-        bufnr,
-        cursorPos,
-      );
+      await this.saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
       await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
@@ -956,11 +934,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.viewItems.length;
       }
 
-      await args.denops.call(
-        "ddu#ui#ff#_save_cursor",
-        bufnr,
-        cursorPos,
-      );
+      await this.saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
       await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
@@ -1233,7 +1207,7 @@ export class Ui extends BaseUi<Params> {
         cancel: true,
       });
 
-      await args.denops.dispatcher.pop(args.options.name);
+      args.denops.dispatcher.pop(args.options.name);
 
       return ActionFlags.None;
     },
@@ -1802,6 +1776,19 @@ export class Ui extends BaseUi<Params> {
         );
       }
     });
+  }
+
+  private async saveCursor(denops: Denops, bufnr: number, cursorPos: number) {
+    if (cursorPos <= 0 || cursorPos > this.items.length) {
+      return;
+    }
+
+    await fn.setbufvar(
+      denops,
+      bufnr,
+      "ddu_ui_ff_save_cursor_item",
+      this.items[cursorPos - 1],
+    );
   }
 }
 
