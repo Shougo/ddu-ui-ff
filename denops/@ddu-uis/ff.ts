@@ -802,7 +802,7 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
     }) => {
-      await args.denops.call("ddu#redraw", args.options.name, {
+      await args.denops.dispatcher.redraw(args.options.name, {
         check: true,
         refreshItems: true,
       });
@@ -827,7 +827,7 @@ export class Ui extends BaseUi<Params> {
       await this.previewUi.close(args.denops, args.context, args.uiParams);
       await this.closeFilterWindow(args.denops);
 
-      await args.denops.call("ddu#start", {
+      await args.denops.dispatcher.start({
         name: args.options.name,
         push: true,
         sources: [
@@ -986,8 +986,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await args.denops.call(
-        "ddu#redraw_tree",
+      await args.denops.dispatcher.redrawTree(
         args.options.name,
         "expand",
         [{ item, maxLevel: params.maxLevel ?? 0 }],
@@ -1234,7 +1233,7 @@ export class Ui extends BaseUi<Params> {
         cancel: true,
       });
 
-      await args.denops.call("ddu#pop", args.options.name);
+      await args.denops.dispatcher.pop(args.options.name);
 
       return ActionFlags.None;
     },
@@ -1343,7 +1342,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      await args.denops.call("ddu#redraw", args.options.name, {
+      await args.denops.dispatcher.redraw(args.options.name, {
         updateOptions: args.actionParams,
       });
       return ActionFlags.None;
@@ -1506,7 +1505,7 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("ddu#ui#ff#_stop_insert");
     }
 
-    await args.denops.call("ddu#event", args.options.name, "close");
+    await args.denops.dispatcher.event(args.options.name, "close");
   }
 
   private async getItem(
@@ -1634,8 +1633,7 @@ export class Ui extends BaseUi<Params> {
       return ActionFlags.None;
     }
 
-    await denops.call(
-      "ddu#redraw_tree",
+    await denops.dispatcher.redrawTree(
       options.name,
       "collapse",
       [{ item }],
