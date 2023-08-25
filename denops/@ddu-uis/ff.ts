@@ -248,12 +248,13 @@ export class Ui extends BaseUi<Params> {
   override async searchItem(args: {
     denops: Denops;
     item: DduItem;
+    uiParams: Params;
   }) {
     const pos = this.items.findIndex((item) => equal(item, args.item));
 
     if (pos > 0) {
       await fn.cursor(args.denops, pos + 1, 0);
-      await args.denops.cmd("normal! zb");
+      await args.denops.cmd(`normal! ${args.uiParams.reversed ? "zt" : "zb"}`);
 
       const bufnr = await fn.bufnr(args.denops, this.bufferName);
       await this.saveCursor(args.denops, bufnr, pos + 1);
@@ -628,6 +629,7 @@ export class Ui extends BaseUi<Params> {
       this.searchItem({
         denops: args.denops,
         item: saveItem,
+        uiParams: args.uiParams,
       });
     }
 
