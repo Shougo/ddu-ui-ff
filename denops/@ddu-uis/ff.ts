@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.5.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.6.0/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.5.1/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.6.0/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -804,8 +804,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const items = await this.getItems(args.denops);
 
-      const actions = await args.denops.call(
-        "ddu#get_item_actions",
+      const actions = await args.denops.dispatcher.getItemActionNames(
         args.options.name,
         items,
       );
@@ -1027,8 +1026,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const items = await this.getItems(args.denops);
 
-      const actions = await args.denops.call(
-        "ddu#get_item_actions",
+      const actions = await args.denops.dispatcher.getItemActionNames(
         args.options.name,
         items,
       );
