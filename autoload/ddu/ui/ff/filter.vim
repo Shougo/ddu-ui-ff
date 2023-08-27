@@ -1,5 +1,5 @@
 function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
-  const bufname = 'ddu-ff-filter-' .. a:name
+  const bufname = 'ddu-ff-filter'
   const ids = bufname->bufnr()->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])

@@ -143,7 +143,6 @@ export type Params = {
 
 export class Ui extends BaseUi<Params> {
   private bufferName = "";
-  private filterBufnr = -1;
   private items: DduItem[] = [];
   private viewItems: DduItem[] = [];
   private selectedItems: Set<number> = new Set();
@@ -177,7 +176,6 @@ export class Ui extends BaseUi<Params> {
     } else {
       this.saveCol = await fn.col(args.denops, ".") as number;
     }
-    this.filterBufnr = -1;
     this.items = [];
     this.enabledAutoAction = args.uiParams.startAutoAction;
   }
@@ -511,11 +509,12 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight} | normal! zb`,
       );
-      if (await fn.bufwinid(args.denops, this.filterBufnr) >= 0) {
+      const filterBufnr = await this.getFilterBufnr(args.denops);
+      if (await fn.bufwinid(args.denops, filterBufnr) >= 0) {
         // Redraw floating window
         await args.denops.call(
           "ddu#ui#ff#filter#_floating",
-          this.filterBufnr,
+          filterBufnr,
           winid,
           args.uiParams,
         );
@@ -639,10 +638,11 @@ export class Ui extends BaseUi<Params> {
         " call ddu#ui#ff#_save_cursor()",
     );
 
+    const filterBufnr = await this.getFilterBufnr(args.denops);
     if (winid < 0) {
       const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
       if (startFilter) {
-        this.filterBufnr = await args.denops.call(
+        await args.denops.call(
           "ddu#ui#ff#filter#_open",
           args.options.name,
           args.context.input,
@@ -655,7 +655,7 @@ export class Ui extends BaseUi<Params> {
       } else {
         await args.denops.cmd("stopinsert");
       }
-    } else if (await fn.bufwinid(args.denops, this.filterBufnr) < 0) {
+    } else if (await fn.bufwinid(args.denops, filterBufnr) < 0) {
       await fn.win_gotoid(args.denops, winid);
     }
 
@@ -1106,7 +1106,7 @@ export class Ui extends BaseUi<Params> {
         await this.previewUi.close(args.denops, args.context, uiParams);
       }
 
-      this.filterBufnr = await args.denops.call(
+      await args.denops.call(
         "ddu#ui#ff#filter#_open",
         args.options.name,
         args.context.input,
@@ -1577,12 +1577,13 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  private async closeFilterWindow(denops: Denops): Promise<boolean> {
-    if (this.filterBufnr <= 0) {
-      return false;
-    }
+  private async getFilterBufnr(denops: Denops): Promise<number> {
+    return await fn.bufnr(denops, `ddu-ff-filter`);
+  }
 
-    const filterWinNr = await fn.bufwinnr(denops, this.filterBufnr);
+  private async closeFilterWindow(denops: Denops): Promise<boolean> {
+    const filterBufnr = await this.getFilterBufnr(denops);
+    const filterWinNr = await fn.bufwinnr(denops, filterBufnr);
     if (filterWinNr > 0) {
       await denops.cmd(`silent! close! ${filterWinNr}`);
     }
