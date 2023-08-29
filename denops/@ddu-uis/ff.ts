@@ -1567,7 +1567,8 @@ export class Ui extends BaseUi<Params> {
 
       await denops.call("ddu#ui#ff#_set_title", bufnr);
     } else {
-      const linenr = "printf('%'.(len(line('$'))).'d/%d',line('.'),line('$'))";
+      const linenr =
+        "printf('%'.(('$'->line())->len()+2).'d/%d','.'->line(),'$'->line())";
       await fn.setwinvar(
         denops,
         winid,
