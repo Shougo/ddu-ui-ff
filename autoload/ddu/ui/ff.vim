@@ -34,11 +34,12 @@ endfunction
 
 function ddu#ui#ff#_update_buffer(
       \ params, bufnr, winid, lines, refreshed, pos) abort
-  const max_lines = a:lines->len()
   const current_lines = '$'->line(a:winid)
 
   call setbufvar(a:bufnr, '&modifiable', 1)
 
+  " NOTE: deletebufline() changes cursor position.
+  let changed_cursor = v:false
   if a:lines->empty()
     " Clear buffer
     if current_lines > 1
@@ -47,6 +48,8 @@ function ddu#ui#ff#_update_buffer(
       else
         silent call deletebufline(a:bufnr, 1, '$')
       endif
+
+      let changed_cursor = v:true
     else
       call setbufline(a:bufnr, 1, [''])
     endif
@@ -54,21 +57,22 @@ function ddu#ui#ff#_update_buffer(
     call setbufline(a:bufnr, 1,
           \ a:params.reversed ? reverse(a:lines) : a:lines)
 
-    if current_lines > 1 && current_lines > max_lines
-      silent call deletebufline(a:bufnr, max_lines + 1, '$')
+    if current_lines > a:lines->len()
+      silent call deletebufline(a:bufnr, a:lines->len() + 1, '$')
+      let changed_cursor = v:true
     endif
   endif
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
 
-  if !a:refreshed
+  if !a:refreshed && !changed_cursor
     return
   endif
 
   " Init the cursor
   const curpos = getcurpos(a:winid)
-  const lnum = a:params.reversed ? max_lines - a:pos : a:pos + 1
+  const lnum = a:params.reversed ? a:lines->len() - a:pos : a:pos + 1
   if curpos[1] != lnum
     call win_execute(a:winid,
           \ printf('call cursor(%d, 0) | normal! zb', lnum))
