@@ -39,9 +39,24 @@ function ddu#ui#ff#_update_buffer(
 
   call setbufvar(a:bufnr, '&modifiable', 1)
 
-  call setbufline(a:bufnr, 1, a:params.reversed ? reverse(a:lines) : a:lines)
-  if current_lines > max_lines
-    silent call deletebufline(a:bufnr, max_lines + 1, '$')
+  if a:lines->empty()
+    " Clear buffer
+    if current_lines > 1
+      if '%'->bufnr() ==# a:bufnr
+        silent % delete _
+      else
+        silent call deletebufline(a:bufnr, 1, '$')
+      endif
+    else
+      call setbufline(a:bufnr, 1, [''])
+    endif
+  else
+    call setbufline(a:bufnr, 1,
+          \ a:params.reversed ? reverse(a:lines) : a:lines)
+
+    if current_lines > 1 && current_lines > max_lines
+      silent call deletebufline(a:bufnr, max_lines + 1, '$')
+    endif
   endif
 
   call setbufvar(a:bufnr, '&modifiable', 0)
@@ -60,6 +75,7 @@ function ddu#ui#ff#_update_buffer(
   elseif a:params.reversed
     call win_execute(a:winid, 'normal! zb')
   endif
+  redraw
 endfunction
 
 function ddu#ui#ff#_highlight_items(
