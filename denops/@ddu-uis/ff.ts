@@ -624,7 +624,7 @@ export class Ui extends BaseUi<Params> {
       await this.saveCursor(args.denops, bufnr, cursorPos + 1);
     }
 
-    if (cursorPos <= 0 && saveItem.word && args.options.resume) {
+    if (cursorPos <= 0 && saveItem.word && !this.refreshed) {
       this.searchItem({
         denops: args.denops,
         item: saveItem,
