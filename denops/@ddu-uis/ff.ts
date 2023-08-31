@@ -252,7 +252,6 @@ export class Ui extends BaseUi<Params> {
 
     if (pos > 0) {
       await fn.cursor(args.denops, pos + 1, 0);
-      await args.denops.cmd(`normal! ${args.uiParams.reversed ? "zt" : "zb"}`);
 
       const bufnr = await fn.bufnr(args.denops, this.bufferName);
       await this.saveCursor(args.denops, bufnr, pos + 1);
