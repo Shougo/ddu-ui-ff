@@ -79,7 +79,6 @@ function ddu#ui#ff#_update_buffer(
   elseif a:params.reversed
     call win_execute(a:winid, 'normal! zb')
   endif
-  redraw
 endfunction
 
 function ddu#ui#ff#_highlight_items(
