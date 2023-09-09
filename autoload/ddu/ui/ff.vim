@@ -385,7 +385,7 @@ function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
 
   " NOTE: Skip save cursor if it is empty text.
   " Because the items are empty
-  if empty(text) || text[0] ==# ''
+  if '$'->line() ==# 1 && (empty(text) || text[0] ==# '')
     return
   endif
 
