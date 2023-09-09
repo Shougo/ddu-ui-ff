@@ -178,6 +178,12 @@ export class Ui extends BaseUi<Params> {
     }
     this.items = [];
     this.enabledAutoAction = args.uiParams.startAutoAction;
+
+    // Clear saved cursor
+    const bufnr = await fn.bufnr(args.denops, this.bufferName);
+    if (bufnr > 0) {
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor_item", {});
+    }
   }
 
   override async onBeforeAction(args: {
@@ -222,7 +228,7 @@ export class Ui extends BaseUi<Params> {
     await vars.g.set(args.denops, "ddu#ui#ff#_in_action", false);
   }
 
-  override async refreshItems(args: {
+  override refreshItems(args: {
     denops: Denops;
     context: Context;
     uiParams: Params;
@@ -233,12 +239,6 @@ export class Ui extends BaseUi<Params> {
     this.items = args.items.slice(0, args.uiParams.maxDisplayItems);
     this.selectedItems.clear();
     this.refreshed = true;
-
-    // Clear saved cursor
-    const bufnr = await fn.bufnr(args.denops, this.bufferName);
-    if (bufnr > 0) {
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor_item", {});
-    }
 
     return Promise.resolve();
   }
@@ -523,6 +523,12 @@ export class Ui extends BaseUi<Params> {
     if (!initialized || winid < 0) {
       await this.initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
+    if (!initialized) {
+      // Save cursor when cursor moved
+      await args.denops.cmd(
+        "autocmd CursorMoved <buffer> call ddu#ui#ff#_save_cursor()",
+      );
+    }
 
     await this.setStatusline(
       args.denops,
@@ -623,19 +629,13 @@ export class Ui extends BaseUi<Params> {
       await this.saveCursor(args.denops, bufnr, cursorPos + 1);
     }
 
-    if (cursorPos <= 0 && saveItem.word && !this.refreshed) {
+    if (cursorPos <= 0 && Object.keys(saveItem).length !== 0) {
       this.searchItem({
         denops: args.denops,
         item: saveItem,
         uiParams: args.uiParams,
       });
     }
-
-    // Save cursor when cursor moved
-    await args.denops.cmd(
-      `autocmd ${augroupName} CursorMoved <buffer>` +
-        " call ddu#ui#ff#_save_cursor()",
-    );
 
     const filterBufnr = await this.getFilterBufnr(args.denops);
     if (winid < 0) {
