@@ -1476,8 +1476,8 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
-    } else if (closedFilterWindow) {
-      await args.denops.call("ddu#ui#ff#_stop_insert");
+    } else if (closedFilterWindow && await fn.mode(args.denops) === "i") {
+      await args.denops.cmd("stopinsert");
     }
 
     await args.denops.dispatcher.event(args.options.name, "close");
