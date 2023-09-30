@@ -26,8 +26,6 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
 
   augroup ddu-ff-filter
     autocmd!
-    autocmd InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
-          \ <buffer> call s:check_update()
   augroup END
 
   " Disable backspace eol.
@@ -57,8 +55,8 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     setlocal signcolumn=no
   endif
 
-  " NOTE: startinsert! does not work in Vim or autoAction
-  if mode() ==# 'i'
+  " NOTE: startinsert! does not work in autoAction
+  if !a:params.autoAction->has_key('name')
     startinsert!
   else
     call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'n')
@@ -76,6 +74,11 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   let s:filter_prev_input = '.'->getline()
   let s:filter_updatetime = a:params.filterUpdateTime
   let g:ddu#ui#ff#_filter_parent_winid = a:parent_id
+
+  autocmd ddu-ff-filter
+        \ InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
+        \ <buffer> call s:check_update()
+
   return '%'->bufnr()
 endfunction
 
