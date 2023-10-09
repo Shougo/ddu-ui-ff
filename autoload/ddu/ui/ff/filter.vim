@@ -56,10 +56,10 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
   endif
 
   " NOTE: startinsert! does not work in resume or autoAction
-  if mode() ==# 'i' || mode() ==# 'c'
-    startinsert!
-  else
+  if mode() ==# 'n'
     call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'n')
+  else
+    startinsert!
   endif
 
   if 'g:ddu#ui#ff#_save_title'->exists()
