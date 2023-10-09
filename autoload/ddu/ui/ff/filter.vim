@@ -55,8 +55,8 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
     setlocal signcolumn=no
   endif
 
-  " NOTE: startinsert! does not work in autoAction
-  if !a:params.autoAction->has_key('name')
+  " NOTE: startinsert! does not work in resume or autoAction
+  if mode() ==# 'i' || mode() ==# 'c'
     startinsert!
   else
     call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'n')
