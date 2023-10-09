@@ -1476,8 +1476,11 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
-    } else if (closedFilterWindow && await fn.mode(args.denops) === "i") {
-      await args.denops.cmd("stopinsert");
+    } else if (closedFilterWindow) {
+      const mode = await fn.mode(args.denops);
+      if (mode === "i" || mode === "n") {
+        await args.denops.cmd("stopinsert");
+      }
     }
 
     await args.denops.dispatcher.event(args.options.name, "close");
