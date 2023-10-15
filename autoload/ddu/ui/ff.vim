@@ -111,7 +111,9 @@ function ddu#ui#ff#_highlight_items(
   for item_nr in a:selected_items
     call ddu#ui#ff#_highlight(
           \ selected_highlight, 'ddu-ui-selected', 10000,
-          \ s:namespace, a:bufnr, item_nr + 1, 1, 1000)
+          \ s:namespace, a:bufnr,
+          \ a:params.reversed ? a:max_lines - item_nr : item_nr + 1,
+          \ 1, 1000)
   endfor
 
   if !has('nvim')
