@@ -177,6 +177,7 @@ export class Ui extends BaseUi<Params> {
       this.saveCol = await fn.col(args.denops, ".") as number;
     }
     this.items = [];
+    this.selectedItems.clear();
     this.enabledAutoAction = args.uiParams.startAutoAction;
 
     // Clear saved cursor
