@@ -251,10 +251,15 @@ export class Ui extends BaseUi<Params> {
     const pos = this.items.findIndex((item) => equal(item, args.item));
 
     if (pos > 0) {
-      await fn.cursor(args.denops, pos + 1, 0);
+      // NOTE: cursorPos is not same with item pos when reversed.
+      const cursorPos = args.uiParams.reversed
+        ? this.items.length - pos
+        : pos + 1;
+
+      await fn.cursor(args.denops, cursorPos, 0);
 
       const bufnr = await fn.bufnr(args.denops, this.bufferName);
-      await this.saveCursor(args.denops, bufnr, pos + 1);
+      await this.saveCursor(args.denops, bufnr, cursorPos);
     }
   }
 
