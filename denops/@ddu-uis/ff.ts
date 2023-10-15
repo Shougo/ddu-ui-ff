@@ -502,7 +502,7 @@ export class Ui extends BaseUi<Params> {
 
     await this.setAutoAction(args.denops, args.uiParams, winid);
 
-    if (args.uiParams.autoResize) {
+    if (args.uiParams.autoResize && await fn.winnr(args.denops, "$") > 1) {
       await fn.win_execute(
         args.denops,
         winid,
