@@ -1415,8 +1415,8 @@ export class Ui extends BaseUi<Params> {
     }
 
     if (
-      args.uiParams.split === "floating" && args.denops.meta.host !== "nvim" &&
-      this.popupId > 0
+      args.uiParams.split === "floating" &&
+      args.denops.meta.host !== "nvim" && this.popupId > 0
     ) {
       // Close popup
       await args.denops.call("popup_close", this.popupId);
@@ -1445,7 +1445,7 @@ export class Ui extends BaseUi<Params> {
               : `buffer ${args.context.bufNr}`,
           );
         } else {
-          await args.denops.cmd(`silent! close! ${winid}`);
+          await args.denops.cmd(`close! ${winid}`);
           await fn.win_gotoid(args.denops, args.context.winId);
         }
       }
@@ -1594,8 +1594,8 @@ export class Ui extends BaseUi<Params> {
   private async closeFilterWindow(denops: Denops): Promise<boolean> {
     const filterBufnr = await this.getFilterBufnr(denops);
     const filterWinNr = await fn.bufwinnr(denops, filterBufnr);
-    if (filterWinNr > 0) {
-      await denops.cmd(`silent! close! ${filterWinNr}`);
+    if (filterWinNr > 0 && await fn.winnr(denops, "$") !== 1) {
+      await denops.cmd(`close! ${filterWinNr}`);
     }
 
     return filterWinNr > 0;
