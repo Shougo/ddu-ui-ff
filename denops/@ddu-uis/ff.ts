@@ -792,7 +792,6 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
     }) => {
-      // NOTE: await freezes UI when startFilter
       args.denops.dispatcher.redraw(args.options.name, {
         check: true,
         refreshItems: true,
@@ -1214,7 +1213,7 @@ export class Ui extends BaseUi<Params> {
         cancel: true,
       });
 
-      args.denops.dispatcher.pop(args.options.name);
+      await args.denops.dispatcher.pop(args.options.name);
 
       return ActionFlags.None;
     },
