@@ -1593,15 +1593,15 @@ export class Ui extends BaseUi<Params> {
 
   private async closeFilterWindow(denops: Denops): Promise<boolean> {
     const filterBufnr = await this.getFilterBufnr(denops);
-    const filterWinNr = await fn.bufwinnr(denops, filterBufnr);
-    if (filterWinNr > 0 && await fn.winnr(denops, "$") !== 1) {
+    const filterWinIds = await fn.win_findbuf(denops, filterBufnr);
+    if (filterWinIds.length > 0 && await fn.winnr(denops, "$") !== 1) {
       const winid = await fn.win_getid(denops);
-      await fn.win_gotoid(denops, filterWinNr);
+      await fn.win_gotoid(denops, filterWinIds[0]);
       await denops.cmd("close!");
       await fn.win_gotoid(denops, winid);
     }
 
-    return filterWinNr > 0;
+    return filterWinIds.length > 0;
   }
 
   private async moveParentWindow(
