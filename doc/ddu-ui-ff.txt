@@ -887,17 +887,15 @@ A: You can pass params like this. >
                                                              *ddu-ui-ff-faq-7*
 Q: I want to use Vim syntax highlight in the buffer.
 
-A: Please use |Syntax| autocmd.  |FileType| autocmd cannot change syntax
-highlights.  |Syntax| autocmd must be called in |FileType| autocmd. >
-Or you can use "syntax/ddu-ff.vim" file instead. >
-
+A: Please set 'syntax' option in |FileType| autocmd.
+If you want to use |treesitter|, you need to stop it manually after quit. >
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
-	  autocmd Syntax <buffer> call s:ddu_ff_my_syntax()
-	endfunction
-	function s:ddu_ff_my_syntax()
 	  if b:ddu_ui_name ==# 'vim'
-	    runtime! syntax/vim.vim
+	    setlocal syntax=vim
+	    " Or
+	    " lua vim.treesitter.start(nil, 'vim')
+	    " autocmd WinClosed <buffer> ++once lua vim.treesitter.stop()
 	  endif
 	endfunction
 <
