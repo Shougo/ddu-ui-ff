@@ -377,7 +377,7 @@ function ddu#ui#ff#_cursor(line, col) abort
         \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
     call cursor(a:line, a:col)
   else
-    call ddu#ui#ff#execute(printf('call cursor(%d, %d)', a:line, a:col))
+    call ddu#ui#ff#execute(printf('call cursor(%d, %d) | redraw', a:line, a:col))
     redraw
   endif
 endfunction
@@ -451,7 +451,7 @@ function s:do_cursor_moved(winid) abort
   try
     call win_gotoid(a:winid)
 
-    doautocmd CursorMoved
+    silent doautocmd CursorMoved
   finally
     call win_gotoid(prev_winid)
   endtry
