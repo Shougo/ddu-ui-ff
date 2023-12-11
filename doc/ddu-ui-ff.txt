@@ -796,6 +796,9 @@ FAQ 23:							|ddu-ui-ff-faq-23|
 FAQ 24:							|ddu-ui-ff-faq-24|
 	I want to change preview cursor on the top.
 
+FAQ 25:							|ddu-ui-ff-faq-25|
+	I want to scroll preview window.
+
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
@@ -1081,6 +1084,18 @@ A: >
 	      \     },
 	      \   },
 	      \ })
+<
+                                                            *ddu-ui-ff-faq-25*
+Q: I want to scroll preview window.
+
+A: >
+	nnoremap <buffer> <C-p>
+	      \ <Cmd>call ddu#ui#do_action('previewExecute',
+	      \ #{ command: 'execute "normal! \<C-y>"' })<CR>
+	nnoremap <buffer> <C-n>
+	      \ <Cmd>call ddu#ui#do_action('previewExecute',
+	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
+<
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*

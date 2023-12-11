@@ -9,7 +9,7 @@ function ddu#ui#ff#multi_actions(actions) abort
 endfunction
 
 function ddu#ui#ff#execute(command) abort
-  if !('g:ddu#ui#ff#_filter_parent_winid'->exists())
+  if !'g:ddu#ui#ff#_filter_parent_winid'->exists()
     return
   endif
 
@@ -84,7 +84,7 @@ endfunction
 function ddu#ui#ff#_highlight_items(
       \ params, bufnr, max_lines, highlight_items, selected_items) abort
   " Buffer must be loaded
-  if !(a:bufnr->bufloaded())
+  if !a:bufnr->bufloaded()
     return
   endif
 
@@ -364,7 +364,7 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   " NOTE: In action execution, auto action should be skipped
   augroup ddu-ui-auto_action
     autocmd CursorMoved <buffer> ++nested
-          \ : if !(g:->get('ddu#ui#ff#_in_action', v:false))
+          \ : if !g:->get('ddu#ui#ff#_in_action', v:false)
           \ |   call ddu#ui#ff#_do_auto_action()
           \ | endif
   augroup END
@@ -374,7 +374,7 @@ endfunction
 
 function ddu#ui#ff#_cursor(line, col) abort
   if &l:filetype ==# 'ddu-ff'
-        \ || !('g:ddu#ui#ff#_filter_parent_winid'->exists())
+        \ || !'g:ddu#ui#ff#_filter_parent_winid'->exists()
     call cursor(a:line, a:col)
   else
     call ddu#ui#ff#execute(printf('call cursor(%d, %d) | redraw', a:line, a:col))
@@ -404,7 +404,7 @@ function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
 endfunction
 
 function ddu#ui#ff#_restore_title() abort
-  if !('g:ddu#ui#ff#_save_title'->exists())
+  if !'g:ddu#ui#ff#_save_title'->exists()
     return
   endif
 
@@ -459,7 +459,7 @@ endfunction
 
 function s:do_auto_action() abort
   const winid = (&l:filetype ==# 'ddu-ff'
-        \        || !('g:ddu#ui#ff#_filter_parent_winid'->exists()))
+        \        || !'g:ddu#ui#ff#_filter_parent_winid'->exists())
         \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
   const bufnr = winid->winbufnr()
 
