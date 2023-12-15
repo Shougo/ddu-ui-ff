@@ -1097,6 +1097,21 @@ A: >
 	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
 <
 
+Q: I want to preview selected item automatically.
+
+A: You need to set |ddu-ui-ff-param-autoAction| like this. >
+	call ddu#custom#patch_global(#{
+	      \   ui: 'ff',
+	      \   uiParams: #{
+	      \     ff: #{
+	      \       autoAction: #{
+	      \         name: 'preview',
+	      \       },
+	      \     },
+	      \   },
+	      \ })
+<
+
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
 
