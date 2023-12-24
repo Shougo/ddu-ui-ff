@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.8.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.9.0/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.8.1/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.9.0/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -771,7 +771,7 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  override async winId(args: {
+  private async winId(args: {
     denops: Denops;
     uiParams: Params;
   }): Promise<number> {
@@ -785,6 +785,18 @@ export class Ui extends BaseUi<Params> {
     const bufnr = await this.getBufnr(args.denops);
     const winIds = await fn.win_findbuf(args.denops, bufnr) as number[];
     return winIds.length > 0 ? winIds[0] : -1;
+  }
+
+  override async winIds(args: {
+    denops: Denops;
+    uiParams: Params;
+  }): Promise<number[]> {
+    const filterBufnr = await this.getFilterBufnr(args.denops);
+    const filterWinIds = await fn.win_findbuf(
+      args.denops,
+      filterBufnr,
+    ) as number[];
+    return [await this.winId(args)].concat(filterWinIds);
   }
 
   override actions: UiActions<Params> = {
