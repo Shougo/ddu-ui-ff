@@ -25,22 +25,22 @@ type PreviewParams = {
 };
 
 export class PreviewUi {
-  private previewWinId = -1;
-  private previewedTarget?: DduItem;
-  private matchIds: Record<number, number> = {};
-  private previewedBufnrs: Set<number> = new Set();
+  #previewWinId = -1;
+  #previewedTarget?: DduItem;
+  #matchIds: Record<number, number> = {};
+  #previewedBufnrs: Set<number> = new Set();
 
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
     if (this.visible() && (await fn.winnr(denops, "$")) !== 1) {
       if (uiParams.previewFloating && denops.meta.host !== "nvim") {
-        await denops.call("popup_close", this.previewWinId);
+        await denops.call("popup_close", this.#previewWinId);
       } else {
         const saveId = await fn.win_getid(denops);
         await batch(denops, async (denops) => {
-          await fn.win_gotoid(denops, this.previewWinId);
-          if (this.previewWinId === context.winId) {
+          await fn.win_gotoid(denops, this.#previewWinId);
+          if (this.#previewWinId === context.winId) {
             await denops.cmd(
               context.bufName === "" ? "enew" : `buffer ${context.bufNr}`,
             );
@@ -50,13 +50,13 @@ export class PreviewUi {
           await fn.win_gotoid(denops, saveId);
         });
       }
-      this.previewWinId = -1;
+      this.#previewWinId = -1;
     }
   }
 
   async removePreviewedBuffers(denops: Denops) {
     await batch(denops, async (denops) => {
-      for (const bufnr of this.previewedBufnrs) {
+      for (const bufnr of this.#previewedBufnrs) {
         await denops.cmd(
           `if bufexists(${bufnr}) && bufwinnr(${bufnr}) < 0 | silent bwipeout! ${bufnr} | endif`,
         );
@@ -71,16 +71,16 @@ export class PreviewUi {
     if (!this.visible()) {
       return;
     }
-    await fn.win_execute(denops, this.previewWinId, command);
+    await fn.win_execute(denops, this.#previewWinId, command);
   }
 
   isAlreadyPreviewed(item: DduItem): boolean {
     return this.visible() &&
-      JSON.stringify(item) === JSON.stringify(this.previewedTarget);
+      JSON.stringify(item) === JSON.stringify(this.#previewedTarget);
   }
 
   visible(): boolean {
-    return this.previewWinId > 0;
+    return this.#previewWinId > 0;
   }
 
   async previewContents(
@@ -125,7 +125,7 @@ export class PreviewUi {
     let flag: ActionFlags;
     // Render the preview
     if (previewer.kind === "terminal") {
-      flag = await this.previewContentsTerminal(
+      flag = await this.#previewContentsTerminal(
         denops,
         previewer,
         uiParams,
@@ -133,7 +133,7 @@ export class PreviewUi {
         context.winId,
       );
     } else {
-      flag = await this.previewContentsBuffer(
+      flag = await this.#previewContentsBuffer(
         denops,
         previewer,
         uiParams,
@@ -155,13 +155,13 @@ export class PreviewUi {
         "CursorLine";
       await fn.setwinvar(
         denops,
-        this.previewWinId,
+        this.#previewWinId,
         "&winhighlight",
         `Normal:${highlight},FloatBorder:${borderHighlight},CursorLine:${cursorLineHighlight}`,
       );
     }
 
-    await this.jump(denops, previewer);
+    await this.#jump(denops, previewer);
 
     if (uiParams.onPreview) {
       if (typeof uiParams.onPreview === "string") {
@@ -171,7 +171,7 @@ export class PreviewUi {
           {
             context,
             item,
-            previewWinId: this.previewWinId,
+            previewWinId: this.#previewWinId,
           },
         );
       } else {
@@ -179,19 +179,19 @@ export class PreviewUi {
           denops,
           context,
           item,
-          previewWinId: this.previewWinId,
+          previewWinId: this.#previewWinId,
         });
       }
     }
 
-    this.previewedBufnrs.add(await fn.bufnr(denops));
-    this.previewedTarget = item;
+    this.#previewedBufnrs.add(await fn.bufnr(denops));
+    this.#previewedTarget = item;
     await fn.win_gotoid(denops, prevId);
 
     return ActionFlags.Persist;
   }
 
-  private async previewContentsTerminal(
+  async #previewContentsTerminal(
     denops: Denops,
     previewer: TerminalPreviewer,
     uiParams: Params,
@@ -199,16 +199,16 @@ export class PreviewUi {
     previousWinId: number,
   ): Promise<ActionFlags> {
     if (!this.visible()) {
-      this.previewWinId = await denops.call(
+      this.#previewWinId = await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
         bufnr,
         bufnr,
         previousWinId,
-        this.previewWinId,
+        this.#previewWinId,
       ) as number;
     } else {
-      await fn.win_gotoid(denops, this.previewWinId);
+      await fn.win_gotoid(denops, this.#previewWinId);
     }
 
     // NOTE: ":terminal" overwrites current buffer.
@@ -233,7 +233,7 @@ export class PreviewUi {
     return ActionFlags.Persist;
   }
 
-  private async previewContentsBuffer(
+  async #previewContentsBuffer(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     uiParams: Params,
@@ -249,10 +249,10 @@ export class PreviewUi {
       return ActionFlags.None;
     }
 
-    const buffer = await this.getPreviewBuffer(denops, previewer, item);
+    const buffer = await this.#getPreviewBuffer(denops, previewer, item);
     const exists = await fn.bufexists(denops, buffer.bufnr);
     let previewBufnr = buffer.bufnr;
-    const [err, contents] = await this.getContents(denops, previewer);
+    const [err, contents] = await this.#getContents(denops, previewer);
     if (err || !exists || previewer.kind === "nofile") {
       // Create new buffer
       previewBufnr = await fn.bufadd(denops, buffer.bufname);
@@ -267,13 +267,13 @@ export class PreviewUi {
       });
     }
 
-    this.previewWinId = await denops.call(
+    this.#previewWinId = await denops.call(
       "ddu#ui#ff#_open_preview_window",
       uiParams,
       bufnr,
       previewBufnr,
       previousWinId,
-      this.previewWinId,
+      this.#previewWinId,
     ) as number;
 
     const limit = actionParams.syntaxLimitChars ?? 400000;
@@ -286,7 +286,7 @@ export class PreviewUi {
           previewer.filetype,
         );
       } else if (previewer.kind === "buffer") {
-        await fn.win_execute(denops, this.previewWinId, "filetype detect");
+        await fn.win_execute(denops, this.#previewWinId, "filetype detect");
       }
 
       if (previewer.syntax) {
@@ -297,12 +297,12 @@ export class PreviewUi {
     // Set options
     await batch(denops, async (denops: Denops) => {
       for (const [option, value] of uiParams.previewWindowOptions) {
-        await fn.setwinvar(denops, this.previewWinId, option, value);
+        await fn.setwinvar(denops, this.#previewWinId, option, value);
       }
     });
 
     if (!err) {
-      await this.highlight(
+      await this.#highlight(
         denops,
         previewer,
         previewBufnr,
@@ -313,7 +313,7 @@ export class PreviewUi {
     return ActionFlags.Persist;
   }
 
-  private async getPreviewBuffer(
+  async #getPreviewBuffer(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     item: DduItem,
@@ -357,7 +357,7 @@ export class PreviewUi {
     };
   }
 
-  private async getContents(
+  async #getContents(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
   ): Promise<[err: true | undefined, contents: string[]]> {
@@ -390,17 +390,17 @@ export class PreviewUi {
     }
   }
 
-  private async jump(denops: Denops, previewer: Previewer) {
+  async #jump(denops: Denops, previewer: Previewer) {
     const pattern = "pattern" in previewer && previewer.pattern
       ? previewer.pattern
       : "";
     const lineNr = "lineNr" in previewer && previewer.lineNr
       ? previewer.lineNr
       : 0;
-    await denops.call("ddu#ui#ff#_jump", this.previewWinId, pattern, lineNr);
+    await denops.call("ddu#ui#ff#_jump", this.#previewWinId, pattern, lineNr);
   }
 
-  private async highlight(
+  async #highlight(
     denops: Denops,
     previewer: BufferPreviewer | NoFilePreviewer,
     bufnr: number,
@@ -413,7 +413,7 @@ export class PreviewUi {
       ? await denops.call("nvim_create_namespace", "ddu-ui-ff-preview")
       : 0;
 
-    const winid = this.previewWinId;
+    const winid = this.#previewWinId;
     if (previewer?.lineNr) {
       await denops.call(
         "ddu#ui#ff#_highlight",
@@ -427,7 +427,7 @@ export class PreviewUi {
         await op.columns.get(denops),
       );
     } else if (previewer?.pattern) {
-      this.matchIds[winid] = await fn.matchadd(
+      this.#matchIds[winid] = await fn.matchadd(
         denops,
         hlName,
         previewer.pattern,
@@ -464,10 +464,10 @@ export class PreviewUi {
     if (!this.visible()) {
       return;
     }
-    const winid = this.previewWinId;
+    const winid = this.#previewWinId;
 
-    if (this.matchIds[winid] > 0) {
-      await fn.matchdelete(denops, this.matchIds[winid], winid);
+    if (this.#matchIds[winid] > 0) {
+      await fn.matchdelete(denops, this.#matchIds[winid], winid);
     }
     if (denops.meta.host === "nvim") {
       const ns = await denops.call(
