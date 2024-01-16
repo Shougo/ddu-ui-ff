@@ -61,6 +61,7 @@ ACTIONS                                                    *ddu-ui-ff-actions*
                                                *ddu-ui-ff-action-chooseAction*
 chooseAction
 		Choose and fire the action by ddu UI.
+		NOTE: Quit the UI after executing the action.
 
 		NOTE: "ddu-source-action" is required.
 		https://github.com/Shougo/ddu-source-action
