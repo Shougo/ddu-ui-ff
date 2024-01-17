@@ -1631,7 +1631,7 @@ export class Ui extends BaseUi<Params> {
 
   async #collapseItemAction(denops: Denops, options: DduOptions) {
     const item = await this.#getItem(denops);
-    if (!item || !item.isTree) {
+    if (!item || !item.isTree || item.__level < 0) {
       return ActionFlags.None;
     }
 
