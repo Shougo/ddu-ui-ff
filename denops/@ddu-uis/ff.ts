@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.9.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.0/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.9.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.0/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -93,6 +93,10 @@ type OnPreviewArguments = {
 
 type PreviewExecuteParams = {
   command: string;
+};
+
+type RedrawParams = {
+  method?: "refreshItems" | "uiRedraw" | "uiRefresh";
 };
 
 export type Params = {
@@ -1229,8 +1233,19 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
-    refreshItems: (_) => {
-      return Promise.resolve(ActionFlags.RefreshItems);
+    redraw: async (args: {
+      denops: Denops;
+      options: DduOptions;
+      actionParams: unknown;
+    }) => {
+      // NOTE: await may freeze UI
+      const params = args.actionParams as RedrawParams;
+      args.denops.dispatcher.redraw(args.options.name, {
+        method: params?.method ?? "uiRefresh",
+        searchItem: await this.#getItem(args.denops),
+      });
+
+      return ActionFlags.None;
     },
     toggleAllItems: (_) => {
       if (this.#items.length === 0) {
@@ -1334,9 +1349,10 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       actionParams: unknown;
     }) => {
-      await args.denops.dispatcher.redraw(args.options.name, {
-        updateOptions: args.actionParams,
-      });
+      await args.denops.dispatcher.updateOptions(
+        args.options.name,
+        args.actionParams,
+      );
       return ActionFlags.None;
     },
   };

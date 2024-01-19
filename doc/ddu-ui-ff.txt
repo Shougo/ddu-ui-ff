@@ -176,9 +176,19 @@ previewPath
 quit
 		Quit the UI window.
 
-                                               *ddu-ui-ff-action-refreshItems*
-refreshItems
-		Refresh the items.
+                                                     *ddu-ui-ff-action-redraw*
+redraw
+		params:
+			{method}: Redraw method
+
+			"refreshItems": Gather all source items and refresh UI
+			items.
+			"uiRedraw": Redraw current UI window.
+			"uiRefresh": Refresh all UI items. (Default)
+
+		Redraw the UI.
+		NOTE: The expanded trees are restored if {method} is not
+		"uiRedraw".
 
                                              *ddu-ui-ff-action-toggleAllItems*
 toggleAllItems
@@ -203,8 +213,7 @@ updateOptions
 
 		Update current options and redraw the UI.
 		Refer to |ddu-options| about options.
-		NOTE: It does not refresh items.
-		NOTE: The expanded trees are restored.
+		NOTE: It does not redraw items.
 
 ==============================================================================
 PARAMS                                                      *ddu-ui-ff-params*
@@ -1117,6 +1126,10 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.01.19
+* Rename "refreshItems" action to "redraw".
+* "updateOptions" action does not redraw automatically.
 
 2023.07.15
 * Only highlight items of "maxHighlightItems" to improve the performance.
