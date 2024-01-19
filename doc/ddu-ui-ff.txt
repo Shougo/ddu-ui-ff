@@ -203,6 +203,7 @@ updateOptions
 
 		Update current options and redraw the UI.
 		Refer to |ddu-options| about options.
+		NOTE: It does not refresh items.
 
 ==============================================================================
 PARAMS                                                      *ddu-ui-ff-params*
