@@ -181,9 +181,10 @@ redraw
 		params:
 			{method}: Redraw method
 
-			"refreshItems": Gather all source items and refresh UI
-			items.
-			"uiRefresh": Refresh UI items. (Default)
+			"refreshItems": Gather all source items and execute
+				"uiRefresh".
+			"uiRefresh": Refresh UI items and execute "uiRedraw".
+				(Default)
 			"uiRedraw": Redraw current UI window.
 
 		Redraw the UI.
