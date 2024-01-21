@@ -183,11 +183,11 @@ redraw
 
 			"refreshItems": Gather all source items and refresh UI
 			items.
+			"uiRefresh": Refresh UI items. (Default)
 			"uiRedraw": Redraw current UI window.
-			"uiRefresh": Refresh all UI items. (Default)
 
 		Redraw the UI.
-		NOTE: The expanded trees are restored if {method} is not
+		NOTE: The expanded trees are collapsed if {method} is not
 		"uiRedraw".
 
                                              *ddu-ui-ff-action-toggleAllItems*
