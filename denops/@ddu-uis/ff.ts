@@ -280,7 +280,7 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    if (this.#items.length === 0 && args.context.done) {
+    if (args.context.done && this.#items.length === 0) {
       // Close preview window when empty items
       await this.#previewUi.close(args.denops, args.context, args.uiParams);
     }
@@ -1235,9 +1235,19 @@ export class Ui extends BaseUi<Params> {
     },
     redraw: async (args: {
       denops: Denops;
+      context: Context;
       options: DduOptions;
       actionParams: unknown;
+      uiParams: Params;
     }) => {
+      if (
+        this.#previewUi.visible() &&
+        this.#previewUi.isChangedUiParams(args.uiParams)
+      ) {
+        // Close preview window when uiParams is changed
+        await this.#previewUi.close(args.denops, args.context, args.uiParams);
+      }
+
       // NOTE: await may freeze UI
       const params = args.actionParams as RedrawParams;
       args.denops.dispatcher.redraw(args.options.name, {

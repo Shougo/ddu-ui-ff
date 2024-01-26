@@ -27,6 +27,7 @@ type PreviewParams = {
 export class PreviewUi {
   #previewWinId = -1;
   #previewedTarget?: DduItem;
+  #previewedUiParams?: Params;
   #matchIds: Record<number, number> = {};
   #previewedBufnrs: Set<number> = new Set();
 
@@ -77,6 +78,10 @@ export class PreviewUi {
   isAlreadyPreviewed(item: DduItem): boolean {
     return this.visible() &&
       JSON.stringify(item) === JSON.stringify(this.#previewedTarget);
+  }
+
+  isChangedUiParams(params: Params): boolean {
+    return JSON.stringify(params) !== JSON.stringify(this.#previewedUiParams);
   }
 
   visible(): boolean {
@@ -186,6 +191,7 @@ export class PreviewUi {
 
     this.#previewedBufnrs.add(await fn.bufnr(denops));
     this.#previewedTarget = item;
+    this.#previewedUiParams = uiParams;
     await fn.win_gotoid(denops, prevId);
 
     return ActionFlags.Persist;

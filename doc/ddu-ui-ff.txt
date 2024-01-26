@@ -190,6 +190,8 @@ redraw
 		Redraw the UI.
 		NOTE: The expanded trees are collapsed if {method} is not
 		"uiRedraw".
+		NOTE: The preview window is closed when |ddu-ui-ff-params| is
+		changed.
 
                                              *ddu-ui-ff-action-toggleAllItems*
 toggleAllItems
