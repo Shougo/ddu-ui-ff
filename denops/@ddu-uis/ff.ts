@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.10.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.1/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.10.0/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.1/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -706,6 +706,7 @@ export class Ui extends BaseUi<Params> {
 
     const insertItems = args.children;
 
+    const prevLength = this.#items.length;
     if (index >= 0) {
       this.#items = this.#items.slice(0, index + 1).concat(insertItems).concat(
         this.#items.slice(index + 1),
@@ -717,7 +718,7 @@ export class Ui extends BaseUi<Params> {
 
     this.#selectedItems.clear();
 
-    return Promise.resolve();
+    return Promise.resolve(prevLength - this.#items.length);
   }
 
   override collapseItem(args: {
@@ -731,13 +732,14 @@ export class Ui extends BaseUi<Params> {
         item.__sourceIndex === args.item.__sourceIndex,
     );
     if (startIndex < 0) {
-      return Promise.resolve();
+      return Promise.resolve(0);
     }
 
     const endIndex = this.#items.slice(startIndex + 1).findIndex(
       (item: DduItem) => item.__level <= args.item.__level,
     );
 
+    const prevLength = this.#items.length;
     if (endIndex < 0) {
       this.#items = this.#items.slice(0, startIndex + 1);
     } else {
@@ -750,7 +752,7 @@ export class Ui extends BaseUi<Params> {
 
     this.#selectedItems.clear();
 
-    return Promise.resolve();
+    return Promise.resolve(prevLength - this.#items.length);
   }
 
   override async visible(args: {
