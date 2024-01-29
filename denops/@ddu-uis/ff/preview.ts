@@ -31,10 +31,6 @@ export class PreviewUi {
   #matchIds: Record<number, number> = {};
   #previewedBufnrs: Set<number> = new Set();
 
-  get previewWinId(): number {
-    return this.#previewWinId;
-  }
-
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
@@ -77,6 +73,10 @@ export class PreviewUi {
       return;
     }
     await fn.win_execute(denops, this.#previewWinId, command);
+  }
+
+  get previewWinId(): number {
+    return this.#previewWinId;
   }
 
   isAlreadyPreviewed(item: DduItem): boolean {
