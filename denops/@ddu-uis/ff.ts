@@ -797,12 +797,17 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     uiParams: Params;
   }): Promise<number[]> {
+    const winIds = [await this.#winId(args)];
     const filterBufnr = await this.#getFilterBufnr(args.denops);
     const filterWinIds = await fn.win_findbuf(
       args.denops,
       filterBufnr,
     ) as number[];
-    return [await this.#winId(args)].concat(filterWinIds);
+    winIds.push(...filterWinIds);
+    if (this.#previewUi.visible()) {
+      winIds.push(this.#previewUi.previewWinId);
+    }
+    return winIds;
   }
 
   override actions: UiActions<Params> = {
