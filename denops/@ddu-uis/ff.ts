@@ -817,7 +817,7 @@ export class Ui extends BaseUi<Params> {
     }) => {
       args.denops.dispatcher.redraw(args.options.name, {
         check: true,
-        refreshItems: true,
+        method: "refreshItems",
       });
 
       return ActionFlags.None;
