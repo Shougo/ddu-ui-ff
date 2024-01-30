@@ -58,6 +58,13 @@ ddu#ui#ff#execute({command})
 ------------------------------------------------------------------------------
 ACTIONS                                                    *ddu-ui-ff-actions*
 
+                                                 *ddu-ui-ff-action-checkItems*
+checkItems
+		Check the items are updated.
+		NOTE: Source support is needed for the feature.
+		NOTE: The expanded trees are collapsed if the items are
+		updated.
+
                                                *ddu-ui-ff-action-chooseAction*
 chooseAction
 		Choose and fire the action by ddu UI.
