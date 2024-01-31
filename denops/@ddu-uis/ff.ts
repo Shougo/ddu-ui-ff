@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.10.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.2/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.10.1/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.2/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -82,6 +82,7 @@ type ExprNumber = string | number;
 type ExpandItemParams = {
   mode?: "toggle";
   maxLevel?: number;
+  isGrouped?: boolean;
 };
 
 type OnPreviewArguments = {
@@ -695,6 +696,7 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     parent: DduItem;
     children: DduItem[];
+    isGrouped: boolean;
   }) {
     // NOTE: treePath may be list.  So it must be compared by JSON.
     const searchPath = JSON.stringify(args.parent.treePath);
@@ -708,10 +710,16 @@ export class Ui extends BaseUi<Params> {
 
     const prevLength = this.#items.length;
     if (index >= 0) {
-      this.#items = this.#items.slice(0, index + 1).concat(insertItems).concat(
-        this.#items.slice(index + 1),
-      );
-      this.#items[index] = args.parent;
+      if (args.isGrouped) {
+        // Replace parent
+        this.#items[index] = insertItems[0];
+      } else {
+        this.#items = this.#items.slice(0, index + 1).concat(insertItems)
+          .concat(
+            this.#items.slice(index + 1),
+          );
+        this.#items[index] = args.parent;
+      }
     } else {
       this.#items = this.#items.concat(insertItems);
     }
@@ -993,7 +1001,11 @@ export class Ui extends BaseUi<Params> {
       await args.denops.dispatcher.redrawTree(
         args.options.name,
         "expand",
-        [{ item, maxLevel: params.maxLevel ?? 0 }],
+        [{
+          item,
+          maxLevel: params.maxLevel ?? 0,
+          isGrouped: params.isGrouped ?? false,
+        }],
       );
 
       return ActionFlags.None;

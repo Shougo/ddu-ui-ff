@@ -116,6 +116,10 @@ expandItem
 				Maximum expand recursive level.
 				If it is less than 0, infinite recursive.
 
+			{isGrouped}:
+				If there is only one directory, it will be
+				concatenated.
+
 		Expand the item tree.
 
                                                     *ddu-ui-ff-action-getItem*
