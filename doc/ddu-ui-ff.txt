@@ -62,8 +62,6 @@ ACTIONS                                                    *ddu-ui-ff-actions*
 checkItems
 		Check the items are updated.
 		NOTE: Source support is needed for the feature.
-		NOTE: The expanded trees are collapsed if the items are
-		updated.
 
                                                *ddu-ui-ff-action-chooseAction*
 chooseAction
@@ -195,8 +193,6 @@ redraw
 			"uiRedraw": Redraw current UI window.
 
 		Redraw the UI.
-		NOTE: The expanded trees are collapsed if {method} is not
-		"uiRedraw".
 		NOTE: The preview window is closed when |ddu-ui-ff-params| is
 		changed.
 
