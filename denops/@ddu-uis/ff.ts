@@ -79,6 +79,13 @@ type WindowOption = [string, number | string];
 
 type ExprNumber = string | number;
 
+type WinInfo = {
+  columns: number;
+  lines: number;
+  winid: number;
+  tabpagebuflist: number[];
+};
+
 type ExpandItemParams = {
   mode?: "toggle";
   maxLevel?: number;
@@ -161,6 +168,8 @@ export class Ui extends BaseUi<Params> {
   #previewUi = new PreviewUi();
   #popupId = -1;
   #enabledAutoAction = false;
+  #restcmd = "";
+  #prevWinInfo: WinInfo | null = null;
 
   override async onInit(args: {
     denops: Denops;
@@ -343,6 +352,12 @@ export class Ui extends BaseUi<Params> {
       denops: args.denops,
       uiParams: args.uiParams,
     });
+
+    if (winid < 0) {
+      // The layout must be saved.
+      this.#restcmd = await fn.winrestcmd(args.denops);
+      this.#prevWinInfo = await this.#getWinInfo(args.denops);
+    }
 
     const direction = args.uiParams.splitDirection;
     if (args.uiParams.split === "horizontal") {
@@ -1547,6 +1562,17 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
+    if (
+      this.#restcmd !== "" &&
+      JSON.stringify(this.#prevWinInfo) ===
+        JSON.stringify(await this.#getWinInfo(args.denops))
+    ) {
+      // Restore the layout.
+      await args.denops.cmd(this.#restcmd);
+      this.#restcmd = "";
+      this.#prevWinInfo = null;
+    }
+
     await args.denops.dispatcher.event(args.options.name, "close");
   }
 
@@ -1862,6 +1888,17 @@ export class Ui extends BaseUi<Params> {
       "ddu_ui_ff_save_cursor_item",
       this.#items[cursorPos - 1],
     );
+  }
+
+  async #getWinInfo(
+    denops: Denops,
+  ): Promise<WinInfo> {
+    return {
+      columns: await op.columns.getGlobal(denops),
+      lines: await op.lines.getGlobal(denops),
+      winid: await fn.win_getid(denops),
+      tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
+    };
   }
 }
 
