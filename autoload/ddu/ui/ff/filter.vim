@@ -1,9 +1,16 @@
-function ddu#ui#ff#filter#_open(name, input, parent_id, params) abort
+function ddu#ui#ff#filter#_open(name, input, parent_id, changed_params, params) abort
   const bufname = 'ddu-ff-filter'
   const ids = bufname->bufnr()->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
-    call cursor('$'->line(), 0)
+
+    if a:changed_params
+      " NOTE: Need redraw filter window
+      close!
+      call s:init_buffer(a:name, bufname, a:params)
+    else
+      call cursor('$'->line(), 0)
+    endif
   else
     call s:init_buffer(a:name, bufname, a:params)
   endif

@@ -165,6 +165,7 @@ export class Ui extends BaseUi<Params> {
   #refreshed = false;
   #prevLength = -1;
   #prevInput = "";
+  #prevUiParams = this.params();
   #previewUi = new PreviewUi();
   #popupId = -1;
   #enabledAutoAction = false;
@@ -664,7 +665,10 @@ export class Ui extends BaseUi<Params> {
     }
 
     const filterBufnr = await this.#getFilterBufnr(args.denops);
-    if (winid < 0) {
+    const changedUiParams =
+      JSON.stringify(args.uiParams) !== JSON.stringify(this.#prevUiParams);
+    if (winid < 0 || changedUiParams) {
+      // NOTE: If uiParams is changed, need to redraw UI window.
       const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
       if (startFilter) {
         await args.denops.call(
@@ -675,6 +679,7 @@ export class Ui extends BaseUi<Params> {
             denops: args.denops,
             uiParams: args.uiParams,
           }),
+          changedUiParams,
           args.uiParams,
         ) as number;
       } else {
@@ -690,6 +695,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.#refreshed = false;
+    this.#prevUiParams = args.uiParams;
   }
 
   override async quit(args: {
@@ -1168,6 +1174,7 @@ export class Ui extends BaseUi<Params> {
           denops: args.denops,
           uiParams: args.uiParams,
         }),
+        false,
         uiParams,
       ) as number;
 
