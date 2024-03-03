@@ -422,7 +422,7 @@ export class Ui extends BaseUi<Params> {
           delete winOpts.title;
           delete winOpts.title_pos;
         }
-        if (winid >= 0) {
+        if (winid >= 0 && await fn.bufwinid(args.denops, bufnr) === winid) {
           await args.denops.call(
             "nvim_win_set_config",
             this.#popupId,
