@@ -8,7 +8,7 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.10.2/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.3/types.ts";
 import {
   batch,
   Denops,
@@ -16,8 +16,8 @@ import {
   fn,
   is,
   op,
-} from "https://deno.land/x/ddu_vim@v3.10.2/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v6.0.1/buffer/mod.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.3/deps.ts";
+import { replace } from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
 import { Params } from "../ff.ts";
 
 type PreviewParams = {
@@ -312,7 +312,7 @@ export class PreviewUi {
         "&filetype",
       ) as string;
       if (filetype.length == 0) {
-        // NOTE: Call filetype detection by "BufRead" autocmd
+        // NOTE: Call filetype detection by "BufRead" autocmd.
         // "filetype detect" is broken for the window.
         await fn.win_execute(
           denops,

@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.10.2/types.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.3/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,7 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.10.2/deps.ts";
+} from "https://deno.land/x/ddu_vim@v3.10.3/deps.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
