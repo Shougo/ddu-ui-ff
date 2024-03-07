@@ -305,6 +305,21 @@ export class PreviewUi {
           previewer.syntax
         );
       }
+
+      const filetype = await fn.getbufvar(
+        denops,
+        previewBufnr,
+        "&filetype",
+      ) as string;
+      if (filetype.length == 0) {
+        // NOTE: Call filetype detection by "BufRead" autocmd
+        // "filetype detect" is broken for the window.
+        await fn.win_execute(
+          denops,
+          this.#previewWinId,
+          "doautocmd BufRead",
+        );
+      }
     }
 
     // Set options
