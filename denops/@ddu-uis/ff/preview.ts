@@ -302,7 +302,7 @@ export class PreviewUi {
           denops,
           previewBufnr,
           "&syntax",
-          previewer.syntax
+          previewer.syntax,
         );
       }
 
@@ -311,13 +311,18 @@ export class PreviewUi {
         previewBufnr,
         "&filetype",
       ) as string;
-      if (filetype.length == 0) {
+      const syntax = await fn.getbufvar(
+        denops,
+        previewBufnr,
+        "&syntax",
+      ) as string;
+      if (filetype.length === 0 && syntax.length === 0) {
         // NOTE: Call filetype detection by "BufRead" autocmd.
         // "filetype detect" is broken for the window.
         await fn.win_execute(
           denops,
           this.#previewWinId,
-          "doautocmd BufRead",
+          "silent! doautocmd BufRead",
         );
       }
     }
@@ -494,7 +499,7 @@ export class PreviewUi {
     }
     const winid = this.#previewWinId;
 
-    if (this.#matchIds[winid] > 0) {
+    if (this.#matchIds[winid] > 0 && await fn.winbufnr(denops, winid) > 0) {
       await fn.matchdelete(denops, this.#matchIds[winid], winid);
     }
     if (denops.meta.host === "nvim") {
