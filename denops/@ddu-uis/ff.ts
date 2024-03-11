@@ -92,6 +92,10 @@ type ExpandItemParams = {
   isGrouped?: boolean;
 };
 
+type OpenFilterWindowParams = {
+  input?: string;
+};
+
 type OnPreviewArguments = {
   denops: Denops;
   context: Context;
@@ -1141,7 +1145,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: OpenFilterWindowParams;
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
@@ -1169,7 +1173,7 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call(
         "ddu#ui#ff#filter#_open",
         args.options.name,
-        args.context.input,
+        args.actionParams.input ?? args.context.input,
         await this.#winId({
           denops: args.denops,
           uiParams: args.uiParams,

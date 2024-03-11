@@ -155,6 +155,9 @@ leaveFilterWindow
 openFilterWindow
 		Open the filter window.
 
+		params:
+			{input}: Overwrite current input
+
                                                     *ddu-ui-ff-action-preview*
 preview
 		params:
