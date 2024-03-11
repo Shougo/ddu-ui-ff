@@ -607,9 +607,6 @@ split		(string)
 		"floating": use floating window feature
 		"no": no split
 
-		NOTE: If you have enabled "floating" in Vim,
-		|ddu-ui-ff-param-startFilter| is enabled automatically.
-
 		Default: "horizontal"
 
                                               *ddu-ui-ff-param-splitDirection*
@@ -623,13 +620,6 @@ startAutoAction	(boolean)
 		If it is true, |ddu-ui-ff-param-autoAction| is fired
 		automatically.
 		Note: It must be set before UI initialization.
-
-		Default: v:false
-
-                                                 *ddu-ui-ff-param-startFilter*
-startFilter	(boolean)
-		If it is true, the filter window is opened automatically when
-		initialized UI.
 
 		Default: v:false
 
@@ -823,6 +813,12 @@ FAQ 24:							|ddu-ui-ff-faq-24|
 FAQ 25:							|ddu-ui-ff-faq-25|
 	I want to scroll preview window.
 
+FAQ 26:							|ddu-ui-ff-faq-26|
+	I want to preview selected item automatically.
+
+FAQ 27:							|ddu-ui-ff-faq-27|
+	I want to start filter window when UI is initialized.
+
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
@@ -979,7 +975,6 @@ A: >
 	\   ],
 	\   uiParams: #{
 	\     ff: #{
-	\       startFilter: v:true,
 	\       replaceCol: match(getline('.')[: col('.') - 1], '\f*$') + 1,
 	\     },
 	\   },
@@ -999,7 +994,6 @@ A: >
 	\   ],
 	\   uiParams: #{
 	\     ff: #{
-	\       startFilter: v:true,
 	\       replaceCol: match(getcmdline()[: getcmdpos() - 2],
 	\                         '\f*$') + 1,
 	\     },
@@ -1121,6 +1115,7 @@ A: >
 	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
 <
 
+                                                            *ddu-ui-ff-faq-26*
 Q: I want to preview selected item automatically.
 
 A: You need to set |ddu-ui-ff-param-autoAction| like this. >
@@ -1136,8 +1131,22 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >
 	      \ })
 <
 
+                                                            *ddu-ui-ff-faq-27*
+Q: I want to start filter window when UI is initialized.
+
+A: It is not supported.  Because it has too many problems.  But you can use the
+function.
+>
+	call ddu#start()
+	autocmd FileType ddu-ff ++once
+	\ call timer_start(1, {-> ddu#ui#do_action('openFilterWindow')})
+<
+
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.03.11
+* Remove "startFilter" option.  Because it has too many problems.
 
 2024.01.19
 * Rename "refreshItems" action to "redraw".

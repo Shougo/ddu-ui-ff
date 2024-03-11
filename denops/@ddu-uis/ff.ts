@@ -145,7 +145,6 @@ export type Params = {
   split: "horizontal" | "vertical" | "floating" | "no";
   splitDirection: "belowright" | "aboveleft" | "topleft" | "botright";
   startAutoAction: boolean;
-  startFilter: boolean;
   statusline: boolean;
   winCol: ExprNumber;
   winHeight: ExprNumber;
@@ -665,11 +664,8 @@ export class Ui extends BaseUi<Params> {
     }
 
     const filterBufnr = await this.#getFilterBufnr(args.denops);
-    const changedUiParams =
-      JSON.stringify(args.uiParams) !== JSON.stringify(this.#prevUiParams);
-    if (winid < 0 || changedUiParams) {
-      // NOTE: If uiParams is changed, need to redraw UI window.
-      const startFilter = args.uiParams.startFilter || (floating && !hasNvim);
+    if (winid < 0) {
+      const startFilter = floating && !hasNvim;
       if (startFilter) {
         await args.denops.call(
           "ddu#ui#ff#filter#_open",
@@ -679,7 +675,7 @@ export class Ui extends BaseUi<Params> {
             denops: args.denops,
             uiParams: args.uiParams,
           }),
-          changedUiParams,
+          false,
           args.uiParams,
         ) as number;
       } else {
@@ -1166,6 +1162,10 @@ export class Ui extends BaseUi<Params> {
         await this.#previewUi.close(args.denops, args.context, uiParams);
       }
 
+      // NOTE: If uiParams is changed, need to redraw UI window.
+      const changedUiParams =
+        JSON.stringify(args.uiParams) !== JSON.stringify(this.#prevUiParams);
+
       await args.denops.call(
         "ddu#ui#ff#filter#_open",
         args.options.name,
@@ -1174,9 +1174,11 @@ export class Ui extends BaseUi<Params> {
           denops: args.denops,
           uiParams: args.uiParams,
         }),
-        false,
+        changedUiParams,
         uiParams,
       ) as number;
+
+      this.#prevUiParams = args.uiParams;
 
       if (reopenPreview) {
         const item = await this.#getItem(args.denops);
@@ -1464,7 +1466,6 @@ export class Ui extends BaseUi<Params> {
       split: "horizontal",
       splitDirection: "botright",
       startAutoAction: false,
-      startFilter: false,
       statusline: true,
       winCol: "(&columns - eval(uiParams.winWidth)) / 2",
       winHeight: 20,
