@@ -64,7 +64,7 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, changed_params, params) 
 
   " NOTE: startinsert! does not work in resume or autoAction
   if mode() ==# 'n'
-    call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'n')
+    call feedkeys('.'->getline() ==# '' ? 'i' : 'A', 'ni')
   else
     startinsert!
   endif
