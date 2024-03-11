@@ -1547,7 +1547,7 @@ export class Ui extends BaseUi<Params> {
       await fn.feedkeys(
         args.denops,
         args.uiParams.replaceCol > 1 || this.#saveCol > endCol ? "a" : "i",
-        "n",
+        "ni",
       );
     } else if (this.#saveMode === ":") {
       const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
