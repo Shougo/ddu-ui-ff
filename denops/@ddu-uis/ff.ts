@@ -669,8 +669,8 @@ export class Ui extends BaseUi<Params> {
 
     const filterBufnr = await this.#getFilterBufnr(args.denops);
     if (winid < 0) {
-      const startFilter = floating && !hasNvim;
-      if (startFilter) {
+      // NOTE: "openFilterWindow" is required for floating Vim
+      if (floating && !hasNvim) {
         await args.denops.call(
           "ddu#ui#ff#filter#_open",
           args.options.name,

@@ -826,8 +826,10 @@ FAQ 27:							|ddu-ui-ff-faq-27|
                                                              *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
 
-A: Please set |ddu-ui-ff-param-startFilter|.
-
+A: You can use |input()| like this.
+>
+	call ddu#start(#{ input: 'Pattern:'->input() })
+<
                                                              *ddu-ui-ff-faq-2*
 Q: I want to call default action in the filter window.
 
