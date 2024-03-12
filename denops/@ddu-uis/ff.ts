@@ -826,7 +826,13 @@ export class Ui extends BaseUi<Params> {
     denops: Denops;
     uiParams: Params;
   }): Promise<number[]> {
-    const winIds = [await this.#winId(args)];
+    const winIds = [];
+
+    const mainWinId = await this.#winId(args);
+    if (mainWinId > 0) {
+      winIds.push(mainWinId);
+    }
+
     const filterBufnr = await this.#getFilterBufnr(args.denops);
     const filterWinIds = await fn.win_findbuf(
       args.denops,
@@ -836,6 +842,7 @@ export class Ui extends BaseUi<Params> {
     if (this.#previewUi.visible()) {
       winIds.push(this.#previewUi.previewWinId);
     }
+
     return winIds;
   }
 
@@ -1846,7 +1853,9 @@ export class Ui extends BaseUi<Params> {
   async #getBufnr(
     denops: Denops,
   ): Promise<number> {
-    return await fn.bufnr(denops, this.#bufferName);
+    return this.#bufferName.length === 0
+      ? -1
+      : await fn.bufnr(denops, this.#bufferName);
   }
 
   async #getIndex(
