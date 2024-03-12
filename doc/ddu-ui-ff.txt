@@ -1143,7 +1143,7 @@ A: It is not supported.  Because it has too many problems.  But you can use the
 function.
 >
 	call ddu#start()
-	autocmd FileType ddu-ff ++once
+	autocmd FileType ddu-ff
 	\ call timer_start(1, {-> ddu#ui#do_action('openFilterWindow')})
 <
 
