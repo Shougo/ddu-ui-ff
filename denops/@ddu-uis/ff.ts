@@ -1755,6 +1755,7 @@ export class Ui extends BaseUi<Params> {
       uiParams,
     });
     const existsStatusColumn = await fn.exists(denops, "+statuscolumn");
+    const existsWinFixBuf = await fn.exists(denops, "+winfixbuf");
 
     await batch(denops, async (denops: Denops) => {
       await fn.setbufvar(denops, bufnr, "ddu_ui_name", options.name);
@@ -1770,6 +1771,9 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&wrap", 0);
       if (existsStatusColumn) {
         await fn.setwinvar(denops, winid, "&statuscolumn", "");
+      }
+      if (existsWinFixBuf && uiParams.split !== "no") {
+        await fn.setwinvar(denops, winid, "&winfixbuf", true);
       }
 
       await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");

@@ -151,6 +151,10 @@ function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
         \ 'floatingBorder', 'FloatBorder')
   call setwinvar(id, '&winhighlight',
         \ 'Normal:' .. highlight .. ',FloatBorder:' .. floating_highlight)
+
+  if '+winfixbuf'->exists()
+    call setwinvar(id, '&winfixbuf', v:true)
+  endif
 endfunction
 
 function s:init_buffer(name, bufname, params) abort
