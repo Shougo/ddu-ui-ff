@@ -160,9 +160,23 @@ endfunction
 
 function ddu#ui#ff#_open_preview_window(
       \ params, bufnr, preview_bufnr, prev_winid, preview_winid) abort
+
+  const use_winfixbuf =
+        \ '+winfixbuf'->exists() && a:params.previewSplit !=# 'no'
+
   if a:preview_winid >= 0 && (!a:params.previewFloating || has('nvim'))
     call win_gotoid(a:preview_winid)
+
+    if use_winfixbuf
+      call setwinvar(a:preview_winid, '&winfixbuf', v:false)
+    endif
+
     execute 'buffer' a:preview_bufnr
+
+    if use_winfixbuf
+      call setwinvar(a:preview_winid, '&winfixbuf', v:true)
+    endif
+
     return a:preview_winid
   endif
 
@@ -333,7 +347,7 @@ function ddu#ui#ff#_open_preview_window(
     call setwinvar(winid, '&previewwindow', v:true)
   endif
   call setwinvar(winid, '&cursorline', v:false)
-  if '+winfixbuf'->exists()
+  if use_winfixbuf
     call setwinvar(winid, '&winfixbuf', v:true)
   endif
 
