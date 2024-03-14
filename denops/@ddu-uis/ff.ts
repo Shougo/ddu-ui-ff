@@ -174,6 +174,7 @@ export class Ui extends BaseUi<Params> {
   #enabledAutoAction = false;
   #restcmd = "";
   #prevWinInfo: WinInfo | null = null;
+  #filterBufnr = -1;
 
   override async onInit(args: {
     denops: Denops;
@@ -538,12 +539,11 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight} | normal! zb`,
       );
-      const filterBufnr = await this.#getFilterBufnr(args.denops);
-      if (await fn.bufwinid(args.denops, filterBufnr) >= 0) {
+      if (await fn.bufwinid(args.denops, this.#filterBufnr) >= 0) {
         // Redraw floating window
         await args.denops.call(
           "ddu#ui#ff#filter#_floating",
-          filterBufnr,
+          this.#filterBufnr,
           winid,
           args.uiParams,
         );
@@ -667,11 +667,10 @@ export class Ui extends BaseUi<Params> {
       });
     }
 
-    const filterBufnr = await this.#getFilterBufnr(args.denops);
     if (winid < 0) {
       // NOTE: "openFilterWindow" is required for floating Vim
       if (floating && !hasNvim) {
-        await args.denops.call(
+        this.#filterBufnr = await args.denops.call(
           "ddu#ui#ff#filter#_open",
           args.options.name,
           args.context.input,
@@ -685,7 +684,7 @@ export class Ui extends BaseUi<Params> {
       } else {
         await args.denops.cmd("stopinsert");
       }
-    } else if (await fn.bufwinid(args.denops, filterBufnr) < 0) {
+    } else if (await fn.bufwinid(args.denops, this.#filterBufnr) < 0) {
       await fn.win_gotoid(args.denops, winid);
     }
 
@@ -833,10 +832,9 @@ export class Ui extends BaseUi<Params> {
       winIds.push(mainWinId);
     }
 
-    const filterBufnr = await this.#getFilterBufnr(args.denops);
     const filterWinIds = await fn.win_findbuf(
       args.denops,
-      filterBufnr,
+      this.#filterBufnr,
     ) as number[];
     winIds.push(...filterWinIds);
     if (this.#previewUi.visible()) {
@@ -1152,7 +1150,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: OpenFilterWindowParams;
+      actionParams: unknown;
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
@@ -1177,10 +1175,12 @@ export class Ui extends BaseUi<Params> {
       const changedUiParams =
         JSON.stringify(args.uiParams) !== JSON.stringify(this.#prevUiParams);
 
-      await args.denops.call(
+      const actionParams = args.actionParams as OpenFilterWindowParams;
+
+      this.#filterBufnr = await args.denops.call(
         "ddu#ui#ff#filter#_open",
         args.options.name,
-        args.actionParams.input ?? args.context.input,
+        actionParams.input ?? args.context.input,
         await this.#winId({
           denops: args.denops,
           uiParams: args.uiParams,
@@ -1689,13 +1689,8 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
-  async #getFilterBufnr(denops: Denops): Promise<number> {
-    return await fn.bufnr(denops, `ddu-ff-filter`);
-  }
-
   async #closeFilterWindow(denops: Denops): Promise<boolean> {
-    const filterBufnr = await this.#getFilterBufnr(denops);
-    const filterWinIds = await fn.win_findbuf(denops, filterBufnr);
+    const filterWinIds = await fn.win_findbuf(denops, this.#filterBufnr);
     if (filterWinIds.length > 0 && await fn.winnr(denops, "$") !== 1) {
       const winid = await fn.win_getid(denops);
       await fn.win_gotoid(denops, filterWinIds[0]);

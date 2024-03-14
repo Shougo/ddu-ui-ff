@@ -1,18 +1,22 @@
 function ddu#ui#ff#filter#_open(name, input, parent_id, changed_params, params) abort
-  const bufname = 'ddu-ff-filter'
-  const ids = bufname->bufnr()->win_findbuf()
+  if !'s:filter_bufnr'->exists()
+    " NOTE: Filter buffer must be unique
+    let s:filter_bufnr = bufadd('ddu-ff-filter')
+  endif
+
+  const ids = s:filter_bufnr->win_findbuf()
   if !empty(ids)
     call win_gotoid(ids[0])
 
     if a:changed_params
       " NOTE: Need redraw filter window
       close!
-      call s:init_buffer(a:name, bufname, a:params)
+      call s:init_buffer(a:name, a:params)
     else
       call cursor('$'->line(), 0)
     endif
   else
-    call s:init_buffer(a:name, bufname, a:params)
+    call s:init_buffer(a:name, a:params)
   endif
 
   if !&l:modifiable
@@ -86,7 +90,7 @@ function ddu#ui#ff#filter#_open(name, input, parent_id, changed_params, params) 
         \ InsertEnter,TextChangedI,TextChangedP,TextChanged,InsertLeave
         \ <buffer> call s:check_update()
 
-  return '%'->bufnr()
+  return s:filter_bufnr
 endfunction
 
 function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
@@ -157,19 +161,17 @@ function ddu#ui#ff#filter#_floating(bufnr, parent, params) abort
   endif
 endfunction
 
-function s:init_buffer(name, bufname, params) abort
+function s:init_buffer(name, params) abort
   const is_floating =
         \ a:params.split ==# 'floating'
         \ || a:params.filterSplitDirection ==# 'floating'
 
-  const bufnr = a:bufname->bufadd()
-
   if has('nvim') && is_floating
-    call ddu#ui#ff#filter#_floating(bufnr, win_getid(), a:params)
+    call ddu#ui#ff#filter#_floating(s:filter_bufnr, win_getid(), a:params)
   else
     const direction = is_floating ?
           \ 'belowright' : a:params.filterSplitDirection
-    silent execute direction 'sbuffer' bufnr
+    silent execute direction 'sbuffer' s:filter_bufnr
   endif
 
   let b:ddu_ui_name = a:name
