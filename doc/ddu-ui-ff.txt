@@ -733,93 +733,93 @@ EXAMPLES                                                  *ddu-ui-ff-examples*
 <
 
 ==============================================================================
-FREQUENTLY ASKED QUESTIONS (FAQ)			*ddu-ui-ff-faq*
+FREQUENTLY ASKED QUESTIONS (FAQ)                               *ddu-ui-ff-faq*
 
-FAQ 1:							|ddu-ui-ff-faq-1|
+FAQ 1:                                                       |ddu-ui-ff-faq-1|
 	I want to toggle hidden files by mappings.
 
-FAQ 2:							|ddu-ui-ff-faq-2|
+FAQ 2:                                                       |ddu-ui-ff-faq-2|
 	I want to call default action in the filter window.
 
-FAQ 3:							|ddu-ui-ff-faq-3|
+FAQ 3:                                                       |ddu-ui-ff-faq-3|
 	I want to move the cursor in the filter window, while in insert mode.
 
-FAQ 4:							|ddu-ui-ff-faq-4|
+FAQ 4:                                                       |ddu-ui-ff-faq-4|
 	I want to define |ddu-option-name| depend key mappings.
 
-FAQ 5:							|ddu-ui-ff-faq-5|
+FAQ 5:                                                       |ddu-ui-ff-faq-5|
 	I want to define kind depend key mappings.
 
-FAQ 6:							|ddu-ui-ff-faq-6|
+FAQ 6:                                                       |ddu-ui-ff-faq-6|
 	I want to pass params to the action when
 	|ddu-ui-ff-action-chooseAction|.
 
-FAQ 7:							|ddu-ui-ff-faq-7|
+FAQ 7:                                                       |ddu-ui-ff-faq-7|
 	I want to use Vim syntax highlight in the buffer.
 
-FAQ 8:							|ddu-ui-ff-faq-8|
+FAQ 8:                                                       |ddu-ui-ff-faq-8|
 	I want to custom the statusline.
 
-FAQ 9:							|ddu-ui-ff-faq-9|
+FAQ 9:                                                       |ddu-ui-ff-faq-9|
 	I want to move to line quickly like denite.nvim's "quick-move"
 	feature.
 
-FAQ 10:							|ddu-ui-ff-faq-10|
+FAQ 10:                                                     |ddu-ui-ff-faq-10|
 	Why ddu-ui-ff does not support Vim's popup window feature instead of
 	neovim's floating window feature?
 
-FAQ 11:							|ddu-ui-ff-faq-11|
+FAQ 11:                                                     |ddu-ui-ff-faq-11|
 	|:close| does not move to the ddu-ui-ff window sometimes.
 
-FAQ 12:							|ddu-ui-ff-faq-12|
+FAQ 12:                                                     |ddu-ui-ff-faq-12|
 	I want to toggle selected items in visual mode.
 
-FAQ 13:							|ddu-ui-ff-faq-13|
+FAQ 13:                                                     |ddu-ui-ff-faq-13|
 	|ddu#ui#ff#execute()| does not execute |:redraw| automatically.
 
-FAQ 14:							|ddu-ui-ff-faq-14|
+FAQ 14:                                                     |ddu-ui-ff-faq-14|
 	I want to use "ddu-ui-ff" in insert mode.
 
-FAQ 15:							|ddu-ui-ff-faq-15|
+FAQ 15:                                                     |ddu-ui-ff-faq-15|
 	I want to use "ddu-ui-ff" in command line mode.
 
-FAQ 16:							|ddu-ui-ff-faq-16|
+FAQ 16:                                                     |ddu-ui-ff-faq-16|
 	I want to switch sources without clear current filter input.
 
-FAQ 17:							|ddu-ui-ff-faq-17|
+FAQ 17:                                                     |ddu-ui-ff-faq-17|
 	I want to use existing buffer to show preview.
 
-FAQ 18:							|ddu-ui-ff-faq-18|
+FAQ 18:                                                     |ddu-ui-ff-faq-18|
 	":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1
 	-immediately" like commands are available?
 
-FAQ 19:							|ddu-ui-ff-faq-19|
+FAQ 19:                                                     |ddu-ui-ff-faq-19|
 	I want to display cursor mark on the left of ddu window like
 	"telescope.nvim".
 
-FAQ 20:							|ddu-ui-ff-faq-20|
+FAQ 20:                                                     |ddu-ui-ff-faq-20|
 	How do I set the floating title with list style ?
 
-FAQ 21:							|ddu-ui-ff-faq-21|
+FAQ 21:                                                     |ddu-ui-ff-faq-21|
 	I want to align column when |ddu-ui-ff-param-prompt| is set.
 
-FAQ 22:							|ddu-ui-ff-faq-22|
+FAQ 22:                                                     |ddu-ui-ff-faq-22|
 	When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction|
 	from insert mode of the filter window, it remains insert mode.
 
-FAQ 23:							|ddu-ui-ff-faq-23|
+FAQ 23:                                                     |ddu-ui-ff-faq-23|
 	I cannot see what item is selected in the filter window.
 
-FAQ 24:							|ddu-ui-ff-faq-24|
+FAQ 24:                                                     |ddu-ui-ff-faq-24|
 	I want to change preview cursor on the top.
 
-FAQ 25:							|ddu-ui-ff-faq-25|
+FAQ 25:                                                     |ddu-ui-ff-faq-25|
 	I want to scroll preview window.
 
-FAQ 26:							|ddu-ui-ff-faq-26|
+FAQ 26:                                                     |ddu-ui-ff-faq-26|
 	I want to preview selected item automatically.
 
-FAQ 27:							|ddu-ui-ff-faq-27|
+FAQ 27:                                                     |ddu-ui-ff-faq-27|
 	I want to start filter window when UI is initialized.
 
 ------------------------------------------------------------------------------
