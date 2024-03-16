@@ -224,8 +224,7 @@ updateOptions
 		params:
 			{option-name}: Option name and value
 
-		Update current options and redraw the UI.
-		Refer to |ddu-options| about options.
+		Update current options. Refer to |ddu-options| about options.
 		NOTE: It does not redraw items.
 		NOTE: If you execute it in the action, |ddu-options| is not
 		updated in current context.
