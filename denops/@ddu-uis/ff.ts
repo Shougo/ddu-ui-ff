@@ -1512,7 +1512,8 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("popup_close", this.#popupId);
       await args.denops.cmd("redraw!");
       this.#popupId = -1;
-      // Focus context window
+
+      // Focus to the previous window
       await fn.win_gotoid(args.denops, args.context.winId);
     } else {
       for (
@@ -1539,6 +1540,8 @@ export class Ui extends BaseUi<Params> {
         } else {
           await fn.win_gotoid(args.denops, winid);
           await args.denops.cmd("close!");
+
+          // Focus to the previous window
           await fn.win_gotoid(args.denops, args.context.winId);
         }
       }
