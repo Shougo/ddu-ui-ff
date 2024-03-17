@@ -175,7 +175,7 @@ export class Ui extends BaseUi<Params> {
   #restcmd = "";
   #prevWinInfo: WinInfo | null = null;
   #filterBufnr = -1;
-  #bufferClosing = false;
+  #closing = false;
 
   override async onInit(args: {
     denops: Denops;
@@ -704,7 +704,7 @@ export class Ui extends BaseUi<Params> {
     options: DduOptions;
     uiParams: Params;
   }): Promise<void> {
-    await this.#closeBuffer({
+    await this.#close({
       denops: args.denops,
       context: args.context,
       options: args.options,
@@ -1276,7 +1276,7 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
       uiParams: Params;
     }) => {
-      await this.#closeBuffer({
+      await this.#close({
         denops: args.denops,
         context: args.context,
         options: args.options,
@@ -1486,128 +1486,140 @@ export class Ui extends BaseUi<Params> {
     };
   }
 
-  async #closeBuffer(args: {
+  async #close(args: {
     denops: Denops;
     context: Context;
     options: DduOptions;
     uiParams: Params;
     cancel: boolean;
   }): Promise<void> {
-    if (this.#bufferClosing) {
+    // NOTE: this.#close() may be multiple called by WinClosed autocmd.
+    if (this.#closing) {
       return;
     }
-    this.#bufferClosing = true;
+
+    this.#closing = true;
 
     try {
-      await this.#previewUi.close(args.denops, args.context, args.uiParams);
-      await this.#previewUi.removePreviewedBuffers(args.denops);
-      const closedFilterWindow = await this.#closeFilterWindow(args.denops);
-      await args.denops.call("ddu#ui#ff#_reset_auto_action");
-      await args.denops.call("ddu#ui#ff#_restore_title");
-
-      // Move to the UI window.
-      const bufnr = await this.#getBufnr(args.denops);
-      if (!bufnr) {
-        return;
-      }
-
-      if (
-        args.uiParams.split === "floating" &&
-        args.denops.meta.host !== "nvim" && this.#popupId > 0
-      ) {
-        // Close popup
-        await args.denops.call("popup_close", this.#popupId);
-        await args.denops.cmd("redraw!");
-        this.#popupId = -1;
-
-        // Focus to the previous window
-        await fn.win_gotoid(args.denops, args.context.winId);
-      } else {
-        for (
-          const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
-        ) {
-          if (winid <= 0) {
-            continue;
-          }
-
-          await this.#closeFilterWindow(args.denops);
-
-          if (
-            args.uiParams.split === "no" ||
-            (await fn.winnr(args.denops, "$")) === 1
-          ) {
-            await fn.win_gotoid(args.denops, winid);
-
-            const prevName = await fn.bufname(args.denops, args.context.bufNr);
-            await args.denops.cmd(
-              prevName !== args.context.bufName || args.context.bufNr == bufnr
-                ? "enew"
-                : `buffer ${args.context.bufNr}`,
-            );
-          } else {
-            await fn.win_gotoid(args.denops, winid);
-            await args.denops.cmd("close!");
-
-            // Focus to the previous window
-            await fn.win_gotoid(args.denops, args.context.winId);
-          }
-        }
-      }
-
-      // Restore mode
-      if (this.#saveMode === "i") {
-        if (!args.cancel && args.uiParams.replaceCol > 0) {
-          const currentLine = await fn.getline(args.denops, ".");
-          const replaceLine = currentLine.slice(
-            0,
-            args.uiParams.replaceCol - 1,
-          ) + currentLine.slice(this.#saveCol - 1);
-          await fn.setline(args.denops, ".", replaceLine);
-          await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
-        }
-
-        const endCol = await fn.col(args.denops, ".");
-        await fn.feedkeys(
-          args.denops,
-          args.uiParams.replaceCol > 1 || this.#saveCol > endCol ? "a" : "i",
-          "ni",
-        );
-      } else if (this.#saveMode === ":") {
-        const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
-          ? this.#saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
-            this.#saveCmdline.slice(this.#saveCmdpos - 1)
-          : this.#saveCmdline;
-        const cmdpos = (!args.cancel && args.uiParams.replaceCol > 0)
-          ? args.uiParams.replaceCol
-          : this.#saveCmdpos;
-
-        await args.denops.call(
-          "ddu#ui#ff#_restore_cmdline",
-          cmdline,
-          cmdpos,
-        );
-      } else if (closedFilterWindow) {
-        const mode = await fn.mode(args.denops);
-        if (mode === "i" || mode === "n") {
-          await args.denops.cmd("stopinsert");
-        }
-      }
-
-      if (
-        this.#restcmd !== "" &&
-        JSON.stringify(this.#prevWinInfo) ===
-          JSON.stringify(await this.#getWinInfo(args.denops))
-      ) {
-        // Restore the layout.
-        await args.denops.cmd(this.#restcmd);
-        this.#restcmd = "";
-        this.#prevWinInfo = null;
-      }
-
-      await args.denops.dispatcher.event(args.options.name, "close");
+      await this.#closeWindows(args);
     } finally {
-      this.#bufferClosing = false;
+      this.#closing = false;
     }
+  }
+
+  async #closeWindows(args: {
+    denops: Denops;
+    context: Context;
+    options: DduOptions;
+    uiParams: Params;
+    cancel: boolean;
+  }): Promise<void> {
+    await this.#previewUi.close(args.denops, args.context, args.uiParams);
+    await this.#previewUi.removePreviewedBuffers(args.denops);
+    const closedFilterWindow = await this.#closeFilterWindow(args.denops);
+    await args.denops.call("ddu#ui#ff#_reset_auto_action");
+    await args.denops.call("ddu#ui#ff#_restore_title");
+
+    // Move to the UI window.
+    const bufnr = await this.#getBufnr(args.denops);
+    if (!bufnr) {
+      return;
+    }
+
+    if (
+      args.uiParams.split === "floating" &&
+      args.denops.meta.host !== "nvim" && this.#popupId > 0
+    ) {
+      // Close popup
+      await args.denops.call("popup_close", this.#popupId);
+      await args.denops.cmd("redraw!");
+      this.#popupId = -1;
+
+      // Focus to the previous window
+      await fn.win_gotoid(args.denops, args.context.winId);
+    } else {
+      for (
+        const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
+      ) {
+        if (winid <= 0) {
+          continue;
+        }
+
+        await this.#closeFilterWindow(args.denops);
+
+        if (
+          args.uiParams.split === "no" ||
+          (await fn.winnr(args.denops, "$")) === 1
+        ) {
+          await fn.win_gotoid(args.denops, winid);
+
+          const prevName = await fn.bufname(args.denops, args.context.bufNr);
+          await args.denops.cmd(
+            prevName !== args.context.bufName || args.context.bufNr == bufnr
+              ? "enew"
+              : `buffer ${args.context.bufNr}`,
+          );
+        } else {
+          await fn.win_gotoid(args.denops, winid);
+          await args.denops.cmd("close!");
+
+          // Focus to the previous window
+          await fn.win_gotoid(args.denops, args.context.winId);
+        }
+      }
+    }
+
+    // Restore mode
+    if (this.#saveMode === "i") {
+      if (!args.cancel && args.uiParams.replaceCol > 0) {
+        const currentLine = await fn.getline(args.denops, ".");
+        const replaceLine = currentLine.slice(
+          0,
+          args.uiParams.replaceCol - 1,
+        ) + currentLine.slice(this.#saveCol - 1);
+        await fn.setline(args.denops, ".", replaceLine);
+        await fn.cursor(args.denops, 0, args.uiParams.replaceCol - 1);
+      }
+
+      const endCol = await fn.col(args.denops, ".");
+      await fn.feedkeys(
+        args.denops,
+        args.uiParams.replaceCol > 1 || this.#saveCol > endCol ? "a" : "i",
+        "ni",
+      );
+    } else if (this.#saveMode === ":") {
+      const cmdline = (!args.cancel && args.uiParams.replaceCol > 0)
+        ? this.#saveCmdline.slice(0, args.uiParams.replaceCol - 1) +
+          this.#saveCmdline.slice(this.#saveCmdpos - 1)
+        : this.#saveCmdline;
+      const cmdpos = (!args.cancel && args.uiParams.replaceCol > 0)
+        ? args.uiParams.replaceCol
+        : this.#saveCmdpos;
+
+      await args.denops.call(
+        "ddu#ui#ff#_restore_cmdline",
+        cmdline,
+        cmdpos,
+      );
+    } else if (closedFilterWindow) {
+      const mode = await fn.mode(args.denops);
+      if (mode === "i" || mode === "n") {
+        await args.denops.cmd("stopinsert");
+      }
+    }
+
+    if (
+      this.#restcmd !== "" &&
+      JSON.stringify(this.#prevWinInfo) ===
+        JSON.stringify(await this.#getWinInfo(args.denops))
+    ) {
+      // Restore the layout.
+      await args.denops.cmd(this.#restcmd);
+      this.#restcmd = "";
+      this.#prevWinInfo = null;
+    }
+
+    await args.denops.dispatcher.event(args.options.name, "close");
   }
 
   async #getItem(
