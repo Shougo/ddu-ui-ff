@@ -1512,6 +1512,8 @@ export class Ui extends BaseUi<Params> {
       await args.denops.call("popup_close", this.#popupId);
       await args.denops.cmd("redraw!");
       this.#popupId = -1;
+      // Focus context window
+      await fn.win_gotoid(args.denops, args.context.winId);
     } else {
       for (
         const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
