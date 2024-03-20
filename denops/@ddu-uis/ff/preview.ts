@@ -13,6 +13,7 @@ import {
   batch,
   Denops,
   ensure,
+  equal,
   fn,
   is,
   op,
@@ -80,12 +81,11 @@ export class PreviewUi {
   }
 
   isAlreadyPreviewed(item: DduItem): boolean {
-    return this.visible() &&
-      JSON.stringify(item) === JSON.stringify(this.#previewedTarget);
+    return this.visible() && equal(item, this.#previewedTarget);
   }
 
   isChangedUiParams(params: Params): boolean {
-    return JSON.stringify(params) !== JSON.stringify(this.#previewedUiParams);
+    return equal(params, this.#previewedUiParams);
   }
 
   visible(): boolean {
