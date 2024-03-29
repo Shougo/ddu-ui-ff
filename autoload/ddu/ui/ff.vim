@@ -106,7 +106,7 @@ function ddu#ui#ff#_highlight_items(
             \ hl.hl_group, hl.name, 1,
             \ s:namespace, a:bufnr,
             \ a:params.reversed ? a:max_lines - item.row + 1 : item.row,
-            \ hl.col + strwidth(item.prefix), hl.width)
+            \ hl.col + strlen(item.prefix), hl.width)
     endfor
   endfor
 
