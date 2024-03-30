@@ -18,7 +18,7 @@ function ddu#ui#ff#execute(command) abort
   endif
 
   const winid = g:ddu#ui#ff#_filter_parent_winid
-  const prev_curpos = getcurpos(winid)
+  const prev_curpos = winid->getcurpos()
 
   call win_execute(winid, a:command)
 
@@ -26,7 +26,7 @@ function ddu#ui#ff#execute(command) abort
     call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
   endif
 
-  if getcurpos(winid) != prev_curpos
+  if winid->getcurpos() != prev_curpos
     " NOTE: CursorMoved autocmd does not work when win_execute()
 
     call ddu#ui#ff#_stop_debounce_timer('s:debounce_cursor_moved_timer')
@@ -75,7 +75,7 @@ function ddu#ui#ff#_update_buffer(
   endif
 
   " Init the cursor
-  const curpos = getcurpos(a:winid)
+  const curpos = a:winid->getcurpos()
   const lnum = a:params.reversed ? a:lines->len() - a:pos : a:pos + 1
   if curpos[1] != lnum
     call win_execute(a:winid,
@@ -106,7 +106,7 @@ function ddu#ui#ff#_highlight_items(
             \ hl.hl_group, hl.name, 1,
             \ s:namespace, a:bufnr,
             \ a:params.reversed ? a:max_lines - item.row + 1 : item.row,
-            \ hl.col + strlen(item.prefix), hl.width)
+            \ hl.col + item.prefix->strlen(), hl.width)
     endfor
   endfor
 
@@ -484,7 +484,7 @@ function s:do_auto_action() abort
         \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
   const bufnr = winid->winbufnr()
 
-  const text = bufnr->getbufline(getcurpos(winid)[1])->get(0, '')
+  const text = bufnr->getbufline(winid->getcurpos()[1])->get(0, '')
   if text ==# s:cursor_text
     return
   endif
