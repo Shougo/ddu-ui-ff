@@ -398,7 +398,8 @@ function ddu#ui#ff#_cursor(line, col) abort
         \ || !'g:ddu#ui#ff#_filter_parent_winid'->exists()
     call cursor(a:line, a:col)
   else
-    call ddu#ui#ff#execute(printf('call cursor(%d, %d) | redraw', a:line, a:col))
+    call ddu#ui#ff#execute(
+          \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
     redraw
   endif
 endfunction
@@ -408,7 +409,7 @@ function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
 
   " NOTE: Skip save cursor if it is empty text.
   " Because the items are empty
-  if '$'->line() ==# 1 && (empty(text) || text[0] ==# '')
+  if '$'->line() ==# 1 && (text->empty() || text[0] ==# '')
     return
   endif
 
@@ -446,7 +447,7 @@ endfunction
 function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   if a:pattern !=# ''
     call win_execute(a:winid,
-          \ printf('call search(%s, "w")', string(a:pattern)))
+          \ printf('call search(%s, "w")', a:pattern->string()))
   endif
 
   if a:linenr > 0
