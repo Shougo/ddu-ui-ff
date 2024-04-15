@@ -1,5 +1,5 @@
 function ddu#ui#ff#filter#_open(name, input, parent_id, changed_params, params) abort
-  if !'s:filter_bufnr'->exists()
+  if !s:->get('filter_bufnr', -1)->bufexists()
     " NOTE: Filter buffer must be unique
     let s:filter_bufnr = bufadd('ddu-ff-filter')
   endif
