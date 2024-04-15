@@ -399,7 +399,7 @@ export class PreviewUi {
     }
 
     try {
-      const bufferPath = previewer?.expr ?? previewer?.path;
+      const bufferPath = previewer.expr ?? previewer.path;
       const stat = await safeStat(previewer.path);
       if (previewer.path && stat && !stat.isDirectory) {
         const data = Deno.readFileSync(previewer.path);
@@ -447,7 +447,7 @@ export class PreviewUi {
       : 0;
 
     const winid = this.#previewWinId;
-    if (previewer?.lineNr) {
+    if (previewer.lineNr) {
       await denops.call(
         "ddu#ui#ff#_highlight",
         hlName,
@@ -455,11 +455,11 @@ export class PreviewUi {
         1,
         ns,
         bufnr,
-        previewer?.lineNr,
+        previewer.lineNr,
         1,
         await op.columns.get(denops),
       );
-    } else if (previewer?.pattern) {
+    } else if (previewer.pattern) {
       this.#matchIds[winid] = await fn.matchadd(
         denops,
         hlName,
