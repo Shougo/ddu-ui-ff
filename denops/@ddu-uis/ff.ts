@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v3.10.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v4.0.0/types.ts";
 import {
   batch,
   Denops,
@@ -18,7 +18,8 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v3.10.3/deps.ts";
+} from "https://deno.land/x/ddu_vim@v4.0.0/deps.ts";
+import { printError } from "https://deno.land/x/ddu_vim@v4.0.0/utils.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -525,8 +526,8 @@ export class Ui extends BaseUi<Params> {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       }
     } else {
-      await args.denops.call(
-        "ddu#util#print_error",
+      await printError(
+        args.denops,
         `Invalid split param: ${args.uiParams.split}`,
       );
       return;
@@ -635,7 +636,7 @@ export class Ui extends BaseUi<Params> {
         );
       });
     } catch (e) {
-      await errorException(
+      await printError(
         args.denops,
         e,
         "[ddu-ui-ff] update buffer failed",
@@ -1835,8 +1836,8 @@ export class Ui extends BaseUi<Params> {
           context,
         );
       } else {
-        await denops.call(
-          "ddu#util#print_error",
+        await printError(
+          denops,
           `Invalid expr param: ${name}`,
         );
       }
@@ -1859,7 +1860,7 @@ export class Ui extends BaseUi<Params> {
     try {
       return await denops.eval(expr, context);
     } catch (e) {
-      await errorException(
+      await printError(
         denops,
         e,
         `[ddu-ui-ff] invalid expression in option: ${name}`,
@@ -1942,24 +1943,5 @@ export class Ui extends BaseUi<Params> {
       winid: await fn.win_getid(denops),
       tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
     };
-  }
-}
-
-async function errorException(denops: Denops, e: unknown, message: string) {
-  await denops.call(
-    "ddu#util#print_error",
-    message,
-  );
-  if (e instanceof Error) {
-    await denops.call(
-      "ddu#util#print_error",
-      e.message,
-    );
-    if (e.stack) {
-      await denops.call(
-        "ddu#util#print_error",
-        e.stack,
-      );
-    }
   }
 }

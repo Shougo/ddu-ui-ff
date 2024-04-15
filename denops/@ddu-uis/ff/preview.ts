@@ -8,7 +8,7 @@ import {
   PreviewContext,
   Previewer,
   TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v3.10.3/types.ts";
+} from "https://deno.land/x/ddu_vim@v4.0.0/types.ts";
 import {
   batch,
   Denops,
@@ -17,7 +17,7 @@ import {
   fn,
   is,
   op,
-} from "https://deno.land/x/ddu_vim@v3.10.3/deps.ts";
+} from "https://deno.land/x/ddu_vim@v4.0.0/deps.ts";
 import { replace } from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import { Params } from "../ff.ts";
 
