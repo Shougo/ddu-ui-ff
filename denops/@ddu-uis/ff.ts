@@ -1708,7 +1708,7 @@ export class Ui extends BaseUi<Params> {
         denops,
         winid,
         "&statusline",
-        header + " %#LineNR#%{" + linenr + "}%*" + async,
+        `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${async}`,
       );
     }
   }
