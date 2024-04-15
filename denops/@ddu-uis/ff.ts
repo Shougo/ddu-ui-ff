@@ -1621,9 +1621,9 @@ export class Ui extends BaseUi<Params> {
 
   async #getItem(
     denops: Denops,
-  ): Promise<DduItem | null> {
+  ): Promise<DduItem | undefined> {
     const idx = await this.#getIndex(denops);
-    return idx >= 0 ? this.#items[idx] : null;
+    return this.#items[idx];
   }
 
   async #getItems(denops: Denops): Promise<DduItem[]> {
