@@ -130,8 +130,9 @@ function ddu#ui#ff#_highlight(
       \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
   if !has('nvim')
     " Add prop_type
-    if a:prop_type->prop_type_get()->empty()
+    if a:prop_type->prop_type_get(#{ bufnr: a:bufnr })->empty()
       call prop_type_add(a:prop_type, #{
+            \   bufnr: a:bufnr,
             \   highlight: a:highlight,
             \   priority: a:priority,
             \   override: v:true,
