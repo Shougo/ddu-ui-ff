@@ -1044,10 +1044,19 @@ A: >
 	endfunction
 	
 	function s:update_cursor()
-	  sign unplace 100 *
-	  sign define cursor text=>> texthl=Search
-	  execute printf('sign place 100 * line=%d name=cursor buffer=%s',
-	        \ '.'->line(), '%'->bufnr())
+	  call sign_unplace('*', #{
+	    \   id: 100,
+	    \ })
+	  call sign_define('cursor', #{
+	    \   text: '>>',
+	    \   texthl: 'Search',
+	    \ })
+	  call sign_place('*', #{
+	    \   name: 'cursor',
+	    \   line: '.'->line(),
+	    \   buffer: '%'->bufnr(),
+	    \   id: 100,
+	    \ })
 	endfunction
 <
                                                             *ddu-ui-ff-faq-20*
