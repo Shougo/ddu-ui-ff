@@ -1044,9 +1044,9 @@ A: >
 	endfunction
 	
 	function s:update_cursor()
-	  sign unplace 100
+	  sign unplace 100 *
 	  sign define cursor text=>> texthl=Search
-	  execute printf('sign place 100 line=%d name=cursor buffer=%s',
+	  execute printf('sign place 100 * line=%d name=cursor buffer=%s',
 	        \ '.'->line(), '%'->bufnr())
 	endfunction
 <
