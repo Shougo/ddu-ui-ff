@@ -432,16 +432,20 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
   endif
 endfunction
 
-function ddu#ui#ff#_open_filter_window(input, params) abort
+function ddu#ui#ff#_open_filter_window(params, input, length) abort
   let s:filter_prev_input = a:input
-  let s:filter_updatetime = a:params.filterUpdateTime
 
   augroup ddu-ff-filter
     autocmd!
-    autocmd CmdlineChanged <buffer> call s:check_update()
     autocmd User Ddu:ui:ff:openFilterWindow :
     autocmd User Ddu:ui:ff:closeFilterWindow :
   augroup END
+
+  if a:params.filterUpdateMax <= 0 || a:params.filterUpdateMax < a:length
+    autocmd ddu-ff-filter CmdlineChanged <buffer> call s:check_redraw()
+  else
+    autocmd ddu-ff-filter CmdlineLeave <buffer> call s:check_redraw()
+  endif
 
   doautocmd User Ddu:ui:ff:openFilterWindow
 
@@ -457,17 +461,6 @@ function ddu#ui#ff#_open_filter_window(input, params) abort
   let s:filter_prev_input = input
 
   return input
-endfunction
-
-function s:check_update() abort
-  if s:filter_updatetime > 0
-    call ddu#ui#ff#_stop_debounce_timer('s:debounce_filter_update_timer')
-
-    let s:debounce_filter_update_timer = timer_start(
-          \ s:filter_updatetime, { -> s:check_redraw() })
-  else
-    call s:check_redraw()
-  endif
 endfunction
 
 function s:check_redraw() abort

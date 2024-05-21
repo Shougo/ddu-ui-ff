@@ -325,9 +325,10 @@ floatingTitlePos	(string)
 
 		Default: "left"
 
-                                            *ddu-ui-ff-param-filterUpdateTime*
-filterUpdateTime	(number)
-		Specify the update time in the filter window.
+                                             *ddu-ui-ff-param-filterUpdateMax*
+filterUpdateMax	(number)
+		Specify the maximum item number to update in the filter
+		window.
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
@@ -1107,9 +1108,12 @@ function.
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
 
+2024.05.22
+* Remove "filterUpdateTime" param.
+
 2024.05.21
 * Use command line instead of filter window.
-* Remove filter related options:
+* Remove filter related params:
   "filterFloatingPosition", "filterFloatingTitle",
   "filterFloatingTitlePos", "filterSplitDirection"
 * Remove filter related actions:

@@ -118,7 +118,7 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
-  filterUpdateTime: number;
+  filterUpdateMax: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
   floatingTitlePos: "left" | "center" | "right";
@@ -1072,8 +1072,9 @@ export class Ui extends BaseUi<Params> {
 
       args.context.input = await args.denops.call(
         "ddu#ui#ff#_open_filter_window",
-        actionParams.input ?? args.context.input,
         uiParams,
+        actionParams.input ?? args.context.input,
+        this.#items.length,
       ) as string;
 
       if (reopenPreview) {
@@ -1323,7 +1324,7 @@ export class Ui extends BaseUi<Params> {
         "winHeight",
         "winWidth",
       ],
-      filterUpdateTime: 0,
+      filterUpdateMax: 0,
       floatingBorder: "none",
       floatingTitle: "",
       floatingTitlePos: "left",
