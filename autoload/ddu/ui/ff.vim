@@ -449,11 +449,12 @@ function ddu#ui#ff#_open_filter_window(input, params) abort
         \ cmdline#input(a:params.prompt, a:input) :
         \ input(a:params.prompt, a:input)
 
+  doautocmd User Ddu:ui:ff:closeFilterWindow
+
   augroup ddu-ff-filter
     autocmd!
   augroup END
   let s:filter_prev_input = input
-  doautocmd User Ddu:ui:ff:closeFilterWindow
 
   return input
 endfunction
