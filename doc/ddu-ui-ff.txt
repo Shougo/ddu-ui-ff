@@ -39,17 +39,6 @@ INTERFACE                                                *ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS                                                *ddu-ui-ff-functions*
 
-                                                       *ddu#ui#ff#do_action()*
-ddu#ui#ff#do_action({action-name}[, {params}])
-		It is deprecated.  Please use |ddu#ui#do_action()|
-		instead.
-
-                                                   *ddu#ui#ff#multi_actions()*
-ddu#ui#ff#multi_actions([{action-name1}[, {params1}], ...])
-		It is deprecated.  Please use |ddu#ui#multi_actions()|
-		instead.
-
-                                                         *ddu#ui#ff#execute()*
 ddu#ui#ff#execute({command})
 		Execute {command} in the UI window.
 		NOTE: It does not execute |:redraw| automatically.
