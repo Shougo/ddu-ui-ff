@@ -1,26 +1,21 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
 function ddu#ui#ff#execute(command) abort
-  if !'g:ddu#ui#ff#_filter_parent_winid'->exists()
+  if &l:filetype !=# 'ddu-ff'
     return
   endif
 
-  const winid = g:ddu#ui#ff#_filter_parent_winid
-  const prev_curpos = winid->getcurpos()
+  const prev_curpos = getcurpos()
 
-  call win_execute(winid, a:command)
+  execute a:command
 
-  if 'g:ddu#ui#ff#_save_title'->exists()
-    call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
-  endif
-
-  if winid->getcurpos() != prev_curpos
+  if getcurpos() != prev_curpos
     " NOTE: CursorMoved autocmd does not work when win_execute()
 
     call ddu#ui#ff#_stop_debounce_timer('s:debounce_cursor_moved_timer')
 
     let s:debounce_cursor_moved_timer = timer_start(
-          \ 100, { -> s:do_cursor_moved(winid) })
+          \ 100, { -> execute('silent doautocmd CursorMoved') })
   endif
 endfunction
 
@@ -254,11 +249,6 @@ function ddu#ui#ff#_open_preview_window(
         let preview_height -= 1
       endif
 
-      if a:params.previewRow <= 0 && a:params.filterFloatingPosition ==# 'top'
-        let preview_height -= 1
-        let win_row -= 1
-      endif
-
       if has('nvim')
         if a:params.previewRow <= 0 && win_row <= preview_height
           let win_row += win_height + 1
@@ -382,17 +372,6 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   call win_gotoid(prev_winid)
 endfunction
 
-function ddu#ui#ff#_cursor(line, col) abort
-  if &l:filetype ==# 'ddu-ff'
-        \ || !'g:ddu#ui#ff#_filter_parent_winid'->exists()
-    call cursor(a:line, a:col)
-  else
-    call ddu#ui#ff#execute(
-          \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
-    redraw
-  endif
-endfunction
-
 function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
   const text = getbufline(a:bufnr, a:pos[1])
 
@@ -403,10 +382,6 @@ function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
   endif
 
   call setbufvar(a:bufnr, 'ddu_ui_ff_save_cursor_item', ddu#ui#get_item())
-endfunction
-
-function ddu#ui#ff#_echo(msg) abort
-  echo a:msg
 endfunction
 
 function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
@@ -457,21 +432,12 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
   endif
 endfunction
 
-function s:do_cursor_moved(winid) abort
-  const prev_winid = win_getid()
-  try
-    call win_gotoid(a:winid)
-
-    silent doautocmd CursorMoved
-  finally
-    call win_gotoid(prev_winid)
-  endtry
-endfunction
-
 function s:do_auto_action() abort
-  const winid = (&l:filetype ==# 'ddu-ff'
-        \        || !'g:ddu#ui#ff#_filter_parent_winid'->exists())
-        \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
+  if &l:filetype !=# 'ddu-ff'
+    return
+  endif
+
+  const winid = win_getid()
   const bufnr = winid->winbufnr()
 
   const text = bufnr->getbufline(winid->getcurpos()[1])->get(0, '')

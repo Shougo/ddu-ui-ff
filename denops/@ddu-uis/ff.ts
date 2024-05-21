@@ -39,7 +39,6 @@ type HighlightGroup = {
   floatingBorder?: string;
   floatingCursorLine?: string;
   preview?: string;
-  prompt?: string;
   selected?: string;
 };
 
@@ -119,10 +118,6 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
-  filterFloatingPosition: "top" | "bottom";
-  filterFloatingTitle: FloatingTitle;
-  filterFloatingTitlePos: "left" | "center" | "right";
-  filterSplitDirection: "belowright" | "aboveleft" | "floating";
   filterUpdateTime: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
@@ -169,13 +164,11 @@ export class Ui extends BaseUi<Params> {
   #refreshed = false;
   #prevLength = -1;
   #prevInput = "";
-  #prevUiParams = this.params();
   #previewUi = new PreviewUi();
   #popupId = -1;
   #enabledAutoAction = false;
   #restcmd = "";
   #prevWinInfo: WinInfo | null = null;
-  #filterBufnr = -1;
   #closing = false;
 
   override async onInit(args: {
@@ -183,10 +176,6 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
   }): Promise<void> {
     this.#saveMode = await fn.mode(args.denops);
-    if (await op.filetype.getLocal(args.denops) === "ddu-ff-filter") {
-      // NOTE: saveMode is ignored in filter window
-      this.#saveMode = "n";
-    }
     if (this.#saveMode === "c") {
       this.#saveMode = await fn.getcmdtype(args.denops) as string;
       if (this.#saveMode === ":") {
@@ -214,12 +203,7 @@ export class Ui extends BaseUi<Params> {
     await vars.g.set(args.denops, "ddu#ui#ff#_in_action", true);
 
     const ft = await op.filetype.getLocal(args.denops);
-    const parentId = await vars.g.get(
-      args.denops,
-      "ddu#ui#ff#_filter_parent_winid",
-      -1,
-    );
-    if (ft === "ddu-ff" || parentId < 0) {
+    if (ft === "ddu-ff") {
       await vars.b.set(
         args.denops,
         "ddu_ui_ff_cursor_pos",
@@ -229,17 +213,6 @@ export class Ui extends BaseUi<Params> {
         args.denops,
         "ddu_ui_ff_cursor_text",
         await fn.getline(args.denops, "."),
-      );
-    } else {
-      await fn.win_execute(
-        args.denops,
-        parentId,
-        "let b:ddu_ui_ff_cursor_pos = getcurpos()",
-      );
-      await fn.win_execute(
-        args.denops,
-        parentId,
-        "let b:ddu_ui_ff_cursor_text = getline('.')",
       );
     }
   }
@@ -541,15 +514,6 @@ export class Ui extends BaseUi<Params> {
         winid,
         `resize ${winHeight} | normal! zb`,
       );
-      if (await fn.bufwinid(args.denops, this.#filterBufnr) >= 0) {
-        // Redraw floating window
-        await args.denops.call(
-          "ddu#ui#ff#filter#_floating",
-          this.#filterBufnr,
-          winid,
-          args.uiParams,
-        );
-      }
     }
 
     if (!initialized || winid < 0) {
@@ -669,34 +633,12 @@ export class Ui extends BaseUi<Params> {
       });
     }
 
-    if (winid < 0) {
-      // NOTE: "openFilterWindow" is required for floating Vim
-      if (floating && !hasNvim) {
-        this.#filterBufnr = await args.denops.call(
-          "ddu#ui#ff#filter#_open",
-          args.options.name,
-          args.context.input,
-          await this.#winId({
-            denops: args.denops,
-            uiParams: args.uiParams,
-          }),
-          false,
-          args.uiParams,
-        ) as number;
-      } else {
-        await args.denops.cmd("stopinsert");
-      }
-    } else if (await fn.bufwinid(args.denops, this.#filterBufnr) < 0) {
-      await fn.win_gotoid(args.denops, winid);
-    }
-
     if (this.#enabledAutoAction) {
       // Call auto action
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
 
     this.#refreshed = false;
-    this.#prevUiParams = args.uiParams;
   }
 
   override async quit(args: {
@@ -832,11 +774,6 @@ export class Ui extends BaseUi<Params> {
       winIds.push(mainWinId);
     }
 
-    const filterWinIds = await fn.win_findbuf(
-      args.denops,
-      this.#filterBufnr,
-    ) as number[];
-    winIds.push(...filterWinIds);
     if (this.#previewUi.visible()) {
       winIds.push(this.#previewUi.previewWinId);
     }
@@ -871,7 +808,6 @@ export class Ui extends BaseUi<Params> {
       );
 
       await this.#previewUi.close(args.denops, args.context, args.uiParams);
-      await this.#closeFilterWindow(args.denops);
 
       await args.denops.dispatcher.start({
         name: args.options.name,
@@ -900,18 +836,6 @@ export class Ui extends BaseUi<Params> {
       options: DduOptions;
     }) => {
       return await this.#collapseItemAction(args.denops, args.options);
-    },
-    closeFilterWindow: async (args: {
-      denops: Denops;
-      context: Context;
-      options: DduOptions;
-      uiParams: Params;
-    }) => {
-      await this.#closeFilterWindow(args.denops);
-
-      await this.#moveParentWindow(args.denops);
-
-      return ActionFlags.None;
     },
     closePreviewWindow: async (args: {
       denops: Denops;
@@ -959,7 +883,7 @@ export class Ui extends BaseUi<Params> {
       await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
-      await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
+      await fn.call(args.denops, cursorPos[1], 0);
 
       return ActionFlags.Persist;
     },
@@ -1001,7 +925,7 @@ export class Ui extends BaseUi<Params> {
       await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
-      await args.denops.call("ddu#ui#ff#_cursor", cursorPos[1], 0);
+      await fn.call(args.denops, cursorPos[1], 0);
 
       return ActionFlags.Persist;
     },
@@ -1045,12 +969,6 @@ export class Ui extends BaseUi<Params> {
       const bufnr = await this.#getBufnr(args.denops);
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item ?? {});
 
-      const ft = await op.filetype.getLocal(args.denops);
-      if (ft === "ddu-ff-filter") {
-        // Set for filter window
-        await vars.b.set(args.denops, "ddu_ui_item", item ?? {});
-      }
-
       return ActionFlags.None;
     },
     getItems: async (args: {
@@ -1059,12 +977,6 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const bufnr = await this.#getBufnr(args.denops);
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
-
-      const ft = await op.filetype.getLocal(args.denops);
-      if (ft === "ddu-ff-filter") {
-        // Set for filter window
-        await vars.b.set(args.denops, "ddu_ui_items", this.#items);
-      }
 
       return ActionFlags.None;
     },
@@ -1075,12 +987,6 @@ export class Ui extends BaseUi<Params> {
       const items = await this.#getItems(args.denops);
       const bufnr = await this.#getBufnr(args.denops);
       await fn.setbufvar(args.denops, bufnr, "ddu_ui_selected_items", items);
-
-      const ft = await op.filetype.getLocal(args.denops);
-      if (ft === "ddu-ff-filter") {
-        // Set for filter window
-        await vars.b.set(args.denops, "ddu_ui_selected_items", items);
-      }
 
       return ActionFlags.None;
     },
@@ -1136,15 +1042,6 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
-    leaveFilterWindow: async (args: {
-      denops: Denops;
-      context: Context;
-      options: DduOptions;
-      uiParams: Params;
-    }) => {
-      await this.#moveParentWindow(args.denops);
-      return ActionFlags.None;
-    },
     openFilterWindow: async (args: {
       denops: Denops;
       context: Context;
@@ -1171,24 +1068,13 @@ export class Ui extends BaseUi<Params> {
         await this.#previewUi.close(args.denops, args.context, uiParams);
       }
 
-      // NOTE: If uiParams is changed, need to redraw UI window.
-      const changedUiParams = equal(args.uiParams, this.#prevUiParams);
-
       const actionParams = args.actionParams as OpenFilterWindowParams;
 
-      this.#filterBufnr = await args.denops.call(
+      args.context.input = await args.denops.call(
         "ddu#ui#ff#filter#_open",
-        args.options.name,
         actionParams.input ?? args.context.input,
-        await this.#winId({
-          denops: args.denops,
-          uiParams: args.uiParams,
-        }),
-        changedUiParams,
         uiParams,
-      ) as number;
-
-      this.#prevUiParams = args.uiParams;
+      ) as string;
 
       if (reopenPreview) {
         const item = await this.#getItem(args.denops);
@@ -1264,7 +1150,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await args.denops.call("ddu#ui#ff#_echo", item.display ?? item.word);
+      await args.denops.cmd(`echo ${item.display ?? item.word}`);
 
       return ActionFlags.Persist;
     },
@@ -1437,10 +1323,6 @@ export class Ui extends BaseUi<Params> {
         "winHeight",
         "winWidth",
       ],
-      filterFloatingPosition: "top",
-      filterSplitDirection: "aboveleft",
-      filterFloatingTitle: "",
-      filterFloatingTitlePos: "left",
       filterUpdateTime: 0,
       floatingBorder: "none",
       floatingTitle: "",
@@ -1514,7 +1396,6 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     await this.#previewUi.close(args.denops, args.context, args.uiParams);
     await this.#previewUi.removePreviewedBuffers(args.denops);
-    const closedFilterWindow = await this.#closeFilterWindow(args.denops);
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
     await args.denops.call("ddu#ui#ff#_restore_title");
 
@@ -1542,8 +1423,6 @@ export class Ui extends BaseUi<Params> {
         if (winid <= 0) {
           continue;
         }
-
-        await this.#closeFilterWindow(args.denops);
 
         if (
           args.uiParams.split === "no" ||
@@ -1599,11 +1478,6 @@ export class Ui extends BaseUi<Params> {
         cmdline,
         cmdpos,
       );
-    } else if (closedFilterWindow) {
-      const mode = await fn.mode(args.denops);
-      if (mode === "i" || mode === "n") {
-        await args.denops.cmd("stopinsert");
-      }
     }
 
     if (
@@ -1710,31 +1584,6 @@ export class Ui extends BaseUi<Params> {
         "&statusline",
         `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${async}`,
       );
-    }
-  }
-
-  async #closeFilterWindow(denops: Denops): Promise<boolean> {
-    const filterWinIds = await fn.win_findbuf(denops, this.#filterBufnr);
-    if (filterWinIds.length > 0 && await fn.winnr(denops, "$") !== 1) {
-      const winid = await fn.win_getid(denops);
-      await fn.win_gotoid(denops, filterWinIds[0]);
-      await denops.cmd("close!");
-      await fn.win_gotoid(denops, winid);
-    }
-
-    return filterWinIds.length > 0;
-  }
-
-  async #moveParentWindow(
-    denops: Denops,
-  ): Promise<void> {
-    const parentId = await vars.g.get(
-      denops,
-      "ddu#ui#ff#_filter_parent_winid",
-      -1,
-    );
-    if (parentId > 0) {
-      await fn.win_gotoid(denops, parentId);
     }
   }
 

@@ -1,4 +1,4 @@
-*ddu-ui-ff.txt*	Standard UI for ddu.vim
+*ddu-ui-ff.txt*	Fuzzy finder UI for ddu.vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
@@ -12,6 +12,7 @@ Interface		|ddu-ui-ff-interface|
   Actions		  |ddu-ui-ff-actions|
   Params		  |ddu-ui-ff-params|
   Params expression	  |ddu-ui-ff-params-expression|
+  Autocmds		  |ddu-ui-ff-autocmds|
 Examples		|ddu-ui-ff-examples|
 FAQ			|ddu-ui-ff-faq|
 Compatibility		|ddu-ui-ff-compatibility|
@@ -63,10 +64,6 @@ chooseAction
                                         *ddu-ui-ff-action-clearSelectAllItems*
 clearSelectAllItems
 		Clear all selected items.
-
-                                          *ddu-ui-ff-action-closeFilterWindow*
-closeFilterWindow
-		Close the filter window and move to the parent UI window.
 
                                          *ddu-ui-ff-action-closePreviewWindow*
 closePreviewWindow
@@ -136,13 +133,10 @@ itemAction
 
 		NOTE: You cannot mix multiple kinds/sources.
 
-                                          *ddu-ui-ff-action-leaveFilterWindow*
-leaveFilterWindow
-		Move to the parent UI window.
-
                                            *ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
-		Open the filter window.
+		Open the filter window in command line.
+		NOTE: Use |cmdline| plugin if possible.
 
 		params:
 			{input}: Overwrite current input
@@ -331,51 +325,6 @@ floatingTitlePos	(string)
 
 		Default: "left"
 
-                                      *ddu-ui-ff-param-filterFloatingPosition*
-filterFloatingPosition	(string)
-		Specify the filter floating window position as {position}.
-
-		If {position} is set to "bottom", the filter will be displayed
-		at the bottom.
-		If {position} is "top", the filter will be displayed at the
-		top.
-
-		NOTE: To use it, you need to use neovim and
-		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
-
-		Default: "top"
-
-                                         *ddu-ui-ff-param-filterFloatingTitle*
-filterFloatingTitle	(string | list)
-		Specify the title of the filter floating window with border if
-		|ddu-ui-ff-param-floatingBorder| is not "none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
-
-		Default: ""
-
-                                      *ddu-ui-ff-param-filterFloatingTitlePos*
-filterFloatingTitlePos	(string)
-		Specify the title position of the filter floating window with
-		border if |ddu-ui-ff-param-floatingBorder| is not "none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
-
-		Default: "left"
-
-                                        *ddu-ui-ff-param-filterSplitDirection*
-filterSplitDirection	(string)
-		Specify the filter window direction as {direction}.
-
-		When {direction} is "floating", the filter uses neovim
-		floating window. If statusline is at the bottom, the filter
-		overwrites statusline. Otherwise, it is located one line below
-		statusline.
-
-		NOTE: To use "floating", you need to use neovim.
-
-		Default: "aboveleft"
-
                                             *ddu-ui-ff-param-filterUpdateTime*
 filterUpdateTime	(number)
 		Specify the update time in the filter window.
@@ -407,10 +356,6 @@ highlights	(dictionary)
 		preview				(string)
 		Specify preview window highlight.
 		Default: "Search"
-
-		prompt				(string)
-		Specify prompt text highlight in filter window.
-		Default: "Special"
 
 		selected			(string)
 		Specify selected item highlight.
@@ -643,7 +588,6 @@ winHeight	(number | string)
 winRow		(number | string)
 		Set the row position of the window if |ddu-ui-ff-param-split|
 		is "floating".
-		If it is 1, the filter window position is always top.
 
 		Default: "&lines / 2 - 10"
 
@@ -691,6 +635,20 @@ on the right side of the screen: >
 	    \   },
 	    \ })
 <
+
+==============================================================================
+AUTOCMDS                                                  *ddu-ui-ff-autocmds*
+
+ddu-ui-ff defines some |User| autocmds.
+
+                                *ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow*
+Ddu:ui:ff:openFilterWindow
+		Called after |ddu-ui-ff-action-openFilterWindow| is called.
+
+                               *ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow*
+Ddu:ui:ff:openFilterWindow
+		Called after filter window is closed.
+
 
 ==============================================================================
 EXAMPLES                                                  *ddu-ui-ff-examples*
@@ -1148,6 +1106,16 @@ function.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.05.21
+* Use command line instead of filter window.
+* Remove filter related options:
+  "filterFloatingPosition", "filterFloatingTitle",
+  "filterFloatingTitlePos", "filterSplitDirection"
+* Remove filter related actions:
+  "closeFilterWindow", "leaveFilterWindow"
+* Remove "ddu-ff-filter" filetype.
+  Please use "Ddu:ui:ff:openFilterWindow" autocmd instead.
 
 2024.03.11
 * Remove "startFilter" option.  Because it has too many problems.
