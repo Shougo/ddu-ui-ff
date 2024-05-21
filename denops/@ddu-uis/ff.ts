@@ -1071,7 +1071,7 @@ export class Ui extends BaseUi<Params> {
       const actionParams = args.actionParams as OpenFilterWindowParams;
 
       args.context.input = await args.denops.call(
-        "ddu#ui#ff#filter#_open",
+        "ddu#ui#ff#_open_filter_window",
         actionParams.input ?? args.context.input,
         uiParams,
       ) as string;
