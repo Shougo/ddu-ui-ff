@@ -449,6 +449,9 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 
   doautocmd User Ddu:ui:ff:openFilterWindow
 
+  " NOTE: :redraw is needed
+  redraw
+
   const input = exists('*cmdline#input') ?
         \ cmdline#input(a:params.prompt, a:input) :
         \ input(a:params.prompt, a:input)

@@ -137,6 +137,7 @@ itemAction
 openFilterWindow
 		Open the filter window in command line.
 		NOTE: Use |cmdline| plugin if possible.
+		NOTE: The items are not updated in the filter window.
 
 		params:
 			{input}: Overwrite current input
@@ -1099,10 +1100,8 @@ A: It is not supported.  Because it has too many problems.  But you can use the
 function.
 >
 	call ddu#start()
-	autocmd User Ddu:uiReady
-	      \ : if &l:filetype ==# 'ddu-ff'
-	      \ |   call ddu#ui#do_action('openFilterWindow')
-	      \ | endif
+	autocmd User Ddu:uiDone
+	      \ call ddu#ui#do_action('openFilterWindow')
 <
 
 ==============================================================================

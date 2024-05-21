@@ -164,11 +164,11 @@ export class Ui extends BaseUi<Params> {
   #refreshed = false;
   #prevLength = -1;
   #prevInput = "";
+  #prevWinInfo: WinInfo | null = null;
   #previewUi = new PreviewUi();
   #popupId = -1;
   #enabledAutoAction = false;
   #restcmd = "";
-  #prevWinInfo: WinInfo | null = null;
   #closing = false;
 
   override async onInit(args: {
