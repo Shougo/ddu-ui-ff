@@ -414,6 +414,8 @@ endfunction
 function ddu#ui#ff#_open_filter_window(params, input, length) abort
   let s:filter_prev_input = a:input
 
+  doautocmd User Ddu:ui:ff:openFilterWindow
+
   augroup ddu-ui-ff-filter
     autocmd!
     autocmd User Ddu:ui:ff:openFilterWindow :
@@ -428,17 +430,16 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
           \ ++nested call s:check_redraw()
   endif
 
-  doautocmd User Ddu:ui:ff:openFilterWindow
-
   const input = exists('*cmdline#input') ?
         \ cmdline#input(a:params.prompt, a:input) :
         \ input(a:params.prompt, a:input)
 
-  doautocmd User Ddu:ui:ff:closeFilterWindow
-
   augroup ddu-ui-ff-filter
     autocmd!
   augroup END
+
+  doautocmd User Ddu:ui:ff:closeFilterWindow
+
   let s:filter_prev_input = input
 
   return input
