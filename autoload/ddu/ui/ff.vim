@@ -321,8 +321,13 @@ function ddu#ui#ff#_do_auto_action() abort
     return
   endif
 
-  let s:debounce_auto_action_timer = timer_start(
-        \ s:auto_action.delay, { -> s:do_auto_action() })
+  if mode() ==# 'c'
+    " NOTE: In command line mode, timer_start() does not work
+    call s:do_auto_action()
+  else
+    let s:debounce_auto_action_timer = timer_start(
+          \ s:auto_action.delay, { -> s:do_auto_action() })
+  endif
 endfunction
 function ddu#ui#ff#_reset_auto_action() abort
   let s:cursor_text = ''
@@ -429,6 +434,9 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
     autocmd ddu-ui-ff-filter CmdlineLeave *
           \ ++nested call s:check_redraw()
   endif
+
+  " NOTE: redraw is needed
+  redraw
 
   const input = exists('*cmdline#input') ?
         \ cmdline#input(a:params.prompt, a:input) :

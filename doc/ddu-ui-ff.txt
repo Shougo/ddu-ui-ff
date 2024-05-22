@@ -222,6 +222,7 @@ autoAction	(dictionary)
 		Time in milliseconds to delay the auto action.
 		If you feel slow, specify large value.
 		Set 0 to disable debouncing.
+		NOTE: It does not work in the filter window.
 
 		Default: 10
 
@@ -797,21 +798,21 @@ must force this behaviour.
 	autocmd User Ddu:ui:ff:openFilterWindow
 	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  setlocal cursorline
+	  set cursorline
 
 	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
 	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
 
-	  cnoremap <buffer> <C-j>
+	  cnoremap <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
-	  cnoremap <buffer> <C-k>
+	  cnoremap <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
 
 	autocmd User Ddu:ui:ff:closeFilterWindow
 	      \ call s:ddu_ff_filter_cleanup()
 	function s:ddu_ff_filter_cleanup() abort
-	  setlocal nocursorline
+	  set nocursorline
 
 	  if s:save_j->empty()
 	    cunmap <C-j>
@@ -837,10 +838,10 @@ NOTE: It does not support |ddu-ui-ff-param-reversed|.
 	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
 	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
 
-	  cnoremap <buffer> <C-j>
+	  cnoremap <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext',
 	        \ #{ loop: v:true })<CR>
-	  cnoremap <buffer> <C-k>
+	  cnoremap <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious',
 	        \ #{ loop: v:true })<CR>
 	endfunction
