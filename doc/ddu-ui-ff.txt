@@ -1123,7 +1123,7 @@ function.
 >
 	call ddu#start()
 	autocmd User Ddu:uiDone ++nested
-	      \ call ddu#ui#do_action('openFilterWindow')
+	      \ call ddu#ui#async_action('openFilterWindow')
 <
 
 ==============================================================================
