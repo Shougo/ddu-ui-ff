@@ -40,11 +40,6 @@ INTERFACE                                                *ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS                                                *ddu-ui-ff-functions*
 
-ddu#ui#ff#execute({command})
-		Execute {command} in the UI window.
-		NOTE: It does not execute |:redraw| automatically.
-		You need to execute |:redraw| if needed.
-
 ------------------------------------------------------------------------------
 ACTIONS                                                    *ddu-ui-ff-actions*
 
@@ -1109,6 +1104,7 @@ COMPATIBILITY                                        *ddu-ui-ff-compatibility*
 
 2024.05.22
 * Remove "filterUpdateTime" param.
+* Remove "ddu#ui#ff#execute()".
 
 2024.05.21
 * Use command line instead of filter window.

@@ -1,24 +1,5 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function ddu#ui#ff#execute(command) abort
-  if &l:filetype !=# 'ddu-ff'
-    return
-  endif
-
-  const prev_curpos = getcurpos()
-
-  execute a:command
-
-  if getcurpos() != prev_curpos
-    " NOTE: CursorMoved autocmd does not work when win_execute()
-
-    call ddu#ui#ff#_stop_debounce_timer('s:debounce_cursor_moved_timer')
-
-    let s:debounce_cursor_moved_timer = timer_start(
-          \ 100, { -> execute('silent doautocmd CursorMoved') })
-  endif
-endfunction
-
 function ddu#ui#ff#_update_buffer(
       \ params, bufnr, winid, lines, refreshed, pos) abort
   const current_lines = '$'->line(a:winid)
