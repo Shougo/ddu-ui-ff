@@ -103,10 +103,8 @@ function ddu#ui#ff#_highlight_items(
           \ 1, 1000)
   endfor
 
-  if !has('nvim')
-    " NOTE: :redraw is needed for Vim
-    redraw
-  endif
+  " NOTE: :redraw is needed
+  redraw
 endfunction
 
 function ddu#ui#ff#_highlight(
@@ -435,22 +433,21 @@ endfunction
 function ddu#ui#ff#_open_filter_window(params, input, length) abort
   let s:filter_prev_input = a:input
 
-  augroup ddu-ff-filter
+  augroup ddu-ui-ff-filter
     autocmd!
     autocmd User Ddu:ui:ff:openFilterWindow :
     autocmd User Ddu:ui:ff:closeFilterWindow :
   augroup END
 
   if a:params.filterUpdateMax <= 0 || a:params.filterUpdateMax < a:length
-    autocmd ddu-ff-filter CmdlineChanged <buffer> call s:check_redraw()
+    autocmd ddu-ui-ff-filter CmdlineChanged *
+          \ ++nested call s:check_redraw()
   else
-    autocmd ddu-ff-filter CmdlineLeave <buffer> call s:check_redraw()
+    autocmd ddu-ui-ff-filter CmdlineLeave *
+          \ ++nested call s:check_redraw()
   endif
 
   doautocmd User Ddu:ui:ff:openFilterWindow
-
-  " NOTE: :redraw is needed
-  redraw
 
   const input = exists('*cmdline#input') ?
         \ cmdline#input(a:params.prompt, a:input) :
@@ -458,7 +455,7 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
-  augroup ddu-ff-filter
+  augroup ddu-ui-ff-filter
     autocmd!
   augroup END
   let s:filter_prev_input = input
@@ -476,9 +473,6 @@ function s:check_redraw() abort
   let s:filter_prev_input = input
 
   call ddu#redraw(b:ddu_ui_name, #{ input: input })
-
-  " NOTE: :redraw is needed
-  redraw
 endfunction
 
 function s:do_auto_action() abort

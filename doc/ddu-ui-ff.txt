@@ -1100,7 +1100,7 @@ A: It is not supported.  Because it has too many problems.  But you can use the
 function.
 >
 	call ddu#start()
-	autocmd User Ddu:uiDone
+	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#do_action('openFilterWindow')
 <
 
