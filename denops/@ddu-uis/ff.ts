@@ -883,7 +883,7 @@ export class Ui extends BaseUi<Params> {
       await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
-      await fn.call(args.denops, cursorPos[1], 0);
+      await fn.cursor(args.denops, cursorPos[1], 0);
 
       return ActionFlags.Persist;
     },
@@ -925,7 +925,7 @@ export class Ui extends BaseUi<Params> {
       await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
 
       // Change real cursor
-      await fn.call(args.denops, cursorPos[1], 0);
+      await fn.cursor(args.denops, cursorPos[1], 0);
 
       return ActionFlags.Persist;
     },
