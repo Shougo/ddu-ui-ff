@@ -665,14 +665,6 @@ EXAMPLES                                                  *ddu-ui-ff-examples*
 	  nnoremap <buffer> q
 	  \ <Cmd>call ddu#ui#do_action('quit')<CR>
 	endfunction
-
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <CR>
-	  \ <Esc><Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
-	  nnoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
-	endfunction
 <
 
 ==============================================================================
@@ -777,38 +769,83 @@ A: You can use |input()| like this.
 Q: I want to call default action in the filter window.
 
 A: >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <CR>
-	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
+	  let s:save_cr = '<CR>'->maparg('c', v:false, v:true)
+
+	  cnoremap <CR>
+	      \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
+	endfunction
+	autocmd User Ddu:ui:ff:closeFilterWindow
+	      \ call s:ddu_ff_filter_cleanup()
+	function s:ddu_ff_filter_cleanup() abort
+	  if s:save_cr->empty()
+	    cunmap <CR>
+	  else
+	    call mapset('c', 0, s:save_cr)
+	  endif
 	endfunction
 <
+
+NOTE: You must restore keys when
+|ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow|.
+
                                                              *ddu-ui-ff-faq-3*
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <C-j>
+	  setlocal cursorline
+
+	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
+	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+
+	  cnoremap <buffer> <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
-	  inoremap <buffer> <C-k>
+	  cnoremap <buffer> <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
+	endfunction
+
+	autocmd User Ddu:ui:ff:closeFilterWindow
+	      \ call s:ddu_ff_filter_cleanup()
+	function s:ddu_ff_filter_cleanup() abort
+	  setlocal nocursorline
+
+	  if s:save_j->empty()
+	    cunmap <C-j>
+	  else
+	    call mapset('c', 0, s:save_j)
+	  endif
+	  if s:save_k->empty()
+	    cunmap <C-k>
+	  else
+	    call mapset('c', 0, s:save_k)
+	  endif
 	endfunction
 <
 
 If you want to loop the cursor:
 NOTE: It does not support |ddu-ui-ff-param-reversed|.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <C-j>
-	      \ <Cmd>call ddu#ui#do_action('cursorNext',
-	      \ #{ loop: v:true })<CR>
-	  inoremap <buffer> <C-k>
-	      \ <Cmd>call ddu#ui#do_action('cursorPrevious',
-	      \ #{ loop: v:true })<CR>
+	  setlocal cursorline
+
+	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
+	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+
+	  cnoremap <buffer> <C-j>
+	        \ <Cmd>call ddu#ui#do_action('cursorNext',
+	        \ #{ loop: v:true })<CR>
+	  cnoremap <buffer> <C-k>
+	        \ <Cmd>call ddu#ui#do_action('cursorPrevious',
+	        \ #{ loop: v:true })<CR>
 	endfunction
 <
                                                              *ddu-ui-ff-faq-4*
@@ -821,13 +858,6 @@ A: You can use "b:ddu_ui_name". >
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
 	    \ <Cmd>call ddu#ui#do_action('itemAction', {'name': 'edit'})<CR>
-	  endif
-	endfunction
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  if b:ddu_ui_name ==# 'foo'
-	    nnoremap <buffer> <CR>
-	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  endif
 	endfunction
 <
@@ -1023,18 +1053,15 @@ A: You can set 'signcolumn' option in UI buffer.
 
                                                             *ddu-ui-ff-faq-22*
 Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
-insert mode of the filter window, it remains insert mode.
+filter window, it remains filter window.
 
 A: It is the feature.  Because |ddu#ui#do_action()| does not change any mode.
-You must escape insert mode when leave from the filter window.
+You must escape command line mode when leave from the filter window.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <Esc>
-	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
-	  inoremap <buffer> <CR>
-	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
-	endfunction
+	cnoremap <ESC>
+	    \ <ESC><Cmd>call ddu#ui#do_action('quit')<CR>
+	cnoremap <CR>
+	    \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 <
                                                             *ddu-ui-ff-faq-23*
 Q: I cannot see what item is selected in the filter window.
