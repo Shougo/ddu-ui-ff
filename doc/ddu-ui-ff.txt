@@ -589,7 +589,7 @@ winRow		(number | string)
 
 		Default: "&lines / 2 - 10"
 
-                                                    *ddu-ui-ff-param-winwidth*
+                                                    *ddu-ui-ff-param-winWidth*
 winWidth	(number | string)
 		Set the width of the window if |ddu-ui-ff-param-split| is
 		"vertical".
@@ -705,55 +705,55 @@ FAQ 10:                                                     |ddu-ui-ff-faq-10|
 	neovim's floating window feature?
 
 FAQ 11:                                                     |ddu-ui-ff-faq-11|
-	|:close| does not move to the ddu-ui-ff window sometimes.
-
-FAQ 12:                                                     |ddu-ui-ff-faq-12|
 	I want to toggle selected items in visual mode.
 
-FAQ 13:                                                     |ddu-ui-ff-faq-13|
+FAQ 12:                                                     |ddu-ui-ff-faq-12|
 	I want to use "ddu-ui-ff" in insert mode.
 
-FAQ 14:                                                     |ddu-ui-ff-faq-14|
+FAQ 13:                                                     |ddu-ui-ff-faq-13|
 	I want to use "ddu-ui-ff" in command line mode.
 
-FAQ 15:                                                     |ddu-ui-ff-faq-15|
+FAQ 14:                                                     |ddu-ui-ff-faq-14|
 	I want to switch sources without clear current filter input.
 
-FAQ 16:                                                     |ddu-ui-ff-faq-16|
+FAQ 15:                                                     |ddu-ui-ff-faq-15|
 	I want to use existing buffer to show preview.
 
-FAQ 17:                                                     |ddu-ui-ff-faq-17|
+FAQ 16:                                                     |ddu-ui-ff-faq-16|
 	":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1
 	-immediately" like commands are available?
 
-FAQ 18:                                                     |ddu-ui-ff-faq-18|
+FAQ 17:                                                     |ddu-ui-ff-faq-17|
 	I want to display cursor mark on the left of ddu window like
 	"telescope.nvim".
 
-FAQ 19:                                                     |ddu-ui-ff-faq-19|
+FAQ 18:                                                     |ddu-ui-ff-faq-18|
 	How do I set the floating title with list style ?
 
-FAQ 20:                                                     |ddu-ui-ff-faq-20|
+FAQ 19:                                                     |ddu-ui-ff-faq-19|
 	I want to align column when |ddu-ui-ff-param-prompt| is set.
 
-FAQ 21:                                                     |ddu-ui-ff-faq-21|
+FAQ 20:                                                     |ddu-ui-ff-faq-20|
 	When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction|
 	from filter window, it remains filter window.
 
-FAQ 22:                                                     |ddu-ui-ff-faq-22|
+FAQ 21:                                                     |ddu-ui-ff-faq-21|
 	I cannot see what item is selected in the filter window.
 
-FAQ 23:                                                     |ddu-ui-ff-faq-23|
+FAQ 22:                                                     |ddu-ui-ff-faq-22|
 	I want to change preview cursor on the top.
 
-FAQ 24:                                                     |ddu-ui-ff-faq-24|
+FAQ 23:                                                     |ddu-ui-ff-faq-23|
 	I want to scroll preview window.
 
-FAQ 25:                                                     |ddu-ui-ff-faq-25|
+FAQ 24:                                                     |ddu-ui-ff-faq-24|
 	I want to preview selected item automatically.
 
-FAQ 26:                                                     |ddu-ui-ff-faq-26|
+FAQ 25:                                                     |ddu-ui-ff-faq-25|
 	I want to start filter window when UI is initialized.
+
+FAQ 26:                                                     |ddu-ui-ff-faq-26|
+	I want to change filter window position.
 
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
@@ -920,11 +920,6 @@ ddu-ui-ff implementation depends on the feature.  So the support is not
 acceptable.
 
                                                             *ddu-ui-ff-faq-11*
-Q: |:close| does not move to the ddu-ui-ff window sometimes.
-
-A: Please use |ddu-ui-ff-action-closeFilterWindow| instead.
-
-                                                            *ddu-ui-ff-faq-12*
 Q: I want to toggle selected items in visual mode.
 
 A: >
@@ -932,7 +927,7 @@ A: >
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 <
 
-                                                            *ddu-ui-ff-faq-13*
+                                                            *ddu-ui-ff-faq-12*
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
@@ -951,7 +946,7 @@ A: >
 	\   },
 	\ })<CR>
 <
-                                                            *ddu-ui-ff-faq-14*
+                                                            *ddu-ui-ff-faq-13*
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
@@ -971,7 +966,7 @@ A: >
 	\   },
 	\ })<CR><Cmd>call setcmdline('')<CR><CR>
 <
-                                                            *ddu-ui-ff-faq-15*
+                                                            *ddu-ui-ff-faq-14*
 Q: I want to switch sources without clear current filter input.
 
 A: >
@@ -982,12 +977,12 @@ A: >
 	\   ],
 	\ })<CR>
 <
-                                                            *ddu-ui-ff-faq-16*
+                                                            *ddu-ui-ff-faq-15*
 Q: I want to use existing buffer to show preview.
 
 A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 
-                                                            *ddu-ui-ff-faq-17*
+                                                            *ddu-ui-ff-faq-16*
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
 like commands are available?
 
@@ -999,7 +994,7 @@ A: >
 	      \ <Cmd>call ddu#ui#multi_actions(
 	      \   ['cursorPrevious', 'itemAction'], 'files')<CR>
 <
-                                                            *ddu-ui-ff-faq-18*
+                                                            *ddu-ui-ff-faq-17*
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
@@ -1026,7 +1021,7 @@ A: >
 	    \ })
 	endfunction
 <
-                                                            *ddu-ui-ff-faq-19*
+                                                            *ddu-ui-ff-faq-18*
 Q: How do I set the floating title with list style ?
 
 A: >
@@ -1039,12 +1034,12 @@ A: >
 	  \   },
 	  \ })
 <
-                                                            *ddu-ui-ff-faq-20*
+                                                            *ddu-ui-ff-faq-19*
 Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
-                                                            *ddu-ui-ff-faq-21*
+                                                            *ddu-ui-ff-faq-20*
 Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
 filter window, it remains filter window.
 
@@ -1056,7 +1051,7 @@ You must escape command line mode when leave from the filter window.
 	cnoremap <CR>
 	    \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 <
-                                                            *ddu-ui-ff-faq-22*
+                                                            *ddu-ui-ff-faq-21*
 Q: I cannot see what item is selected in the filter window.
 
 A: You can set 'cursorline' option in ddu buffer.
@@ -1066,7 +1061,7 @@ A: You can set 'cursorline' option in ddu buffer.
 	  setlocal cursorline
 	endfunction
 <
-                                                            *ddu-ui-ff-faq-23*
+                                                            *ddu-ui-ff-faq-22*
 Q: I want to change preview cursor on the top.
 
 A: >
@@ -1080,7 +1075,7 @@ A: >
 	      \   },
 	      \ })
 <
-                                                            *ddu-ui-ff-faq-24*
+                                                            *ddu-ui-ff-faq-23*
 Q: I want to scroll preview window.
 
 A: >
@@ -1092,7 +1087,7 @@ A: >
 	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
 <
 
-                                                            *ddu-ui-ff-faq-25*
+                                                            *ddu-ui-ff-faq-24*
 Q: I want to preview selected item automatically.
 
 A: You need to set |ddu-ui-ff-param-autoAction| like this. >
@@ -1108,7 +1103,7 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >
 	      \ })
 <
 
-                                                            *ddu-ui-ff-faq-26*
+                                                            *ddu-ui-ff-faq-25*
 Q: I want to start filter window when UI is initialized.
 
 A: It is not supported.  Because it has too many problems.  But you can use
@@ -1118,6 +1113,11 @@ the function.
 	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#async_action('openFilterWindow')
 <
+
+                                                            *ddu-ui-ff-faq-26*
+Q: I want to change filter window position.
+
+A: "cmdline.vim" supports the feature.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
