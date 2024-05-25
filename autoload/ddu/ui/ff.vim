@@ -453,7 +453,6 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 endfunction
 
 function s:check_redraw(input) abort
-  echomsg 'input' .. a:input
   if a:input ==# s:filter_prev_input
     return
   endif
