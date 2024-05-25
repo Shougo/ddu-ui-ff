@@ -420,6 +420,7 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
   if !'s:filter_prev_input'->exists()
     let s:filter_prev_input = a:input
   endif
+  let s:filter_init_input = a:input
 
   doautocmd User Ddu:ui:ff:openFilterWindow
 
@@ -453,6 +454,16 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 endfunction
 
 function s:check_redraw(input) abort
+  if exists('s:filter_init_input')
+    " Check s:filter_init_input
+    " Because CmdlineChanged is called when default input
+    if s:filter_init_input !=# '' && a:input !=# s:filter_init_input
+      return
+    endif
+
+    unlet s:filter_init_input
+  endif
+
   if a:input ==# s:filter_prev_input
     return
   endif
