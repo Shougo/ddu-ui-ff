@@ -755,6 +755,9 @@ FAQ 25:                                                     |ddu-ui-ff-faq-25|
 FAQ 26:                                                     |ddu-ui-ff-faq-26|
 	I want to change filter window position.
 
+FAQ 27:                                                     |ddu-ui-ff-faq-27|
+	The filter input is cleared when I press <ESC> key.
+
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
@@ -1118,6 +1121,12 @@ the function.
 Q: I want to change filter window position.
 
 A: "cmdline.vim" supports the feature.
+
+                                                            *ddu-ui-ff-faq-27*
+Q: The filter input is cleared when I press <ESC> key.
+
+A: It is Vim's feature.  <ESC> is not confirm key.  It is cancel your input.
+If you don't like the behavior, you can map it.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
