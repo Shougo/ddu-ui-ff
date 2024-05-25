@@ -644,7 +644,7 @@ Ddu:ui:ff:openFilterWindow
 		Called after |ddu-ui-ff-action-openFilterWindow| is called.
 
                                *ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow*
-Ddu:ui:ff:openFilterWindow
+Ddu:ui:ff:closeFilterWindow
 		Called after filter window is closed.
 
 
