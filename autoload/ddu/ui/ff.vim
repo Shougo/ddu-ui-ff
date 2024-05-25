@@ -1,29 +1,5 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function ddu#ui#ff#execute(command) abort
-  if !'g:ddu#ui#ff#_filter_parent_winid'->exists()
-    return
-  endif
-
-  const winid = g:ddu#ui#ff#_filter_parent_winid
-  const prev_curpos = winid->getcurpos()
-
-  call win_execute(winid, a:command)
-
-  if 'g:ddu#ui#ff#_save_title'->exists()
-    call ddu#ui#ff#_set_title(winid->winbufnr(), winid)
-  endif
-
-  if winid->getcurpos() != prev_curpos
-    " NOTE: CursorMoved autocmd does not work when win_execute()
-
-    call ddu#ui#ff#_stop_debounce_timer('s:debounce_cursor_moved_timer')
-
-    let s:debounce_cursor_moved_timer = timer_start(
-          \ 100, { -> s:do_cursor_moved(winid) })
-  endif
-endfunction
-
 function ddu#ui#ff#_update_buffer(
       \ params, bufnr, winid, lines, refreshed, pos) abort
   const current_lines = '$'->line(a:winid)
@@ -108,10 +84,8 @@ function ddu#ui#ff#_highlight_items(
           \ 1, 1000)
   endfor
 
-  if !has('nvim')
-    " NOTE: :redraw is needed for Vim
-    redraw
-  endif
+  " NOTE: :redraw is needed
+  redraw
 endfunction
 
 function ddu#ui#ff#_highlight(
@@ -254,11 +228,6 @@ function ddu#ui#ff#_open_preview_window(
         let preview_height -= 1
       endif
 
-      if a:params.previewRow <= 0 && a:params.filterFloatingPosition ==# 'top'
-        let preview_height -= 1
-        let win_row -= 1
-      endif
-
       if has('nvim')
         if a:params.previewRow <= 0 && win_row <= preview_height
           let win_row += win_height + 1
@@ -352,8 +321,13 @@ function ddu#ui#ff#_do_auto_action() abort
     return
   endif
 
-  let s:debounce_auto_action_timer = timer_start(
-        \ s:auto_action.delay, { -> s:do_auto_action() })
+  if mode() ==# 'c'
+    " NOTE: In command line mode, timer_start() does not work
+    call s:do_auto_action()
+  else
+    let s:debounce_auto_action_timer = timer_start(
+          \ s:auto_action.delay, { -> s:do_auto_action() })
+  endif
 endfunction
 function ddu#ui#ff#_reset_auto_action() abort
   let s:cursor_text = ''
@@ -382,17 +356,6 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   call win_gotoid(prev_winid)
 endfunction
 
-function ddu#ui#ff#_cursor(line, col) abort
-  if &l:filetype ==# 'ddu-ff'
-        \ || !'g:ddu#ui#ff#_filter_parent_winid'->exists()
-    call cursor(a:line, a:col)
-  else
-    call ddu#ui#ff#execute(
-          \ printf('call cursor(%d, %d) | redraw', a:line, a:col))
-    redraw
-  endif
-endfunction
-
 function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
   const text = getbufline(a:bufnr, a:pos[1])
 
@@ -403,10 +366,6 @@ function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
   endif
 
   call setbufvar(a:bufnr, 'ddu_ui_ff_save_cursor_item', ddu#ui#get_item())
-endfunction
-
-function ddu#ui#ff#_echo(msg) abort
-  echo a:msg
 endfunction
 
 function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
@@ -457,21 +416,61 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
   endif
 endfunction
 
-function s:do_cursor_moved(winid) abort
-  const prev_winid = win_getid()
-  try
-    call win_gotoid(a:winid)
+function ddu#ui#ff#_open_filter_window(params, input, length) abort
+  let s:filter_prev_input = a:input
 
-    silent doautocmd CursorMoved
-  finally
-    call win_gotoid(prev_winid)
-  endtry
+  doautocmd User Ddu:ui:ff:openFilterWindow
+
+  augroup ddu-ui-ff-filter
+    autocmd!
+    autocmd User Ddu:ui:ff:openFilterWindow :
+    autocmd User Ddu:ui:ff:closeFilterWindow :
+  augroup END
+
+  if a:params.filterUpdateMax <= 0 || a:params.filterUpdateMax < a:length
+    autocmd ddu-ui-ff-filter CmdlineChanged *
+          \ ++nested call s:check_redraw()
+  else
+    autocmd ddu-ui-ff-filter CmdlineLeave *
+          \ ++nested call s:check_redraw()
+  endif
+
+  " NOTE: redraw is needed
+  redraw
+
+  const input = exists('*cmdline#input') ?
+        \ cmdline#input(a:params.prompt, a:input) :
+        \ input(a:params.prompt, a:input)
+
+  augroup ddu-ui-ff-filter
+    autocmd!
+  augroup END
+
+  doautocmd User Ddu:ui:ff:closeFilterWindow
+
+  let s:filter_prev_input = input
+
+  return input
+endfunction
+
+function s:check_redraw() abort
+  const input = getcmdline()
+
+  if input ==# s:filter_prev_input
+    return
+  endif
+
+  let s:filter_prev_input = input
+
+  call ddu#redraw(b:ddu_ui_name, #{ input: input })
 endfunction
 
 function s:do_auto_action() abort
-  const winid = (&l:filetype ==# 'ddu-ff'
-        \        || !'g:ddu#ui#ff#_filter_parent_winid'->exists())
-        \ ? win_getid() : g:ddu#ui#ff#_filter_parent_winid
+  if &l:filetype !=# 'ddu-ff'
+    return
+  endif
+
+  const winid = win_getid()
   const bufnr = winid->winbufnr()
 
   const text = bufnr->getbufline(winid->getcurpos()[1])->get(0, '')

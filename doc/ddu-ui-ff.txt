@@ -1,4 +1,4 @@
-*ddu-ui-ff.txt*	Standard UI for ddu.vim
+*ddu-ui-ff.txt*	Fuzzy finder UI for ddu.vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
@@ -12,6 +12,7 @@ Interface		|ddu-ui-ff-interface|
   Actions		  |ddu-ui-ff-actions|
   Params		  |ddu-ui-ff-params|
   Params expression	  |ddu-ui-ff-params-expression|
+  Autocmds		  |ddu-ui-ff-autocmds|
 Examples		|ddu-ui-ff-examples|
 FAQ			|ddu-ui-ff-faq|
 Compatibility		|ddu-ui-ff-compatibility|
@@ -39,11 +40,6 @@ INTERFACE                                                *ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS                                                *ddu-ui-ff-functions*
 
-ddu#ui#ff#execute({command})
-		Execute {command} in the UI window.
-		NOTE: It does not execute |:redraw| automatically.
-		You need to execute |:redraw| if needed.
-
 ------------------------------------------------------------------------------
 ACTIONS                                                    *ddu-ui-ff-actions*
 
@@ -63,10 +59,6 @@ chooseAction
                                         *ddu-ui-ff-action-clearSelectAllItems*
 clearSelectAllItems
 		Clear all selected items.
-
-                                          *ddu-ui-ff-action-closeFilterWindow*
-closeFilterWindow
-		Close the filter window and move to the parent UI window.
 
                                          *ddu-ui-ff-action-closePreviewWindow*
 closePreviewWindow
@@ -136,13 +128,11 @@ itemAction
 
 		NOTE: You cannot mix multiple kinds/sources.
 
-                                          *ddu-ui-ff-action-leaveFilterWindow*
-leaveFilterWindow
-		Move to the parent UI window.
-
                                            *ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
-		Open the filter window.
+		Open the filter window in command line.
+		NOTE: Use |cmdline| plugin if possible.
+		NOTE: The items are not updated in the filter window.
 
 		params:
 			{input}: Overwrite current input
@@ -232,6 +222,7 @@ autoAction	(dictionary)
 		Time in milliseconds to delay the auto action.
 		If you feel slow, specify large value.
 		Set 0 to disable debouncing.
+		NOTE: It does not work in the filter window.
 
 		Default: 10
 
@@ -331,54 +322,10 @@ floatingTitlePos	(string)
 
 		Default: "left"
 
-                                      *ddu-ui-ff-param-filterFloatingPosition*
-filterFloatingPosition	(string)
-		Specify the filter floating window position as {position}.
-
-		If {position} is set to "bottom", the filter will be displayed
-		at the bottom.
-		If {position} is "top", the filter will be displayed at the
-		top.
-
-		NOTE: To use it, you need to use neovim and
-		|ddu-ui-ff-param-filterSplitDirection| must be "floating".
-
-		Default: "top"
-
-                                         *ddu-ui-ff-param-filterFloatingTitle*
-filterFloatingTitle	(string | list)
-		Specify the title of the filter floating window with border if
-		|ddu-ui-ff-param-floatingBorder| is not "none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
-
-		Default: ""
-
-                                      *ddu-ui-ff-param-filterFloatingTitlePos*
-filterFloatingTitlePos	(string)
-		Specify the title position of the filter floating window with
-		border if |ddu-ui-ff-param-floatingBorder| is not "none".
-		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
-
-		Default: "left"
-
-                                        *ddu-ui-ff-param-filterSplitDirection*
-filterSplitDirection	(string)
-		Specify the filter window direction as {direction}.
-
-		When {direction} is "floating", the filter uses neovim
-		floating window. If statusline is at the bottom, the filter
-		overwrites statusline. Otherwise, it is located one line below
-		statusline.
-
-		NOTE: To use "floating", you need to use neovim.
-
-		Default: "aboveleft"
-
-                                            *ddu-ui-ff-param-filterUpdateTime*
-filterUpdateTime	(number)
-		Specify the update time in the filter window.
+                                             *ddu-ui-ff-param-filterUpdateMax*
+filterUpdateMax	(number)
+		Specify the maximum item number to update in the filter
+		window.
 		If it is less than equal 0, the feature will be disabled.
 
 		Default: 0
@@ -407,10 +354,6 @@ highlights	(dictionary)
 		preview				(string)
 		Specify preview window highlight.
 		Default: "Search"
-
-		prompt				(string)
-		Specify prompt text highlight in filter window.
-		Default: "Special"
 
 		selected			(string)
 		Specify selected item highlight.
@@ -643,7 +586,6 @@ winHeight	(number | string)
 winRow		(number | string)
 		Set the row position of the window if |ddu-ui-ff-param-split|
 		is "floating".
-		If it is 1, the filter window position is always top.
 
 		Default: "&lines / 2 - 10"
 
@@ -693,6 +635,20 @@ on the right side of the screen: >
 <
 
 ==============================================================================
+AUTOCMDS                                                  *ddu-ui-ff-autocmds*
+
+ddu-ui-ff defines some |User| autocmds.
+
+                                *ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow*
+Ddu:ui:ff:openFilterWindow
+		Called after |ddu-ui-ff-action-openFilterWindow| is called.
+
+                               *ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow*
+Ddu:ui:ff:openFilterWindow
+		Called after filter window is closed.
+
+
+==============================================================================
 EXAMPLES                                                  *ddu-ui-ff-examples*
 >
 	call ddu#custom#patch_global(#{
@@ -709,14 +665,6 @@ EXAMPLES                                                  *ddu-ui-ff-examples*
 	  \ <Cmd>call ddu#ui#do_action('openFilterWindow')<CR>
 	  nnoremap <buffer> q
 	  \ <Cmd>call ddu#ui#do_action('quit')<CR>
-	endfunction
-
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <CR>
-	  \ <Esc><Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
-	  nnoremap <buffer> <CR>
-	  \ <Cmd>call ddu#ui#do_action('closeFilterWindow')<CR>
 	endfunction
 <
 
@@ -763,51 +711,48 @@ FAQ 12:                                                     |ddu-ui-ff-faq-12|
 	I want to toggle selected items in visual mode.
 
 FAQ 13:                                                     |ddu-ui-ff-faq-13|
-	|ddu#ui#ff#execute()| does not execute |:redraw| automatically.
-
-FAQ 14:                                                     |ddu-ui-ff-faq-14|
 	I want to use "ddu-ui-ff" in insert mode.
 
-FAQ 15:                                                     |ddu-ui-ff-faq-15|
+FAQ 14:                                                     |ddu-ui-ff-faq-14|
 	I want to use "ddu-ui-ff" in command line mode.
 
-FAQ 16:                                                     |ddu-ui-ff-faq-16|
+FAQ 15:                                                     |ddu-ui-ff-faq-15|
 	I want to switch sources without clear current filter input.
 
-FAQ 17:                                                     |ddu-ui-ff-faq-17|
+FAQ 16:                                                     |ddu-ui-ff-faq-16|
 	I want to use existing buffer to show preview.
 
-FAQ 18:                                                     |ddu-ui-ff-faq-18|
+FAQ 17:                                                     |ddu-ui-ff-faq-17|
 	":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1
 	-immediately" like commands are available?
 
-FAQ 19:                                                     |ddu-ui-ff-faq-19|
+FAQ 18:                                                     |ddu-ui-ff-faq-18|
 	I want to display cursor mark on the left of ddu window like
 	"telescope.nvim".
 
-FAQ 20:                                                     |ddu-ui-ff-faq-20|
+FAQ 19:                                                     |ddu-ui-ff-faq-19|
 	How do I set the floating title with list style ?
 
-FAQ 21:                                                     |ddu-ui-ff-faq-21|
+FAQ 20:                                                     |ddu-ui-ff-faq-20|
 	I want to align column when |ddu-ui-ff-param-prompt| is set.
 
-FAQ 22:                                                     |ddu-ui-ff-faq-22|
+FAQ 21:                                                     |ddu-ui-ff-faq-21|
 	When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction|
-	from insert mode of the filter window, it remains insert mode.
+	from filter window, it remains filter window.
 
-FAQ 23:                                                     |ddu-ui-ff-faq-23|
+FAQ 22:                                                     |ddu-ui-ff-faq-22|
 	I cannot see what item is selected in the filter window.
 
-FAQ 24:                                                     |ddu-ui-ff-faq-24|
+FAQ 23:                                                     |ddu-ui-ff-faq-23|
 	I want to change preview cursor on the top.
 
-FAQ 25:                                                     |ddu-ui-ff-faq-25|
+FAQ 24:                                                     |ddu-ui-ff-faq-24|
 	I want to scroll preview window.
 
-FAQ 26:                                                     |ddu-ui-ff-faq-26|
+FAQ 25:                                                     |ddu-ui-ff-faq-25|
 	I want to preview selected item automatically.
 
-FAQ 27:                                                     |ddu-ui-ff-faq-27|
+FAQ 26:                                                     |ddu-ui-ff-faq-26|
 	I want to start filter window when UI is initialized.
 
 ------------------------------------------------------------------------------
@@ -822,38 +767,83 @@ A: You can use |input()| like this.
 Q: I want to call default action in the filter window.
 
 A: >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <CR>
-	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
+	  let s:save_cr = '<CR>'->maparg('c', v:false, v:true)
+
+	  cnoremap <CR>
+	      \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
+	endfunction
+	autocmd User Ddu:ui:ff:closeFilterWindow
+	      \ call s:ddu_ff_filter_cleanup()
+	function s:ddu_ff_filter_cleanup() abort
+	  if s:save_cr->empty()
+	    cunmap <CR>
+	  else
+	    call mapset('c', 0, s:save_cr)
+	  endif
 	endfunction
 <
+
+NOTE: You must restore keys when
+|ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow|.
+
                                                              *ddu-ui-ff-faq-3*
 Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <C-j>
+	  set cursorline
+
+	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
+	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+
+	  cnoremap <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
-	  inoremap <buffer> <C-k>
+	  cnoremap <C-k>
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
+	endfunction
+
+	autocmd User Ddu:ui:ff:closeFilterWindow
+	      \ call s:ddu_ff_filter_cleanup()
+	function s:ddu_ff_filter_cleanup() abort
+	  set nocursorline
+
+	  if s:save_j->empty()
+	    cunmap <C-j>
+	  else
+	    call mapset('c', 0, s:save_j)
+	  endif
+	  if s:save_k->empty()
+	    cunmap <C-k>
+	  else
+	    call mapset('c', 0, s:save_k)
+	  endif
 	endfunction
 <
 
 If you want to loop the cursor:
 NOTE: It does not support |ddu-ui-ff-param-reversed|.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
+	autocmd User Ddu:ui:ff:openFilterWindow
+	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <C-j>
-	      \ <Cmd>call ddu#ui#do_action('cursorNext',
-	      \ #{ loop: v:true })<CR>
-	  inoremap <buffer> <C-k>
-	      \ <Cmd>call ddu#ui#do_action('cursorPrevious',
-	      \ #{ loop: v:true })<CR>
+	  setlocal cursorline
+
+	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
+	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+
+	  cnoremap <C-j>
+	        \ <Cmd>call ddu#ui#do_action('cursorNext',
+	        \ #{ loop: v:true })<CR>
+	  cnoremap <C-k>
+	        \ <Cmd>call ddu#ui#do_action('cursorPrevious',
+	        \ #{ loop: v:true })<CR>
 	endfunction
 <
                                                              *ddu-ui-ff-faq-4*
@@ -866,13 +856,6 @@ A: You can use "b:ddu_ui_name". >
 	  if b:ddu_ui_name ==# 'foo'
 	    nnoremap <buffer> e
 	    \ <Cmd>call ddu#ui#do_action('itemAction', {'name': 'edit'})<CR>
-	  endif
-	endfunction
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  if b:ddu_ui_name ==# 'foo'
-	    nnoremap <buffer> <CR>
-	    \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
 	  endif
 	endfunction
 <
@@ -948,13 +931,8 @@ A: >
   xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 <
+
                                                             *ddu-ui-ff-faq-13*
-Q: |ddu#ui#ff#execute()| does not execute |:redraw| automatically.
-
-A: It is feature.  Because it increases screen flicker.
-You need to add |:redraw| command manually if needed.
-
-                                                            *ddu-ui-ff-faq-14*
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
@@ -973,7 +951,7 @@ A: >
 	\   },
 	\ })<CR>
 <
-                                                            *ddu-ui-ff-faq-15*
+                                                            *ddu-ui-ff-faq-14*
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
@@ -993,7 +971,7 @@ A: >
 	\   },
 	\ })<CR><Cmd>call setcmdline('')<CR><CR>
 <
-                                                            *ddu-ui-ff-faq-16*
+                                                            *ddu-ui-ff-faq-15*
 Q: I want to switch sources without clear current filter input.
 
 A: >
@@ -1004,14 +982,14 @@ A: >
 	\   ],
 	\ })<CR>
 <
-                                                            *ddu-ui-ff-faq-17*
+                                                            *ddu-ui-ff-faq-16*
 Q: I want to use existing buffer to show preview.
 
 A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 
-                                                            *ddu-ui-ff-faq-18*
+                                                            *ddu-ui-ff-faq-17*
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
-   like commands are available?
+like commands are available?
 
 A: >
 	nnoremap <C-n>
@@ -1021,7 +999,7 @@ A: >
 	      \ <Cmd>call ddu#ui#multi_actions(
 	      \   ['cursorPrevious', 'itemAction'], 'files')<CR>
 <
-                                                            *ddu-ui-ff-faq-19*
+                                                            *ddu-ui-ff-faq-18*
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
@@ -1048,7 +1026,7 @@ A: >
 	    \ })
 	endfunction
 <
-                                                            *ddu-ui-ff-faq-20*
+                                                            *ddu-ui-ff-faq-19*
 Q: How do I set the floating title with list style ?
 
 A: >
@@ -1061,27 +1039,24 @@ A: >
 	  \   },
 	  \ })
 <
-                                                            *ddu-ui-ff-faq-21*
+                                                            *ddu-ui-ff-faq-20*
 Q: I want to align column when |ddu-ui-ff-param-prompt| is set.
 
 A: You can set 'signcolumn' option in UI buffer.
 
-                                                            *ddu-ui-ff-faq-22*
+                                                            *ddu-ui-ff-faq-21*
 Q: When calling |ddu-ui-ff-action-quit| or |ddu-ui-ff-action-itemAction| from
-insert mode of the filter window, it remains insert mode.
+filter window, it remains filter window.
 
 A: It is the feature.  Because |ddu#ui#do_action()| does not change any mode.
-You must escape insert mode when leave from the filter window.
+You must escape command line mode when leave from the filter window.
 >
-	autocmd FileType ddu-ff-filter call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
-	  inoremap <buffer> <Esc>
-	  \ <Esc><Cmd>call ddu#ui#do_action('quit')<CR>
-	  inoremap <buffer> <CR>
-	  \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
-	endfunction
+	cnoremap <ESC>
+	    \ <ESC><Cmd>call ddu#ui#do_action('quit')<CR>
+	cnoremap <CR>
+	    \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 <
-                                                            *ddu-ui-ff-faq-23*
+                                                            *ddu-ui-ff-faq-22*
 Q: I cannot see what item is selected in the filter window.
 
 A: You can set 'cursorline' option in ddu buffer.
@@ -1091,7 +1066,7 @@ A: You can set 'cursorline' option in ddu buffer.
 	  setlocal cursorline
 	endfunction
 <
-                                                            *ddu-ui-ff-faq-24*
+                                                            *ddu-ui-ff-faq-23*
 Q: I want to change preview cursor on the top.
 
 A: >
@@ -1105,7 +1080,7 @@ A: >
 	      \   },
 	      \ })
 <
-                                                            *ddu-ui-ff-faq-25*
+                                                            *ddu-ui-ff-faq-24*
 Q: I want to scroll preview window.
 
 A: >
@@ -1117,7 +1092,7 @@ A: >
 	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
 <
 
-                                                            *ddu-ui-ff-faq-26*
+                                                            *ddu-ui-ff-faq-25*
 Q: I want to preview selected item automatically.
 
 A: You need to set |ddu-ui-ff-param-autoAction| like this. >
@@ -1133,21 +1108,33 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >
 	      \ })
 <
 
-                                                            *ddu-ui-ff-faq-27*
+                                                            *ddu-ui-ff-faq-26*
 Q: I want to start filter window when UI is initialized.
 
-A: It is not supported.  Because it has too many problems.  But you can use the
-function.
+A: It is not supported.  Because it has too many problems.  But you can use
+the function.
 >
 	call ddu#start()
-	autocmd User Ddu:uiReady
-	      \ : if &l:filetype ==# 'ddu-ff'
-	      \ |   call ddu#ui#do_action('openFilterWindow')
-	      \ | endif
+	autocmd User Ddu:uiDone ++nested
+	      \ call ddu#ui#async_action('openFilterWindow')
 <
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.05.22
+* Remove "filterUpdateTime" param.
+* Remove "ddu#ui#ff#execute()".
+
+2024.05.21
+* Use command line instead of filter window.
+* Remove filter related params:
+  "filterFloatingPosition", "filterFloatingTitle",
+  "filterFloatingTitlePos", "filterSplitDirection"
+* Remove filter related actions:
+  "closeFilterWindow", "leaveFilterWindow"
+* Remove "ddu-ff-filter" filetype.
+  Please use "Ddu:ui:ff:openFilterWindow" autocmd instead.
 
 2024.03.11
 * Remove "startFilter" option.  Because it has too many problems.
