@@ -417,7 +417,9 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
 endfunction
 
 function ddu#ui#ff#_open_filter_window(params, input, length) abort
-  let s:filter_prev_input = a:input
+  if !'s:filter_prev_input'->exists()
+    let s:filter_prev_input = a:input
+  endif
 
   doautocmd User Ddu:ui:ff:openFilterWindow
 
@@ -429,10 +431,7 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 
   if a:params.filterUpdateMax <= 0 || a:params.filterUpdateMax < a:length
     autocmd ddu-ui-ff-filter CmdlineChanged *
-          \ ++nested call s:check_redraw()
-  else
-    autocmd ddu-ui-ff-filter CmdlineLeave *
-          \ ++nested call s:check_redraw()
+          \ ++nested call s:check_redraw(getcmdline())
   endif
 
   " NOTE: redraw is needed
@@ -448,21 +447,20 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
-  let s:filter_prev_input = input
+  call s:check_redraw(input)
 
   return input
 endfunction
 
-function s:check_redraw() abort
-  const input = getcmdline()
-
-  if input ==# s:filter_prev_input
+function s:check_redraw(input) abort
+  echomsg 'input' .. a:input
+  if a:input ==# s:filter_prev_input
     return
   endif
 
-  let s:filter_prev_input = input
+  let s:filter_prev_input = a:input
 
-  call ddu#redraw(b:ddu_ui_name, #{ input: input })
+  call ddu#redraw(b:ddu_ui_name, #{ input: a:input })
 endfunction
 
 function s:do_auto_action() abort
