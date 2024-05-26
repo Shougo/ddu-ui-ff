@@ -438,9 +438,7 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
   " NOTE: redraw is needed
   redraw
 
-  const input = exists('*cmdline#input') ?
-        \ cmdline#input(a:params.prompt, a:input) :
-        \ input(a:params.prompt, a:input)
+  const new_input = input(a:params.prompt, a:input)
 
   augroup ddu-ui-ff-filter
     autocmd!
@@ -448,9 +446,9 @@ function ddu#ui#ff#_open_filter_window(params, input, length) abort
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
-  call s:check_redraw(input)
+  call s:check_redraw(new_input)
 
-  return input
+  return new_input
 endfunction
 
 function s:check_redraw(input) abort

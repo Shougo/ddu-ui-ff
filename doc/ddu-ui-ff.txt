@@ -1121,7 +1121,9 @@ the function.
 Q: I want to change filter window position.
 
 A: "cmdline.vim" supports the feature.
-
+>
+	autocmd User Ddu:ui:ff:openFilterWindow call cmdline#enable()
+<
                                                             *ddu-ui-ff-faq-27*
 Q: The filter input is cleared when I press <ESC> key.
 
@@ -1130,6 +1132,10 @@ If you don't like the behavior, you can map it.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.05.26
+* Remove "cmdline.vim" support.  You can call |cmdline#enable()| in
+  |ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow| autocmd.
 
 2024.05.22
 * Remove "filterUpdateTime" param.
