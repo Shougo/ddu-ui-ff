@@ -847,6 +847,8 @@ export class Ui extends BaseUi<Params> {
     },
     cursorNext: async (args: {
       denops: Denops;
+      context: Context;
+      options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
     }) => {
@@ -885,10 +887,22 @@ export class Ui extends BaseUi<Params> {
       // Change real cursor
       await fn.cursor(args.denops, cursorPos[1], 0);
 
+      await this.#setStatusline(
+        args.denops,
+        args.context,
+        args.options,
+        args.uiParams,
+        bufnr,
+        args.uiParams.split === "floating",
+        `ddu-ui-ff-${bufnr}`,
+      );
+
       return ActionFlags.Persist;
     },
     cursorPrevious: async (args: {
       denops: Denops;
+      context: Context;
+      options: DduOptions;
       uiParams: Params;
       actionParams: unknown;
     }) => {
@@ -926,6 +940,16 @@ export class Ui extends BaseUi<Params> {
 
       // Change real cursor
       await fn.cursor(args.denops, cursorPos[1], 0);
+
+      await this.#setStatusline(
+        args.denops,
+        args.context,
+        args.options,
+        args.uiParams,
+        bufnr,
+        args.uiParams.split === "floating",
+        `ddu-ui-ff-${bufnr}`,
+      );
 
       return ActionFlags.Persist;
     },
@@ -1552,7 +1576,10 @@ export class Ui extends BaseUi<Params> {
       (this.#items.length !== context.maxItems
         ? ` ${this.#items.length}/${context.maxItems}`
         : "");
-    const async = `${context.done ? "" : " [async]"}`;
+
+    const footer = `${context.input.length > 0 ? " " + context.input : ""}${
+      context.done || await fn.mode(denops) == "c" ? "" : " [async]"
+    }`;
 
     if (floating || await op.laststatus.get(denops) === 0) {
       if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
@@ -1564,15 +1591,16 @@ export class Ui extends BaseUi<Params> {
       }
 
       await denops.cmd(
-        `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
+        `autocmd ${augroupName} WinClosed,BufLeave <buffer> ++nested` +
           " call ddu#ui#ff#_restore_title()",
       );
       await denops.cmd(
-        `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
+        `autocmd ${augroupName}` +
+          " WinEnter,BufEnter <buffer> ++nested" +
           " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))",
       );
 
-      const titleString = `${header}${async}`;
+      const titleString = `${header}${footer}`;
       await vars.b.set(denops, "ddu_ui_ff_title", titleString);
 
       await denops.call("ddu#ui#ff#_set_title", bufnr);
@@ -1583,7 +1611,7 @@ export class Ui extends BaseUi<Params> {
         denops,
         winid,
         "&statusline",
-        `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${async}`,
+        `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${footer}`,
       );
     }
   }
