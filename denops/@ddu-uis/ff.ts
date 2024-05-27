@@ -1079,6 +1079,7 @@ export class Ui extends BaseUi<Params> {
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
     }) => {
+      console.log("openFilterWindow");
       const uiParams = await this.#resolveParams(
         args.denops,
         args.options,

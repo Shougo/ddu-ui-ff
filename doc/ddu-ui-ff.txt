@@ -40,6 +40,18 @@ INTERFACE                                                *ddu-ui-ff-interface*
 ------------------------------------------------------------------------------
 FUNCTIONS                                                *ddu-ui-ff-functions*
 
+                                   *ddu-ui-ff-function-ddu#ui#ff#save_cmaps()*
+ddu#ui#ff#save_cmaps({keys})
+		Save command line maps for {keys}.
+		It is useful to use
+		in |ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow| autocmd.
+
+                                *ddu-ui-ff-function-ddu#ui#ff#restore_cmaps()*
+ddu#ui#ff#restore_cmaps({keys})
+		Restore command line maps for {keys}.
+		It is useful to use
+		in |ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow| autocmd.
+
 ------------------------------------------------------------------------------
 ACTIONS                                                    *ddu-ui-ff-actions*
 
@@ -802,8 +814,7 @@ must force this behaviour.
 	function s:ddu_ff_filter_my_settings() abort
 	  set cursorline
 
-	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
-	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
 
 	  cnoremap <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext')<CR>
@@ -816,16 +827,7 @@ must force this behaviour.
 	function s:ddu_ff_filter_cleanup() abort
 	  set nocursorline
 
-	  if s:save_j->empty()
-	    cunmap <C-j>
-	  else
-	    call mapset('c', 0, s:save_j)
-	  endif
-	  if s:save_k->empty()
-	    cunmap <C-k>
-	  else
-	    call mapset('c', 0, s:save_k)
-	  endif
+	  call ddu#ui#ff#restore_cmaps()
 	endfunction
 <
 
