@@ -839,8 +839,7 @@ NOTE: It does not support |ddu-ui-ff-param-reversed|.
 	function s:ddu_ff_filter_my_settings() abort
 	  setlocal cursorline
 
-	  let s:save_j = '<C-j>'->maparg('c', v:false, v:true)
-	  let s:save_k = '<C-k>'->maparg('c', v:false, v:true)
+	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
 
 	  cnoremap <C-j>
 	        \ <Cmd>call ddu#ui#do_action('cursorNext',
@@ -930,7 +929,6 @@ A: >
   xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 <
-
                                                             *ddu-ui-ff-faq-12*
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
@@ -1090,7 +1088,6 @@ A: >
 	      \ <Cmd>call ddu#ui#do_action('previewExecute',
 	      \ #{ command: 'execute "normal! \<C-e>"' })<CR>
 <
-
                                                             *ddu-ui-ff-faq-24*
 Q: I want to preview selected item automatically.
 
@@ -1106,7 +1103,6 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >
 	      \   },
 	      \ })
 <
-
                                                             *ddu-ui-ff-faq-25*
 Q: I want to start filter window when UI is initialized.
 
@@ -1117,7 +1113,6 @@ the function.
 	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#async_action('openFilterWindow')
 <
-
                                                             *ddu-ui-ff-faq-26*
 Q: I want to change filter window position.
 
