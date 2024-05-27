@@ -47,8 +47,9 @@ ddu#ui#ff#save_cmaps({keys})
 		in |ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow| autocmd.
 
                                 *ddu-ui-ff-function-ddu#ui#ff#restore_cmaps()*
-ddu#ui#ff#restore_cmaps({keys})
-		Restore command line maps for {keys}.
+ddu#ui#ff#restore_cmaps()
+		Restore command line maps saved by
+		|ddu-ui-ff-function-ddu#ui#ff#save_cmaps()|.
 		It is useful to use
 		in |ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow| autocmd.
 
