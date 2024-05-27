@@ -143,7 +143,6 @@ itemAction
                                            *ddu-ui-ff-action-openFilterWindow*
 openFilterWindow
 		Open the filter window in command line.
-		NOTE: The items are not updated in the filter window.
 
 		params:
 			{input}: Overwrite current input
