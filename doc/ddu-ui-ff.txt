@@ -218,7 +218,7 @@ updateOptions
 		NOTE: If you execute it in the action, |ddu-options| is not
 		updated in current context.
 
-==============================================================================
+------------------------------------------------------------------------------
 PARAMS                                                      *ddu-ui-ff-params*
 
                                                   *ddu-ui-ff-param-autoAction*
@@ -258,10 +258,10 @@ autoResize	(boolean)
 
                                                    *ddu-ui-ff-param-cursorPos*
 cursorPos	(number)
-		Select {number} candidate.  It is 0 origin.
+		Select {number} candidate.  It is 1 origin.
 		If you set the option, cursor restore feature is disabled.
 
-		Default: -1
+		Default: 0
 
                                            *ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)
@@ -608,7 +608,7 @@ winWidth	(number | string)
 
 		Default: "&columns / 2"
 
-==============================================================================
+------------------------------------------------------------------------------
 PARAMS EXPRESSION                                *ddu-ui-ff-params-expression*
 
 If the parameter value is a string, it can be evaluated as a Vim |expression|.
@@ -644,7 +644,7 @@ on the right side of the screen: >
 	    \ })
 <
 
-==============================================================================
+------------------------------------------------------------------------------
 AUTOCMDS                                                  *ddu-ui-ff-autocmds*
 
 ddu-ui-ff defines some |User| autocmds.
@@ -1127,6 +1127,9 @@ If you don't like the behavior, you can map it.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.05.27
+* |ddu-ui-ff-param-cursorPos| is 1 origin.
 
 2024.05.26
 * Remove "cmdline.vim" support.  You can call |cmdline#enable()| in

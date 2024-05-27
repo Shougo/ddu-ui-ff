@@ -26,7 +26,7 @@ function ddu#ui#ff#_update_buffer(
   call setbufvar(a:bufnr, '&modifiable', 1)
 
   " NOTE: deletebufline() changes cursor position.
-  let changed_cursor = v:false
+  const before_cursor = a:winid->getcurpos()
   if a:lines->empty()
     " Clear buffer
     if current_lines > 1
@@ -35,8 +35,6 @@ function ddu#ui#ff#_update_buffer(
       else
         silent call deletebufline(a:bufnr, 1, '$')
       endif
-
-      let changed_cursor = v:true
     else
       call setbufline(a:bufnr, 1, [''])
     endif
@@ -46,21 +44,20 @@ function ddu#ui#ff#_update_buffer(
 
     if current_lines > a:lines->len()
       silent call deletebufline(a:bufnr, a:lines->len() + 1, '$')
-      let changed_cursor = v:true
     endif
   endif
 
   call setbufvar(a:bufnr, '&modifiable', 0)
   call setbufvar(a:bufnr, '&modified', 0)
 
-  if !a:refreshed && !changed_cursor
+  if !a:refreshed && a:winid->getcurpos() ==# before_cursor
     return
   endif
 
   " Init the cursor
   const curpos = a:winid->getcurpos()
-  const lnum = a:params.reversed ? a:lines->len() - a:pos : a:pos + 1
-  if curpos[1] != lnum
+  const lnum = a:params.reversed ? a:lines->len() - a:pos : a:pos
+  if a:pos > 0 && curpos[1] != lnum
     call win_execute(a:winid,
           \ printf('call cursor(%d, 0) | normal! zb', lnum))
   elseif a:params.reversed

@@ -549,7 +549,7 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const cursorPos = Number(args.uiParams.cursorPos) >= 0 && this.#refreshed &&
+    const cursorPos = Number(args.uiParams.cursorPos) > 0 && this.#refreshed &&
         this.#prevLength == 0
       ? Number(args.uiParams.cursorPos)
       : 0;
@@ -579,7 +579,7 @@ export class Ui extends BaseUi<Params> {
           bufnr,
           winid,
           this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-          args.uiParams.cursorPos >= 0 || (this.#refreshed && checkRefreshed),
+          args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
           cursorPos,
         );
         await denops.call(
@@ -1336,7 +1336,7 @@ export class Ui extends BaseUi<Params> {
     return {
       autoAction: {},
       autoResize: false,
-      cursorPos: -1,
+      cursorPos: 0,
       displaySourceName: "no",
       displayTree: false,
       exprParams: [
