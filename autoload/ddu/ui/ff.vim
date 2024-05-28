@@ -10,7 +10,9 @@ endfunction
 function ddu#ui#ff#restore_cmaps() abort
   for [key, map] in s:save_maps->items()
     if map->empty()
-      execute 'cunmap' key
+      if !key->maparg('c', v:false, v:true)->empty()
+        execute 'cunmap' key
+      endif
     else
       call mapset('c', 0, map)
     endif
@@ -480,7 +482,7 @@ function s:check_redraw(input) abort
     unlet s:filter_init_input
   endif
 
-  if a:input ==# s:filter_prev_input
+  if a:input ==# s:filter_prev_input || !'b:ddu_ui_name'->exists()
     return
   endif
 
