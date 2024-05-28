@@ -1115,6 +1115,8 @@ the function.
 	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#async_action('openFilterWindow')
 <
+NOTE: It must be |ddu#ui#async_action()|.
+
                                                             *ddu-ui-ff-faq-26*
 Q: I want to change filter window position.
 
