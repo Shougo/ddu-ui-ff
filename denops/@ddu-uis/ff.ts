@@ -321,8 +321,8 @@ export class Ui extends BaseUi<Params> {
       args.context,
     );
 
-    const floating = args.uiParams.split === "floating";
     const hasNvim = args.denops.meta.host === "nvim";
+    const floating = args.uiParams.split === "floating" && hasNvim;
     const winWidth = Number(args.uiParams.winWidth);
     let winHeight = args.uiParams.autoResize &&
         this.#items.length < Number(args.uiParams.winHeight)
@@ -753,7 +753,8 @@ export class Ui extends BaseUi<Params> {
   }): Promise<number> {
     // NOTE: In Vim popup window, win_findbuf()/winbufnr() does not work.
     if (
-      args.uiParams.split === "floating" && args.denops.meta.host !== "nvim"
+      args.uiParams.split === "floating" &&
+      args.denops.meta.host !== "nvim" && this.#popupId > 0
     ) {
       return this.#popupId;
     }
@@ -887,13 +888,16 @@ export class Ui extends BaseUi<Params> {
       // Change real cursor
       await fn.cursor(args.denops, cursorPos[1], 0);
 
+      const floating = args.uiParams.split === "floating" &&
+        args.denops.meta.host === "nvim";
+
       await this.#setStatusline(
         args.denops,
         args.context,
         args.options,
         args.uiParams,
         bufnr,
-        args.uiParams.split === "floating",
+        floating,
         `ddu-ui-ff-${bufnr}`,
       );
 
@@ -941,13 +945,16 @@ export class Ui extends BaseUi<Params> {
       // Change real cursor
       await fn.cursor(args.denops, cursorPos[1], 0);
 
+      const floating = args.uiParams.split === "floating" &&
+        args.denops.meta.host === "nvim";
+
       await this.#setStatusline(
         args.denops,
         args.context,
         args.options,
         args.uiParams,
         bufnr,
-        args.uiParams.split === "floating",
+        floating,
         `ddu-ui-ff-${bufnr}`,
       );
 
@@ -1098,6 +1105,7 @@ export class Ui extends BaseUi<Params> {
         "ddu#ui#ff#_open_filter_window",
         uiParams,
         actionParams.input ?? args.context.input,
+        args.options.name,
         this.#items.length,
       ) as string;
 

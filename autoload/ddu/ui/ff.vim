@@ -432,11 +432,13 @@ function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
   endif
 endfunction
 
-function ddu#ui#ff#_open_filter_window(params, input, length) abort
+function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
   if !'s:filter_prev_input'->exists()
     let s:filter_prev_input = a:input
   endif
   let s:filter_init_input = a:input
+
+  let b:ddu_ui_name = a:name
 
   doautocmd User Ddu:ui:ff:openFilterWindow
 

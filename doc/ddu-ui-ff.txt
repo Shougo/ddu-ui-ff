@@ -552,6 +552,8 @@ split		(string)
 		"floating": use floating window feature
 		"no": no split
 
+		NOTE: "floating" does not work in Vim.
+
 		Default: "horizontal"
 
                                               *ddu-ui-ff-param-splitDirection*
@@ -1128,6 +1130,10 @@ If you don't like the behavior, you can map it.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2024.05.28
+* Remove |ddu-ui-ff-param-split| floating window support in Vim.  Because it
+  does not work.
 
 2024.05.27
 * |ddu-ui-ff-param-cursorPos| is 1 origin.
