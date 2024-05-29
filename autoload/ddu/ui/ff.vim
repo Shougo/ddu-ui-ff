@@ -450,7 +450,7 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
     autocmd User Ddu:ui:ff:closeFilterWindow :
   augroup END
 
-  if a:params.filterUpdateMax <= 0 || a:params.filterUpdateMax < a:length
+  if a:params.filterUpdateMax <= 0 || a:length <= a:params.filterUpdateMax
     autocmd ddu-ui-ff-filter CmdlineChanged *
           \ ++nested call s:check_redraw(getcmdline())
   endif
