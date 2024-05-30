@@ -442,13 +442,13 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
 
   let b:ddu_ui_name = a:name
 
-  doautocmd User Ddu:ui:ff:openFilterWindow
-
   augroup ddu-ui-ff-filter
     autocmd!
     autocmd User Ddu:ui:ff:openFilterWindow :
     autocmd User Ddu:ui:ff:closeFilterWindow :
   augroup END
+
+  doautocmd User Ddu:ui:ff:openFilterWindow
 
   if a:params.filterUpdateMax <= 0 || a:length <= a:params.filterUpdateMax
     autocmd ddu-ui-ff-filter CmdlineChanged *
@@ -460,11 +460,11 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
 
   const new_input = input(a:params.prompt, a:input)
 
+  doautocmd User Ddu:ui:ff:closeFilterWindow
+
   augroup ddu-ui-ff-filter
     autocmd!
   augroup END
-
-  doautocmd User Ddu:ui:ff:closeFilterWindow
 
   call s:check_redraw(new_input)
 
