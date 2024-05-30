@@ -333,7 +333,7 @@ endfunction
 let s:cursor_text = ''
 let s:auto_action = {}
 function ddu#ui#ff#_do_auto_action() abort
-  call ddu#ui#ff#_stop_debounce_timer('s:debounce_auto_action_timer')
+  call s:stop_debounce_timer('s:debounce_auto_action_timer')
 
   if empty(s:auto_action)
     return
@@ -351,7 +351,7 @@ function ddu#ui#ff#_reset_auto_action() abort
   let s:cursor_text = ''
   let s:auto_action = {}
 
-  call ddu#ui#ff#_stop_debounce_timer('s:debounce_auto_action_timer')
+  call s:stop_debounce_timer('s:debounce_auto_action_timer')
 
   augroup ddu-ui-auto_action
     autocmd!
@@ -427,13 +427,6 @@ function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   endif
 endfunction
 
-function ddu#ui#ff#_stop_debounce_timer(timer_name) abort
-  if a:timer_name->exists()
-    silent! call timer_stop({a:timer_name})
-    unlet {a:timer_name}
-  endif
-endfunction
-
 function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
   if !'s:filter_prev_input'->exists()
     let s:filter_prev_input = a:input
@@ -448,12 +441,12 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
     autocmd User Ddu:ui:ff:closeFilterWindow :
   augroup END
 
-  doautocmd User Ddu:ui:ff:openFilterWindow
-
   if a:params.filterUpdateMax <= 0 || a:length <= a:params.filterUpdateMax
     autocmd ddu-ui-ff-filter CmdlineChanged *
           \ ++nested call s:check_redraw(getcmdline())
   endif
+
+  doautocmd User Ddu:ui:ff:openFilterWindow
 
   " NOTE: redraw is needed
   redraw
@@ -510,4 +503,11 @@ function s:do_auto_action() abort
     call ddu#ui#do_action(s:auto_action.name, s:auto_action.params)
   endif
   let s:cursor_text = text
+endfunction
+
+function s:stop_debounce_timer(timer_name) abort
+  if a:timer_name->exists()
+    silent! call timer_stop({a:timer_name})
+    unlet {a:timer_name}
+  endif
 endfunction
