@@ -550,6 +550,7 @@ split		(string)
 		"horizontal": horizontal split
 		"vertical": vertical split
 		"floating": use floating window feature
+		"tab": use new tab
 		"no": no split
 
 		NOTE: "floating" does not work in Vim.
