@@ -1464,8 +1464,9 @@ export class Ui extends BaseUi<Params> {
         }
 
         if (
-          args.uiParams.split === "no" ||
-          (await fn.winnr(args.denops, "$")) === 1
+          args.uiParams.split !== "tab" &&
+          (args.uiParams.split === "no" ||
+            (await fn.winnr(args.denops, "$")) === 1)
         ) {
           await fn.win_gotoid(args.denops, winid);
 
