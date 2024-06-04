@@ -171,8 +171,8 @@ previewExecute
 
                                                 *ddu-ui-ff-action-previewPath*
 previewPath
-
 		Preview the item path in echo area.
+		NOTE: 'cmdheight' must be greater than 0.
 
                                                        *ddu-ui-ff-action-quit*
 quit

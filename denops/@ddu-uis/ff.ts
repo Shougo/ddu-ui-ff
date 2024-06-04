@@ -1189,7 +1189,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.None;
       }
 
-      await args.denops.cmd(`echo ${item.display ?? item.word}`);
+      await args.denops.cmd(`echo '${item.display ?? item.word}'`);
 
       return ActionFlags.Persist;
     },
