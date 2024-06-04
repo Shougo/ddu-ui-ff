@@ -245,6 +245,11 @@ export class Ui extends BaseUi<Params> {
     item: DduItem;
     uiParams: Params;
   }) {
+    const bufnr = await this.#getBufnr(args.denops);
+    if (bufnr !== await fn.bufnr(args.denops)) {
+      return;
+    }
+
     const pos = this.#items.findIndex((item) => equal(item, args.item));
 
     if (pos <= 0) {
@@ -256,7 +261,6 @@ export class Ui extends BaseUi<Params> {
       ? this.#items.length - pos
       : pos + 1;
 
-    const bufnr = await this.#getBufnr(args.denops);
     const winHeight = await fn.winheight(args.denops, 0);
     const maxLine = await fn.line(args.denops, "$");
     if ((maxLine - cursorPos) < winHeight / 2) {
