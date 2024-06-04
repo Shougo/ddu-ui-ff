@@ -77,6 +77,8 @@ type FloatingTitle =
 
 type WindowOption = [string, number | string];
 
+type CursorPos = [] | [lnum: number, col: number, off?: number];
+
 type ExprNumber = string | number;
 
 type WinInfo = {
@@ -245,16 +247,26 @@ export class Ui extends BaseUi<Params> {
   }) {
     const pos = this.#items.findIndex((item) => equal(item, args.item));
 
-    if (pos > 0) {
-      // NOTE: cursorPos is not same with item pos when reversed.
-      const cursorPos = args.uiParams.reversed
-        ? this.#items.length - pos
-        : pos + 1;
+    if (pos <= 0) {
+      return;
+    }
 
-      await fn.cursor(args.denops, cursorPos, 0);
+    // NOTE: cursorPos is not same with item pos when reversed.
+    const cursorPos = args.uiParams.reversed
+      ? this.#items.length - pos
+      : pos + 1;
 
-      const bufnr = await fn.bufnr(args.denops, this.#bufferName);
-      await this.#saveCursor(args.denops, bufnr, cursorPos);
+    const bufnr = await this.#getBufnr(args.denops);
+    const winHeight = await fn.winheight(args.denops, 0);
+    const maxLine = await fn.line(args.denops, "$");
+    if ((maxLine - cursorPos) < winHeight / 2) {
+      // Adjust cursor position when cursor is near bottom.
+      await args.denops.cmd("normal! Gzb");
+    }
+    await this.#cursor(args.denops, bufnr, [cursorPos, 0]);
+    if (cursorPos < winHeight / 2) {
+      // Adjust cursor position when cursor is near top.
+      await args.denops.cmd("normal! zb");
     }
   }
 
@@ -889,10 +901,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
-
-      // Change real cursor
-      await fn.cursor(args.denops, cursorPos[1], 0);
+      await this.#cursor(args.denops, bufnr, [cursorPos[1], cursorPos[2]]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -946,10 +955,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#saveCursor(args.denops, bufnr, cursorPos[1]);
-
-      // Change real cursor
-      await fn.cursor(args.denops, cursorPos[1], 0);
+      await this.#cursor(args.denops, bufnr, [cursorPos[1], cursorPos[2]]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -1785,7 +1791,7 @@ export class Ui extends BaseUi<Params> {
       bufnr,
       "ddu_ui_ff_cursor_pos",
       [],
-    ) as number[];
+    ) as CursorPos;
     if (cursorPos.length === 0) {
       return -1;
     }
@@ -1816,8 +1822,28 @@ export class Ui extends BaseUi<Params> {
     });
   }
 
-  async #saveCursor(denops: Denops, bufnr: number, cursorPos: number) {
-    if (cursorPos <= 0 || cursorPos > this.#items.length) {
+  async #cursor(
+    denops: Denops,
+    bufnr: number,
+    pos: CursorPos,
+  ): Promise<void> {
+    if (pos.length !== 0) {
+      await fn.cursor(denops, pos);
+    }
+
+    const newPos = await fn.getcurpos(denops);
+    if (pos[0]) {
+      newPos[1] = pos[0];
+    }
+    if (pos[1]) {
+      newPos[2] = pos[1];
+    }
+
+    this.#saveCursor(denops, bufnr, newPos[1]);
+  }
+
+  async #saveCursor(denops: Denops, bufnr: number, line: number) {
+    if (line > this.#items.length) {
       return;
     }
 
@@ -1825,7 +1851,7 @@ export class Ui extends BaseUi<Params> {
       denops,
       bufnr,
       "ddu_ui_ff_save_cursor_item",
-      this.#items[cursorPos - 1],
+      this.#items[line - 1],
     );
   }
 
