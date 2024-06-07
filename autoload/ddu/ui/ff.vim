@@ -57,12 +57,19 @@ function ddu#ui#ff#_update_buffer(
   endif
 
   " Init the cursor
-  const curpos = a:winid->getcurpos()
-  const lnum = a:params.reversed ? a:lines->len() - a:pos : a:pos
-  if a:pos > 0 && curpos[1] != lnum
-    call win_execute(a:winid,
-          \ printf('call cursor(%d, 0) | normal! zb', lnum))
-  elseif a:params.reversed
+  const lnum =
+        \ a:pos <= 0 ? a:winid->getcurpos()[1] :
+        \ a:params.reversed ? a:lines->len() - a:pos :
+        \ a:pos
+  const win_height = a:winid->winheight()
+  const max_line = '$'->line(a:winid)
+  if max_line - lnum < win_height / 2
+    " Adjust cursor position when cursor is near bottom.
+    call win_execute(a:winid, 'normal! Gzb')
+  endif
+  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
+  if lnum < win_height / 2
+    " Adjust cursor position when cursor is near top.
     call win_execute(a:winid, 'normal! zb')
   endif
 endfunction
