@@ -590,16 +590,11 @@ export class Ui extends BaseUi<Params> {
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
         (args.uiParams.reversed && this.#items.length !== this.#prevLength);
       // NOTE: Use batch for screen flicker when highlight items.
-      const winid = await this.#winId({
-        denops: args.denops,
-        uiParams: args.uiParams,
-      });
       await batch(args.denops, async (denops: Denops) => {
         await denops.call(
           "ddu#ui#ff#_update_buffer",
           args.uiParams,
           bufnr,
-          winid,
           this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
           args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
           cursorPos,
