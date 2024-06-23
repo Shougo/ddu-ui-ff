@@ -772,6 +772,9 @@ FAQ 26:                                                     |ddu-ui-ff-faq-26|
 FAQ 27:                                                     |ddu-ui-ff-faq-27|
 	The filter input is cleared when I press <ESC> key.
 
+FAQ 28:                                                     |ddu-ui-ff-faq-28|
+	The cursor is not restored when the items are refreshed.
+
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
 Q: I want to start narrowing in the first.
@@ -1130,6 +1133,13 @@ Q: The filter input is cleared when I press <ESC> key.
 
 A: It is Vim's feature.  <ESC> is not confirm key.  It is cancel your input.
 If you don't like the behavior, you can map it.
+
+                                                            *ddu-ui-ff-faq-28*
+Q: The cursor is not restored when the items are refreshed.
+
+A: It is feature.  The items are refreshed and it will be empty temporary.
+The cursor cannot restore when the items are empty.
+You can prevent the behavior by |ddu-option-sync|.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
