@@ -30,7 +30,7 @@ function ddu#ui#ff#_update_buffer(
   const winid = winids[0]
   const current_lines = '$'->line(winid)
 
-  call setbufvar(a:bufnr, '&modifiable', 1)
+  call setbufvar(a:bufnr, '&modifiable', v:true)
 
   " NOTE: deletebufline() changes cursor position.
   const before_cursor = winid->getcurpos()
@@ -54,8 +54,8 @@ function ddu#ui#ff#_update_buffer(
     endif
   endif
 
-  call setbufvar(a:bufnr, '&modifiable', 0)
-  call setbufvar(a:bufnr, '&modified', 0)
+  call setbufvar(a:bufnr, '&modifiable', v:false)
+  call setbufvar(a:bufnr, '&modified', v:false)
 
   if !a:refreshed && winid->getcurpos() ==# before_cursor
     return
