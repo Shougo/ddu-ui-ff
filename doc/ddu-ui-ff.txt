@@ -390,6 +390,14 @@ immediateAction (string)
 
 		Default: ""
 
+                                                   *ddu-ui-ff-param-inputFunc*
+inputFunc	(string)
+		Specify the input function name when
+		|ddu-ui-ff-action-openFilterWindow|.
+		For example: |cmdline#input()|
+
+		Default: "input"
+
                                              *ddu-ui-ff-param-maxDisplayItems*
 maxDisplayItems (number)
 		The maximum number of displayed items.

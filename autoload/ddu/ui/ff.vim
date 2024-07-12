@@ -465,7 +465,7 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
   " NOTE: redraw is needed
   redraw
 
-  const new_input = input(a:params.prompt, a:input)
+  const new_input = a:params.inputFunc->call([a:params.prompt, a:input])
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 

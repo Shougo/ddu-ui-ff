@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v4.1.0/types.ts";
+} from "https://deno.land/x/ddu_vim@v4.1.1/types.ts";
 import {
   batch,
   Denops,
@@ -18,8 +18,8 @@ import {
   is,
   op,
   vars,
-} from "https://deno.land/x/ddu_vim@v4.1.0/deps.ts";
-import { printError } from "https://deno.land/x/ddu_vim@v4.1.0/utils.ts";
+} from "https://deno.land/x/ddu_vim@v4.1.1/deps.ts";
+import { printError } from "https://deno.land/x/ddu_vim@v4.1.1/utils.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -127,6 +127,7 @@ export type Params = {
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
+  inputFunc: string;
   maxDisplayItems: number;
   maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
@@ -1374,6 +1375,7 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
+      inputFunc: "input",
       maxDisplayItems: 1000,
       maxHighlightItems: 100,
       onPreview: (_) => {
