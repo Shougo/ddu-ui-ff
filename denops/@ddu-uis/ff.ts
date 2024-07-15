@@ -93,6 +93,7 @@ type ExpandItemParams = {
   mode?: "toggle";
   maxLevel?: number;
   isGrouped?: boolean;
+  isInTree?: boolean;
 };
 
 type OpenFilterWindowParams = {
@@ -999,6 +1000,7 @@ export class Ui extends BaseUi<Params> {
           item,
           maxLevel: params.maxLevel ?? 0,
           isGrouped: params.isGrouped ?? false,
+          isInTree: params.isInTree ?? false,
         }],
       );
 

@@ -112,8 +112,11 @@ expandItem
 				If it is less than 0, infinite recursive.
 
 			{isGrouped}:
-				If there is only one directory, it will be
+				If it is only one item tree, it will be
 				concatenated.
+
+			{isInTree}:
+				If it is not empty tree, enter the tree.
 
 		Expand the item tree.
 
