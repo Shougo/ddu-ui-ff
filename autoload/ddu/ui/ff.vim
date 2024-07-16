@@ -9,11 +9,18 @@ function ddu#ui#ff#save_cmaps(keys) abort
 endfunction
 function ddu#ui#ff#restore_cmaps() abort
   for [key, map] in s:save_maps->items()
-    if map->empty()
-      if !key->maparg('c', v:false, v:true)->empty()
+    " Remove current map
+    let ff_map = key->maparg('c', v:false, v:true)
+    if !ff_map->empty()
+      if ff_map.buffer
+        execute 'cunmap' '<buffer>' key
+      else
         execute 'cunmap' key
       endif
-    else
+    endif
+
+    if !map->empty()
+      " Restore old map
       call mapset('c', 0, map)
     endif
   endfor
