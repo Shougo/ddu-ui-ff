@@ -9,7 +9,7 @@ import {
   Previewer,
   UiActions,
   UiOptions,
-} from "https://deno.land/x/ddu_vim@v4.1.1/types.ts";
+} from "https://deno.land/x/ddu_vim@v4.2.0/types.ts";
 import {
   batch,
   Denops,
@@ -19,8 +19,8 @@ import {
   op,
   pathsep,
   vars,
-} from "https://deno.land/x/ddu_vim@v4.1.1/deps.ts";
-import { printError } from "https://deno.land/x/ddu_vim@v4.1.1/utils.ts";
+} from "https://deno.land/x/ddu_vim@v4.2.0/deps.ts";
+import { printError } from "https://deno.land/x/ddu_vim@v4.2.0/utils.ts";
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -192,13 +192,13 @@ export class Ui extends BaseUi<Params> {
       this.#saveCol = await fn.col(args.denops, ".") as number;
     }
     this.#items = [];
-    this.#selectedItems.clear();
+    await this.#clearSelectedItems(args.denops);
     this.#enabledAutoAction = args.uiParams.startAutoAction;
 
     // Clear saved cursor
     const bufnr = await fn.bufnr(args.denops, this.#bufferName);
     if (bufnr > 0) {
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_ff_save_cursor_item", {});
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", {});
     }
   }
 
@@ -228,7 +228,7 @@ export class Ui extends BaseUi<Params> {
     await vars.g.set(args.denops, "ddu#ui#ff#_in_action", false);
   }
 
-  override refreshItems(args: {
+  override async refreshItems(args: {
     denops: Denops;
     context: Context;
     uiParams: Params;
@@ -237,7 +237,7 @@ export class Ui extends BaseUi<Params> {
     this.#prevLength = this.#items.length;
     this.#prevInput = args.context.input;
     this.#items = args.items.slice(0, args.uiParams.maxDisplayItems);
-    this.#selectedItems.clear();
+    await this.#clearSelectedItems(args.denops);
     this.#refreshed = true;
 
     return Promise.resolve();
@@ -270,7 +270,7 @@ export class Ui extends BaseUi<Params> {
       // Adjust cursor position when cursor is near bottom.
       await args.denops.cmd("normal! Gzb");
     }
-    await this.#cursor(args.denops, bufnr, [cursorPos, 0]);
+    await this.#cursor(args.denops, [cursorPos, 0]);
     if (cursorPos < winHeight / 2) {
       // Adjust cursor position when cursor is near top.
       await args.denops.cmd("normal! zb");
@@ -545,9 +545,9 @@ export class Ui extends BaseUi<Params> {
       await this.#initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
     if (!initialized) {
-      // Save cursor when cursor moved
+      // Update cursor when cursor moved
       await args.denops.cmd(
-        "autocmd CursorMoved <buffer> call ddu#ui#ff#_save_cursor()",
+        "autocmd CursorMoved <buffer> call ddu#ui#ff#_update_cursor()",
       );
     }
 
@@ -636,13 +636,13 @@ export class Ui extends BaseUi<Params> {
     const saveItem = await fn.getbufvar(
       args.denops,
       bufnr,
-      "ddu_ui_ff_save_cursor_item",
+      "ddu_ui_item",
       {},
     ) as DduItem;
 
     if (!initialized || cursorPos > 0) {
-      // Save current cursor
-      await this.#saveCursor(args.denops, bufnr, cursorPos + 1);
+      // Update current cursor
+      await this.updateCursor({ denops: args.denops });
     }
 
     if (cursorPos <= 0 && Object.keys(saveItem).length !== 0) {
@@ -657,6 +657,8 @@ export class Ui extends BaseUi<Params> {
       // Call auto action
       await args.denops.call("ddu#ui#ff#_do_auto_action");
     }
+
+    await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
 
     this.#refreshed = false;
   }
@@ -676,7 +678,8 @@ export class Ui extends BaseUi<Params> {
     });
   }
 
-  override expandItem(args: {
+  override async expandItem(args: {
+    denops: Denops;
     uiParams: Params;
     parent: DduItem;
     children: DduItem[];
@@ -707,12 +710,13 @@ export class Ui extends BaseUi<Params> {
       this.#items = this.#items.concat(insertItems);
     }
 
-    this.#selectedItems.clear();
+    await this.#clearSelectedItems(args.denops);
 
     return Promise.resolve(prevLength - this.#items.length);
   }
 
-  override collapseItem(args: {
+  override async collapseItem(args: {
+    denops: Denops;
     item: DduItem;
   }) {
     // NOTE: treePath may be list.  So it must be compared by JSON.
@@ -740,7 +744,7 @@ export class Ui extends BaseUi<Params> {
 
     this.#items[startIndex] = args.item;
 
-    this.#selectedItems.clear();
+    await this.#clearSelectedItems(args.denops);
 
     return Promise.resolve(prevLength - this.#items.length);
   }
@@ -802,6 +806,14 @@ export class Ui extends BaseUi<Params> {
     return winIds;
   }
 
+  override async updateCursor(args: {
+    denops: Denops;
+  }) {
+    const item = await this.#getItem(args.denops);
+    const bufnr = await this.#getBufnr(args.denops);
+    await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item ?? {});
+  }
+
   override actions: UiActions<Params> = {
     checkItems: (args: {
       denops: Denops;
@@ -848,8 +860,11 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
-    clearSelectAllItems: (_) => {
-      this.#selectedItems.clear();
+    clearSelectAllItems: async (args: {
+      denops: Denops;
+    }) => {
+      await this.#clearSelectedItems(args.denops);
+
       return Promise.resolve(ActionFlags.Redraw);
     },
     collapseItem: async (args: {
@@ -903,7 +918,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#cursor(args.denops, bufnr, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -957,7 +972,7 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#cursor(args.denops, bufnr, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -1003,36 +1018,6 @@ export class Ui extends BaseUi<Params> {
           isInTree: params.isInTree ?? false,
         }],
       );
-
-      return ActionFlags.None;
-    },
-    getItem: async (args: {
-      denops: Denops;
-      options: DduOptions;
-    }) => {
-      const item = await this.#getItem(args.denops);
-
-      const bufnr = await this.#getBufnr(args.denops);
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item ?? {});
-
-      return ActionFlags.None;
-    },
-    getItems: async (args: {
-      denops: Denops;
-      options: DduOptions;
-    }) => {
-      const bufnr = await this.#getBufnr(args.denops);
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
-
-      return ActionFlags.None;
-    },
-    getSelectedItems: async (args: {
-      denops: Denops;
-      options: DduOptions;
-    }) => {
-      const items = await this.#getItems(args.denops);
-      const bufnr = await this.#getBufnr(args.denops);
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_selected_items", items);
 
       return ActionFlags.None;
     },
@@ -1244,7 +1229,9 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
-    toggleAllItems: (_) => {
+    toggleAllItems: async (args: {
+      denops: Denops;
+    }) => {
       if (this.#items.length === 0) {
         return Promise.resolve(ActionFlags.None);
       }
@@ -1256,6 +1243,13 @@ export class Ui extends BaseUi<Params> {
           this.#selectedItems.add(idx);
         }
       });
+
+      await fn.setbufvar(
+        args.denops,
+        await this.#getBufnr(args.denops),
+        "ddu_ui_selected_items",
+        this.#getSelectedItems(),
+      );
 
       return Promise.resolve(ActionFlags.Redraw);
     },
@@ -1338,6 +1332,13 @@ export class Ui extends BaseUi<Params> {
       } else {
         this.#selectedItems.add(idx);
       }
+
+      await fn.setbufvar(
+        args.denops,
+        await this.#getBufnr(args.denops),
+        "ddu_ui_selected_items",
+        this.#getSelectedItems(),
+      );
 
       return ActionFlags.Redraw;
     },
@@ -1550,6 +1551,10 @@ export class Ui extends BaseUi<Params> {
     return this.#items[idx];
   }
 
+  #getSelectedItems(): DduItem[] {
+    return [...this.#selectedItems].map((i) => this.#items[i]);
+  }
+
   async #getItems(denops: Denops): Promise<DduItem[]> {
     let items: DduItem[];
     if (this.#selectedItems.size === 0) {
@@ -1560,7 +1565,7 @@ export class Ui extends BaseUi<Params> {
 
       items = [item];
     } else {
-      items = [...this.#selectedItems].map((i) => this.#items[i]);
+      items = this.#getSelectedItems();
     }
 
     return items.filter((item) => item);
@@ -1852,7 +1857,6 @@ export class Ui extends BaseUi<Params> {
 
   async #cursor(
     denops: Denops,
-    bufnr: number,
     pos: CursorPos,
   ): Promise<void> {
     if (pos.length !== 0) {
@@ -1867,20 +1871,7 @@ export class Ui extends BaseUi<Params> {
       newPos[2] = pos[1];
     }
 
-    this.#saveCursor(denops, bufnr, newPos[1]);
-  }
-
-  async #saveCursor(denops: Denops, bufnr: number, line: number) {
-    if (line > this.#items.length) {
-      return;
-    }
-
-    await fn.setbufvar(
-      denops,
-      bufnr,
-      "ddu_ui_ff_save_cursor_item",
-      this.#items[line - 1],
-    );
+    await this.updateCursor({ denops });
   }
 
   async #getWinInfo(
@@ -1892,5 +1883,13 @@ export class Ui extends BaseUi<Params> {
       winid: await fn.win_getid(denops),
       tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
     };
+  }
+
+  async #clearSelectedItems(
+    denops: Denops,
+  ) {
+    this.#selectedItems.clear();
+    const bufnr = await this.#getBufnr(denops);
+    await fn.setbufvar(denops, bufnr, "ddu_ui_selected_items", []);
   }
 }

@@ -395,16 +395,10 @@ function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
   call win_gotoid(prev_winid)
 endfunction
 
-function ddu#ui#ff#_save_cursor(bufnr='%'->bufnr(), pos=getcurpos()) abort
-  const text = getbufline(a:bufnr, a:pos[1])
+function ddu#ui#ff#_update_cursor() abort
+  let b:ddu_ui_ff_cursor_pos = getcurpos()
 
-  " NOTE: Skip save cursor if it is empty text.
-  " Because the items are empty
-  if '$'->line() ==# 1 && (text->empty() || text[0] ==# '')
-    return
-  endif
-
-  call setbufvar(a:bufnr, 'ddu_ui_ff_save_cursor_item', ddu#ui#get_item())
+  call ddu#ui#update_cursor()
 endfunction
 
 function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
