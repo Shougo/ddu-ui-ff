@@ -1861,6 +1861,11 @@ export class Ui extends BaseUi<Params> {
   ): Promise<void> {
     if (pos.length !== 0) {
       await fn.cursor(denops, pos);
+
+      if (this.#enabledAutoAction) {
+        // Call auto action
+        await denops.call("ddu#ui#ff#_do_auto_action");
+      }
     }
 
     const newPos = await fn.getcurpos(denops);
