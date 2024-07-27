@@ -10,8 +10,8 @@ import {
   type Previewer,
   type UiActions,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@5.0.0-pre8/types";
-import { printError } from "jsr:@shougo/ddu-vim@5.0.0-pre8/utils";
+} from "jsr:@shougo/ddu-vim@5.0.0-pre10/types";
+import { printError } from "jsr:@shougo/ddu-vim@5.0.0-pre10/utils";
 
 import { batch } from "jsr:@denops/std@7.0.0/batch";
 import * as op from "jsr:@denops/std@7.0.0/option";
