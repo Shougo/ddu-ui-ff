@@ -15,8 +15,8 @@ import { batch } from "jsr:@denops/std@7.0.0/batch";
 import * as op from "jsr:@denops/std@7.0.0/option";
 import * as fn from "jsr:@denops/std@7.0.0/function";
 import { equal } from "jsr:@std/assert@1.0.0";
+import { replace } from "jsr:@denops/std@7.0.0/buffer";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.1";
-import { replace } from "https://deno.land/x/denops_std@v6.5.1/buffer/mod.ts";
 
 import type { Params } from "../ff.ts";
 
