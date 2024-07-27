@@ -21,4 +21,3 @@
     "upgrade": "deno run -A jsr:@molt/cli **/*.ts --no-resolve --write"
   }
 }
-
