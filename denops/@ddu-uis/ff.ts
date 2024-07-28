@@ -1,26 +1,26 @@
 import {
   ActionFlags,
-  BaseActionParams,
+  type BaseActionParams,
   BaseUi,
-  Context,
-  DduItem,
-  DduOptions,
-  PreviewContext,
-  Previewer,
-  UiActions,
-  UiOptions,
-} from "https://deno.land/x/ddu_vim@v4.2.0/types.ts";
-import {
-  batch,
-  Denops,
-  equal,
-  fn,
-  is,
-  op,
-  pathsep,
-  vars,
-} from "https://deno.land/x/ddu_vim@v4.2.0/deps.ts";
-import { printError } from "https://deno.land/x/ddu_vim@v4.2.0/utils.ts";
+  type Context,
+  type DduItem,
+  type DduOptions,
+  type Denops,
+  type PreviewContext,
+  type Previewer,
+  type UiActions,
+  type UiOptions,
+} from "jsr:@shougo/ddu-vim@5.0.0-pre10/types";
+import { printError } from "jsr:@shougo/ddu-vim@5.0.0-pre10/utils";
+
+import { batch } from "jsr:@denops/std@7.0.0/batch";
+import * as op from "jsr:@denops/std@7.0.0/option";
+import * as fn from "jsr:@denops/std@7.0.0/function";
+import * as vars from "jsr:@denops/std@7.0.0/variable";
+import { equal } from "jsr:@std/assert@1.0.0";
+import { is } from "jsr:@core/unknownutil@3.18.1";
+import { SEPARATOR as pathsep } from "jsr:@std/path@1.0.1";
+
 import { PreviewUi } from "./ff/preview.ts";
 
 type DoActionParams = {
@@ -684,7 +684,7 @@ export class Ui extends BaseUi<Params> {
     parent: DduItem;
     children: DduItem[];
     isGrouped: boolean;
-  }) {
+  }): Promise<number> {
     // NOTE: treePath may be list.  So it must be compared by JSON.
     const index = this.#items.findIndex(
       (item: DduItem) =>
@@ -718,7 +718,7 @@ export class Ui extends BaseUi<Params> {
   override async collapseItem(args: {
     denops: Denops;
     item: DduItem;
-  }) {
+  }): Promise<number> {
     // NOTE: treePath may be list.  So it must be compared by JSON.
     const startIndex = this.#items.findIndex(
       (item: DduItem) =>

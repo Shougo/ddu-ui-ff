@@ -1,25 +1,24 @@
 import {
   ActionFlags,
-  BaseActionParams,
-  BufferPreviewer,
-  Context,
-  DduItem,
-  NoFilePreviewer,
-  PreviewContext,
-  Previewer,
-  TerminalPreviewer,
-} from "https://deno.land/x/ddu_vim@v4.2.0/types.ts";
-import {
-  batch,
-  Denops,
-  ensure,
-  equal,
-  fn,
-  is,
-  op,
-} from "https://deno.land/x/ddu_vim@v4.2.0/deps.ts";
-import { replace } from "https://deno.land/x/denops_std@v6.5.1/buffer/mod.ts";
-import { Params } from "../ff.ts";
+  type BaseActionParams,
+  type BufferPreviewer,
+  type Context,
+  type DduItem,
+  type Denops,
+  type NoFilePreviewer,
+  type PreviewContext,
+  type Previewer,
+  type TerminalPreviewer,
+} from "jsr:@shougo/ddu-vim@5.0.0-pre8/types";
+
+import { batch } from "jsr:@denops/std@7.0.0/batch";
+import * as op from "jsr:@denops/std@7.0.0/option";
+import * as fn from "jsr:@denops/std@7.0.0/function";
+import { equal } from "jsr:@std/assert@1.0.0";
+import { replace } from "jsr:@denops/std@7.0.0/buffer";
+import { ensure, is } from "jsr:@core/unknownutil@3.18.1";
+
+import type { Params } from "../ff.ts";
 
 type PreviewParams = {
   syntaxLimitChars?: number;
