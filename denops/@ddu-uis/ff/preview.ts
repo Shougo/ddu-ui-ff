@@ -9,7 +9,7 @@ import {
   type PreviewContext,
   type Previewer,
   type TerminalPreviewer,
-} from "jsr:@shougo/ddu-vim@5.0.0-pre8/types";
+} from "jsr:@shougo/ddu-vim@5.0.0/types";
 
 import { batch } from "jsr:@denops/std@7.0.0/batch";
 import * as op from "jsr:@denops/std@7.0.0/option";
