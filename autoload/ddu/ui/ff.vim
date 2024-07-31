@@ -129,6 +129,13 @@ endfunction
 
 function ddu#ui#ff#_highlight(
       \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
+
+  if !a:highlight->hlexists()
+    call ddu#util#print_error(
+          \ printf('highlight "%s" does not exists', a:highlight))
+    return
+  endif
+
   if !has('nvim')
     " Add prop_type
     if a:prop_type->prop_type_get(#{ bufnr: a:bufnr })->empty()
