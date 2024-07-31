@@ -132,7 +132,7 @@ function ddu#ui#ff#_highlight(
 
   if !a:highlight->hlexists()
     call ddu#util#print_error(
-          \ printf('highlight "%s" does not exists', a:highlight))
+          \ printf('highlight "%s" does not exist', a:highlight))
     return
   endif
 
