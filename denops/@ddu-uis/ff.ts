@@ -10,16 +10,16 @@ import {
   type Previewer,
   type UiActions,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@5.0.0/types";
-import { printError } from "jsr:@shougo/ddu-vim@5.0.0/utils";
+} from "jsr:@shougo/ddu-vim@~5.0.0/types";
+import { printError } from "jsr:@shougo/ddu-vim@~5.0.0/utils";
 
-import { batch } from "jsr:@denops/std@7.0.0/batch";
-import * as op from "jsr:@denops/std@7.0.0/option";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import * as vars from "jsr:@denops/std@7.0.0/variable";
-import { equal } from "jsr:@std/assert@1.0.0";
-import { is } from "jsr:@core/unknownutil@3.18.1";
-import { SEPARATOR as pathsep } from "jsr:@std/path@1.0.1";
+import { batch } from "jsr:@denops/std@~7.0.2/batch";
+import * as op from "jsr:@denops/std@~7.0.2/option";
+import * as fn from "jsr:@denops/std@~7.0.2/function";
+import * as vars from "jsr:@denops/std@~7.0.2/variable";
+import { equal } from "jsr:@std/assert@~1.0.2";
+import { is } from "jsr:@core/unknownutil@~4.0.0";
+import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2";
 
 import { PreviewUi } from "./ff/preview.ts";
 
