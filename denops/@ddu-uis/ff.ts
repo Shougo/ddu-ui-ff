@@ -1,25 +1,25 @@
 import {
   ActionFlags,
-  type BaseActionParams,
-  BaseUi,
+  type BaseParams,
   type Context,
   type DduItem,
   type DduOptions,
-  type Denops,
   type PreviewContext,
   type Previewer,
-  type UiActions,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~5.0.0/types";
+} from "jsr:@shougo/ddu-vim@~6.0.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.0.0/ui";
 import { printError } from "jsr:@shougo/ddu-vim@~5.0.0/utils";
 
-import { batch } from "jsr:@denops/std@~7.0.2/batch";
-import * as op from "jsr:@denops/std@~7.0.2/option";
-import * as fn from "jsr:@denops/std@~7.0.2/function";
-import * as vars from "jsr:@denops/std@~7.0.2/variable";
+import type { Denops } from "jsr:@denops/std@~7.1.0";
+import { batch } from "jsr:@denops/std@~7.1.0/batch";
+import * as op from "jsr:@denops/std@~7.1.0/option";
+import * as fn from "jsr:@denops/std@~7.1.0/function";
+import * as vars from "jsr:@denops/std@~7.1.0/variable";
+
 import { equal } from "jsr:@std/assert@~1.0.2";
-import { is } from "jsr:@core/unknownutil@~4.0.0";
-import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2";
+import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 import { PreviewUi } from "./ff/preview.ts";
 
@@ -1082,7 +1082,7 @@ export class Ui extends BaseUi<Params> {
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
-        actionParams: BaseActionParams,
+        actionParams: BaseParams,
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
     }) => {
@@ -1137,7 +1137,7 @@ export class Ui extends BaseUi<Params> {
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
-        actionParams: BaseActionParams,
+        actionParams: BaseParams,
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
     }) => {
@@ -1285,7 +1285,7 @@ export class Ui extends BaseUi<Params> {
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
-        actionParams: BaseActionParams,
+        actionParams: BaseParams,
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
     }) => {
