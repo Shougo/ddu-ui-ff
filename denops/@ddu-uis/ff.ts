@@ -7,9 +7,9 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~6.0.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.0.0/ui";
-import { printError } from "jsr:@shougo/ddu-vim@~5.0.0/utils";
+} from "jsr:@shougo/ddu-vim@~6.1.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.1.0/ui";
+import { printError } from "jsr:@shougo/ddu-vim@~6.1.0/utils";
 
 import type { Denops } from "jsr:@denops/std@~7.1.0";
 import { batch } from "jsr:@denops/std@~7.1.0/batch";
@@ -831,7 +831,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const items = await this.#getItems(args.denops);
 
@@ -886,7 +886,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const bufnr = await this.#getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
@@ -940,7 +940,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const bufnr = await this.#getBufnr(args.denops);
       const cursorPos = await fn.getbufvar(
@@ -992,7 +992,7 @@ export class Ui extends BaseUi<Params> {
     expandItem: async (args: {
       denops: Denops;
       options: DduOptions;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const item = await this.#getItem(args.denops);
       if (!item) {
@@ -1054,7 +1054,7 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const params = args.actionParams as DoActionParams;
 
@@ -1078,7 +1078,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
@@ -1133,7 +1133,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
@@ -1165,7 +1165,7 @@ export class Ui extends BaseUi<Params> {
     },
     previewExecute: async (args: {
       denops: Denops;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const command = (args.actionParams as PreviewExecuteParams).command;
       await this.#previewUi.execute(args.denops, command);
@@ -1176,7 +1176,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       const item = await this.#getItem(args.denops);
       if (!item) {
@@ -1209,7 +1209,7 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       context: Context;
       options: DduOptions;
-      actionParams: unknown;
+      actionParams: BaseParams;
       uiParams: Params;
     }) => {
       if (
@@ -1281,7 +1281,7 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
-      actionParams: unknown;
+      actionParams: BaseParams;
       getPreviewer?: (
         denops: Denops,
         item: DduItem,
@@ -1345,7 +1345,7 @@ export class Ui extends BaseUi<Params> {
     updateOptions: async (args: {
       denops: Denops;
       options: DduOptions;
-      actionParams: unknown;
+      actionParams: BaseParams;
     }) => {
       await args.denops.dispatcher.updateOptions(
         args.options.name,

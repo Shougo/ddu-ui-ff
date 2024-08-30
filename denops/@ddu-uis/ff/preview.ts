@@ -8,7 +8,7 @@ import {
   type PreviewContext,
   type Previewer,
   type TerminalPreviewer,
-} from "jsr:@shougo/ddu-vim@~6.0.0/types";
+} from "jsr:@shougo/ddu-vim@~6.1.0/types";
 
 import type { Denops } from "jsr:@denops/std@~7.1.0";
 import { batch } from "jsr:@denops/std@~7.1.0/batch";
