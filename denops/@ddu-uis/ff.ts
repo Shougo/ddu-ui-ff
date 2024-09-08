@@ -1212,12 +1212,10 @@ export class Ui extends BaseUi<Params> {
       actionParams: BaseParams;
       uiParams: Params;
     }) => {
-      if (
-        this.#previewUi.visible() &&
-        this.#previewUi.isChangedUiParams(args.uiParams)
-      ) {
-        // Close preview window when uiParams is changed
+      if (this.#previewUi.visible()) {
+        // Close preview window when redraw
         await this.#previewUi.close(args.denops, args.context, args.uiParams);
+        await this.#previewUi.removePreviewedBuffers(args.denops);
       }
 
       // NOTE: await may freeze UI
