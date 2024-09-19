@@ -98,6 +98,16 @@ cursorPrevious
 
 		Move the cursor to the previous.
 
+                                           *ddu-ui-ff-action-cursorTreeBottom*
+cursorTreeBottom
+
+		Move the cursor to the bottom of current tree.
+
+                                              *ddu-ui-ff-action-cursorTreeTop*
+cursorTreeTop
+
+		Move the cursor to the top of current tree.
+
                                                  *ddu-ui-ff-action-expandItem*
 expandItem
 		params:

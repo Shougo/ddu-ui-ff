@@ -995,6 +995,82 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.Persist;
     },
+    cursorTreeBottom: async (args: {
+      denops: Denops;
+      uiParams: Params;
+      actionParams: BaseParams;
+    }) => {
+      const bufnr = await this.#getBufnr(args.denops);
+      const cursorPos = await fn.getbufvar(
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        [],
+      ) as number[];
+      if (cursorPos.length === 0 || !cursorPos[1] || !cursorPos[2]) {
+        return ActionFlags.Persist;
+      }
+
+      // Search tree top
+      const item = await this.#getItem(args.denops);
+      const targetLevel = item?.__level ?? 0;
+      let idx = await this.#getIndex(args.denops);
+      let minIndex = idx;
+
+      while (idx < this.#viewItems.length) {
+        if (this.#viewItems[idx].__level === targetLevel) {
+          minIndex = idx;
+        }
+        if (this.#viewItems[idx].__level < targetLevel) {
+          break;
+        }
+
+        idx++;
+      }
+      cursorPos[1] = minIndex + 1;
+
+      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+
+      return ActionFlags.Persist;
+    },
+    cursorTreeTop: async (args: {
+      denops: Denops;
+      uiParams: Params;
+      actionParams: BaseParams;
+    }) => {
+      const bufnr = await this.#getBufnr(args.denops);
+      const cursorPos = await fn.getbufvar(
+        args.denops,
+        bufnr,
+        "ddu_ui_ff_cursor_pos",
+        [],
+      ) as number[];
+      if (cursorPos.length === 0 || !cursorPos[1] || !cursorPos[2]) {
+        return ActionFlags.Persist;
+      }
+
+      // Search tree top
+      const item = await this.#getItem(args.denops);
+      const targetLevel = item?.__level ?? 0;
+      let idx = await this.#getIndex(args.denops);
+      let minIndex = idx;
+
+      while (idx >= 0) {
+        if (this.#viewItems[idx].__level === targetLevel) {
+          minIndex = idx;
+        }
+        if (this.#viewItems[idx].__level < targetLevel) {
+          break;
+        }
+
+        idx--;
+      }
+      cursorPos[1] = minIndex + 1;
+
+      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+
+      return ActionFlags.Persist;
+    },
     expandItem: async (args: {
       denops: Denops;
       options: DduOptions;
