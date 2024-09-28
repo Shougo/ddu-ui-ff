@@ -10,11 +10,11 @@ import {
   type TerminalPreviewer,
 } from "jsr:@shougo/ddu-vim@~6.2.0/types";
 
-import type { Denops } from "jsr:@denops/std@~7.1.0";
-import { batch } from "jsr:@denops/std@~7.1.0/batch";
-import { replace } from "jsr:@denops/std@~7.1.0/buffer";
-import * as op from "jsr:@denops/std@~7.1.0/option";
-import * as fn from "jsr:@denops/std@~7.1.0/function";
+import type { Denops } from "jsr:@denops/std@~7.2.0";
+import { batch } from "jsr:@denops/std@~7.2.0/batch";
+import { replace } from "jsr:@denops/std@~7.2.0/buffer";
+import * as op from "jsr:@denops/std@~7.2.0/option";
+import * as fn from "jsr:@denops/std@~7.2.0/function";
 
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
 import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";

@@ -11,11 +11,11 @@ import {
 import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.2.0/ui";
 import { printError } from "jsr:@shougo/ddu-vim@~6.2.0/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.1.0";
-import { batch } from "jsr:@denops/std@~7.1.0/batch";
-import * as op from "jsr:@denops/std@~7.1.0/option";
-import * as fn from "jsr:@denops/std@~7.1.0/function";
-import * as vars from "jsr:@denops/std@~7.1.0/variable";
+import type { Denops } from "jsr:@denops/std@~7.2.0";
+import { batch } from "jsr:@denops/std@~7.2.0/batch";
+import * as op from "jsr:@denops/std@~7.2.0/option";
+import * as fn from "jsr:@denops/std@~7.2.0/function";
+import * as vars from "jsr:@denops/std@~7.2.0/variable";
 
 import { equal } from "jsr:@std/assert@~1.0.2";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
@@ -1941,6 +1941,11 @@ export class Ui extends BaseUi<Params> {
   ): Promise<void> {
     if (pos.length !== 0) {
       await fn.cursor(denops, pos);
+      await vars.b.set(
+        denops,
+        "ddu_ui_ff_cursor_pos",
+        await fn.getcurpos(denops),
+      );
 
       if (this.#enabledAutoAction) {
         // Call auto action
