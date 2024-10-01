@@ -355,6 +355,12 @@ filterUpdateMax	(number)
 
 		Default: 0
 
+                                                       *ddu-ui-ff-param-focus*
+focus		(boolean)
+		Focus on the UI window after opening the UI window.
+
+		Default: v:true
+
                                                   *ddu-ui-ff-param-highlights*
 highlights	(dictionary)
 		It specifies ddu-ui-ff buffer highlights.

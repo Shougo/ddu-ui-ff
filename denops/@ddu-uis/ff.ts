@@ -126,6 +126,7 @@ export type Params = {
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
   floatingTitlePos: "left" | "center" | "right";
+  focus: boolean;
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
@@ -659,6 +660,10 @@ export class Ui extends BaseUi<Params> {
     }
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
+
+    if (!args.uiParams.focus) {
+      await fn.win_gotoid(args.denops, args.context.winId);
+    }
 
     this.#refreshed = false;
   }
@@ -1456,6 +1461,7 @@ export class Ui extends BaseUi<Params> {
       floatingBorder: "none",
       floatingTitle: "",
       floatingTitlePos: "left",
+      focus: true,
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
