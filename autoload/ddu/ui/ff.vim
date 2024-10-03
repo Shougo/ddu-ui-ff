@@ -358,50 +358,6 @@ function ddu#ui#ff#_open_preview_window(
   return winid
 endfunction
 
-let s:cursor_text = ''
-let s:auto_action = {}
-function ddu#ui#ff#_do_auto_action() abort
-  call s:stop_debounce_timer('s:debounce_auto_action_timer')
-
-  if empty(s:auto_action)
-    return
-  endif
-
-  if mode() ==# 'c'
-    " NOTE: In command line mode, timer_start() does not work
-    call s:do_auto_action()
-  else
-    let s:debounce_auto_action_timer = timer_start(
-          \ s:auto_action.delay, { -> s:do_auto_action() })
-  endif
-endfunction
-function ddu#ui#ff#_reset_auto_action() abort
-  let s:cursor_text = ''
-  let s:auto_action = {}
-
-  call s:stop_debounce_timer('s:debounce_auto_action_timer')
-
-  augroup ddu-ui-auto_action
-    autocmd!
-  augroup END
-endfunction
-function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
-  const prev_winid = win_getid()
-  let s:auto_action = a:auto_action
-
-  call win_gotoid(a:winid)
-
-  " NOTE: In action execution, auto action should be skipped
-  augroup ddu-ui-auto_action
-    autocmd CursorMoved <buffer> ++nested
-          \ : if !g:->get('ddu#ui#ff#_in_action', v:false)
-          \ |   call ddu#ui#ff#_do_auto_action()
-          \ | endif
-  augroup END
-
-  call win_gotoid(prev_winid)
-endfunction
-
 function ddu#ui#ff#_update_cursor() abort
   let b:ddu_ui_ff_cursor_pos = getcurpos()
 
@@ -504,6 +460,50 @@ function s:check_redraw(input) abort
   let s:filter_prev_input = a:input
 
   call ddu#redraw(b:ddu_ui_name, #{ input: a:input })
+endfunction
+
+let s:cursor_text = ''
+let s:auto_action = {}
+function ddu#ui#ff#_do_auto_action() abort
+  call s:stop_debounce_timer('s:debounce_auto_action_timer')
+
+  if empty(s:auto_action)
+    return
+  endif
+
+  if mode() ==# 'c'
+    " NOTE: In command line mode, timer_start() does not work
+    call s:do_auto_action()
+  else
+    let s:debounce_auto_action_timer = timer_start(
+          \ s:auto_action.delay, { -> s:do_auto_action() })
+  endif
+endfunction
+function ddu#ui#ff#_reset_auto_action() abort
+  let s:cursor_text = ''
+  let s:auto_action = {}
+
+  call s:stop_debounce_timer('s:debounce_auto_action_timer')
+
+  augroup ddu-ui-ff-auto_action
+    autocmd!
+  augroup END
+endfunction
+function ddu#ui#ff#_set_auto_action(winid, auto_action) abort
+  const prev_winid = win_getid()
+  let s:auto_action = a:auto_action
+
+  call win_gotoid(a:winid)
+
+  " NOTE: In action execution, auto action should be skipped
+  augroup ddu-ui-ff-auto_action
+    autocmd CursorMoved <buffer> ++nested
+          \ : if !g:->get('ddu#ui#ff#_in_action', v:false)
+          \ |   call ddu#ui#ff#_do_auto_action()
+          \ | endif
+  augroup END
+
+  call win_gotoid(prev_winid)
 endfunction
 
 function s:do_auto_action() abort
