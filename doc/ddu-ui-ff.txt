@@ -415,6 +415,7 @@ inputFunc	(string)
 		Specify the input function name when
 		|ddu-ui-ff-action-openFilterWindow|.
 		For example: |cmdline#input()|
+		NOTE: The function must have the same interface as |input()|.
 
 		Default: "input"
 
