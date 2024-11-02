@@ -432,7 +432,7 @@ function ddu#ui#ff#_open_filter_window(
   redraw
 
   const new_input = a:params.inputFunc->call(
-        \ [a:params.prompt, a:input, 'customlist,'])
+        \ [a:params.prompt, a:input, 'custom,ddu#ui#ff#complete_input'])
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
@@ -445,7 +445,7 @@ function ddu#ui#ff#_open_filter_window(
   return new_input
 endfunction
 function ddu#ui#ff#complete_input(arglead, cmdline, cursorpos) abort
-  return s:filter_history
+  return s:filter_history->join("\n")
 endfunction
 
 function s:check_redraw(input) abort
