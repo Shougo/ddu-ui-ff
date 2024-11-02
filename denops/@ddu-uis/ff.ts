@@ -7,15 +7,15 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~6.2.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.2.0/ui";
-import { printError } from "jsr:@shougo/ddu-vim@~6.2.0/utils";
+} from "jsr:@shougo/ddu-vim@~6.4.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~6.4.0/ui";
+import { printError } from "jsr:@shougo/ddu-vim@~6.4.0/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.2.0";
-import { batch } from "jsr:@denops/std@~7.2.0/batch";
-import * as op from "jsr:@denops/std@~7.2.0/option";
-import * as fn from "jsr:@denops/std@~7.2.0/function";
-import * as vars from "jsr:@denops/std@~7.2.0/variable";
+import type { Denops } from "jsr:@denops/std@~7.3.0";
+import { batch } from "jsr:@denops/std@~7.3.0/batch";
+import * as op from "jsr:@denops/std@~7.3.0/option";
+import * as fn from "jsr:@denops/std@~7.3.0/function";
+import * as vars from "jsr:@denops/std@~7.3.0/variable";
 
 import { equal } from "jsr:@std/assert@~1.0.2";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
@@ -1169,6 +1169,7 @@ export class Ui extends BaseUi<Params> {
         actionParams: BaseParams,
         previewContext: PreviewContext,
       ) => Promise<Previewer | undefined>;
+      inputHistory: string[];
     }) => {
       const uiParams = await this.#resolveParams(
         args.denops,
@@ -1191,6 +1192,7 @@ export class Ui extends BaseUi<Params> {
         actionParams.input ?? args.context.input,
         args.options.name,
         this.#items.length,
+        args.inputHistory,
       ) as string;
 
       if (reopenPreview) {

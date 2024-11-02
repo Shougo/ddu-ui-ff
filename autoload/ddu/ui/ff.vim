@@ -405,11 +405,13 @@ function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   endif
 endfunction
 
-function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
+function ddu#ui#ff#_open_filter_window(
+      \ params, input, name, length, history) abort
   if !'s:filter_prev_input'->exists()
     let s:filter_prev_input = a:input
   endif
   let s:filter_init_input = a:input
+  let s:filter_history = a:history
 
   let b:ddu_ui_name = a:name
 
@@ -429,7 +431,8 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
   " NOTE: redraw is needed
   redraw
 
-  const new_input = a:params.inputFunc->call([a:params.prompt, a:input])
+  const new_input = a:params.inputFunc->call(
+        \ [a:params.prompt, a:input, 'customlist,'])
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
@@ -440,6 +443,9 @@ function ddu#ui#ff#_open_filter_window(params, input, name, length) abort
   call s:check_redraw(new_input)
 
   return new_input
+endfunction
+function ddu#ui#ff#complete_input(arglead, cmdline, cursorpos) abort
+  return s:filter_history
 endfunction
 
 function s:check_redraw(input) abort
