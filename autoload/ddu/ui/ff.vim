@@ -44,11 +44,7 @@ function ddu#ui#ff#_update_buffer(
   if a:lines->empty()
     " Clear buffer
     if current_lines > 1
-      if '%'->bufnr() ==# a:bufnr
-        silent % delete _
-      else
-        silent call deletebufline(a:bufnr, 1, '$')
-      endif
+      call deletebufline(a:bufnr, 1, '$')
     else
       call setbufline(a:bufnr, 1, [''])
     endif
