@@ -1308,7 +1308,7 @@ export class Ui extends BaseUi<Params> {
       if (params.force) {
         const bufnr = await this.#getBufnr(args.denops);
         if (bufnr && await fn.bufexists(args.denops, this.#bufferName)) {
-          await args.denops.cmd(`bdelete! ${bufnr}`);
+          await args.denops.cmd(`bwipeout! ${bufnr}`);
         }
       } else {
         await args.denops.dispatcher.pop(args.options.name);
