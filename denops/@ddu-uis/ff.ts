@@ -23,17 +23,6 @@ import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
 
 import { PreviewUi } from "./ff/preview.ts";
 
-type DoActionParams = {
-  name?: string;
-  items?: DduItem[];
-  params?: unknown;
-};
-
-type CursorActionParams = {
-  count?: number;
-  loop?: boolean;
-};
-
 type HighlightGroup = {
   filterText?: string;
   floating?: string;
@@ -89,6 +78,17 @@ type WinInfo = {
   tabpagebuflist: number[];
 };
 
+type DoActionParams = {
+  name?: string;
+  items?: DduItem[];
+  params?: unknown;
+};
+
+type CursorActionParams = {
+  count?: number;
+  loop?: boolean;
+};
+
 type ExpandItemParams = {
   mode?: "toggle";
   maxLevel?: number;
@@ -113,6 +113,10 @@ type PreviewExecuteParams = {
 
 type RedrawParams = {
   method?: "refreshItems" | "uiRedraw" | "uiRefresh";
+};
+
+type QuitParams = {
+  force?: boolean;
 };
 
 export type Params = {
@@ -1289,7 +1293,10 @@ export class Ui extends BaseUi<Params> {
       context: Context;
       options: DduOptions;
       uiParams: Params;
+      actionParams: BaseParams;
     }) => {
+      const params = args.actionParams as QuitParams;
+
       await this.#close({
         denops: args.denops,
         context: args.context,
@@ -1298,7 +1305,14 @@ export class Ui extends BaseUi<Params> {
         cancel: true,
       });
 
-      await args.denops.dispatcher.pop(args.options.name);
+      if (params.force) {
+        const bufnr = await this.#getBufnr(args.denops);
+        if (bufnr && await fn.bufexists(args.denops, this.#bufferName)) {
+          await args.denops.cmd(`bdelete! ${bufnr}`);
+        }
+      } else {
+        await args.denops.dispatcher.pop(args.options.name);
+      }
 
       return ActionFlags.None;
     },

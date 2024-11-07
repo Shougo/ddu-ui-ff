@@ -192,6 +192,9 @@ previewPath
 quit
 		Quit the UI window.
 
+		params:
+			{force}: Force quit buffer if it is non zero.
+
                                                      *ddu-ui-ff-action-redraw*
 redraw
 		params:
