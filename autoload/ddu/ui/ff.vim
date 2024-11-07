@@ -29,19 +29,14 @@ function ddu#ui#ff#restore_cmaps() abort
 endfunction
 
 function ddu#ui#ff#_update_buffer(
-      \ params, bufnr, lines, refreshed, pos) abort
-  const winids = a:bufnr->win_findbuf()
-  if winids->empty()
-    return
-  endif
-  const winid = winids[0]
-  const current_lines = '$'->line(winid)
+      \ params, bufnr, winid, lines, refreshed, pos) abort
+  const current_lines = '$'->line(a:winid)
 
   call setbufvar(a:bufnr, '&modifiable', v:true)
 
   try
     " NOTE: deletebufline() changes cursor position.
-    const before_cursor = winid->getcurpos()
+    const before_cursor = a:winid->getcurpos()
     if a:lines->empty()
       " Clear buffer
       if current_lines > 1
@@ -66,7 +61,7 @@ function ddu#ui#ff#_update_buffer(
     call setbufvar(a:bufnr, '&modified', v:false)
   endtry
 
-  if !a:refreshed && winid->getcurpos() ==# before_cursor
+  if !a:refreshed && a:winid->getcurpos() ==# before_cursor
     return
   endif
 
@@ -77,16 +72,16 @@ function ddu#ui#ff#_update_buffer(
         \ : a:params.reversed
         \ ? a:lines->len() - a:pos
         \ : a:pos
-  const win_height = winid->winheight()
-  const max_line = '$'->line(winid)
+  const win_height = a:winid->winheight()
+  const max_line = '$'->line(a:winid)
   if max_line - lnum < win_height / 2
     " Adjust cursor position when cursor is near bottom.
-    call win_execute(winid, 'normal! Gzb')
+    call win_execute(a:winid, 'normal! Gzb')
   endif
-  call win_execute(winid, 'call cursor(' .. lnum .. ', 0)')
+  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
   if lnum < win_height / 2
     " Adjust cursor position when cursor is near top.
-    call win_execute(winid, 'normal! zb')
+    call win_execute(a:winid, 'normal! zb')
   endif
 endfunction
 

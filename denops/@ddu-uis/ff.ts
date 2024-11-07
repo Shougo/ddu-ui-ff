@@ -342,18 +342,19 @@ export class Ui extends BaseUi<Params> {
     );
 
     const hasNvim = args.denops.meta.host === "nvim";
+    //const floating = args.uiParams.split === "floating";
     const floating = args.uiParams.split === "floating" && hasNvim;
     const winWidth = Number(args.uiParams.winWidth);
     let winHeight = args.uiParams.autoResize &&
         this.#items.length < Number(args.uiParams.winHeight)
       ? Math.max(this.#items.length, 1)
       : Number(args.uiParams.winHeight);
-    const winid = await this.#winId({
+    const prevWinid = await this.#winId({
       denops: args.denops,
       uiParams: args.uiParams,
     });
 
-    if (winid < 0) {
+    if (prevWinid < 0) {
       // The layout must be saved.
       this.#restcmd = await fn.winrestcmd(args.denops);
       this.#prevWinInfo = await this.#getWinInfo(args.denops);
@@ -369,10 +370,10 @@ export class Ui extends BaseUi<Params> {
         winHeight = maxWinHeight;
       }
 
-      if (winid >= 0) {
+      if (prevWinid >= 0) {
         await fn.win_execute(
           args.denops,
-          winid,
+          prevWinid,
           `resize ${winHeight}`,
         );
       } else {
@@ -382,10 +383,10 @@ export class Ui extends BaseUi<Params> {
         );
       }
     } else if (args.uiParams.split === "vertical") {
-      if (winid >= 0) {
+      if (prevWinid >= 0) {
         await fn.win_execute(
           args.denops,
-          winid,
+          prevWinid,
           `vertical resize ${winWidth}`,
         );
       } else {
@@ -421,7 +422,9 @@ export class Ui extends BaseUi<Params> {
           delete winOpts.title;
           delete winOpts.title_pos;
         }
-        if (winid >= 0 && await fn.bufwinid(args.denops, bufnr) === winid) {
+        if (
+          prevWinid >= 0 && await fn.bufwinid(args.denops, bufnr) === prevWinid
+        ) {
           await args.denops.call(
             "nvim_win_set_config",
             this.#popupId,
@@ -451,6 +454,7 @@ export class Ui extends BaseUi<Params> {
           "scrollbar": 0,
           "title": args.uiParams.floatingTitle,
           "wrap": 0,
+          "focusable": 1,
         } as Record<string, unknown>;
 
         switch (args.uiParams.floatingBorder) {
@@ -468,7 +472,7 @@ export class Ui extends BaseUi<Params> {
           default:
             winOpts["borderchars"] = args.uiParams.floatingBorder;
         }
-        if (winid >= 0) {
+        if (prevWinid >= 0) {
           await args.denops.call(
             "popup_move",
             this.#popupId,
@@ -515,13 +519,13 @@ export class Ui extends BaseUi<Params> {
         }
       }
     } else if (args.uiParams.split === "tab") {
-      if (winid >= 0) {
-        await fn.win_gotoid(args.denops, winid);
+      if (prevWinid >= 0) {
+        await fn.win_gotoid(args.denops, prevWinid);
       } else {
         await args.denops.cmd(`tabnew | silent keepalt buffer ${bufnr}`);
       }
     } else if (args.uiParams.split === "no") {
-      if (winid < 0) {
+      if (prevWinid < 0) {
         await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
       }
     } else {
@@ -531,6 +535,11 @@ export class Ui extends BaseUi<Params> {
       );
       return;
     }
+
+    const winid = await this.#winId({
+      denops: args.denops,
+      uiParams: args.uiParams,
+    });
 
     await this.#setAutoAction(args.denops, args.uiParams, winid);
 
@@ -599,6 +608,7 @@ export class Ui extends BaseUi<Params> {
           "ddu#ui#ff#_update_buffer",
           args.uiParams,
           bufnr,
+          winid,
           this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
           args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
           cursorPos,
@@ -658,9 +668,10 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
 
-    if (!args.uiParams.focus) {
-      await fn.win_gotoid(args.denops, args.context.winId);
-    }
+    await fn.win_gotoid(
+      args.denops,
+      args.uiParams.focus ? winid : args.context.winId,
+    );
 
     this.#refreshed = false;
   }
@@ -1542,13 +1553,13 @@ export class Ui extends BaseUi<Params> {
       args.uiParams.split === "floating" &&
       args.denops.meta.host !== "nvim" && this.#popupId > 0
     ) {
+      // Focus to the previous window
+      await fn.win_gotoid(args.denops, args.context.winId);
+
       // Close popup
       await args.denops.call("popup_close", this.#popupId);
       await args.denops.cmd("redraw!");
       this.#popupId = -1;
-
-      // Focus to the previous window
-      await fn.win_gotoid(args.denops, args.context.winId);
     } else {
       for (
         const winid of (await fn.win_findbuf(args.denops, bufnr) as number[])
