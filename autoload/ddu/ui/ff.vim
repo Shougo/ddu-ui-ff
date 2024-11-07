@@ -39,26 +39,32 @@ function ddu#ui#ff#_update_buffer(
 
   call setbufvar(a:bufnr, '&modifiable', v:true)
 
-  " NOTE: deletebufline() changes cursor position.
-  const before_cursor = winid->getcurpos()
-  if a:lines->empty()
-    " Clear buffer
-    if current_lines > 1
-      call deletebufline(a:bufnr, 1, '$')
+  try
+    " NOTE: deletebufline() changes cursor position.
+    const before_cursor = winid->getcurpos()
+    if a:lines->empty()
+      " Clear buffer
+      if current_lines > 1
+        call deletebufline(a:bufnr, 1, '$')
+      else
+        call setbufline(a:bufnr, 1, [''])
+      endif
     else
-      call setbufline(a:bufnr, 1, [''])
-    endif
-  else
-    call setbufline(a:bufnr, 1,
-          \ a:params.reversed ? reverse(a:lines) : a:lines)
+      call setbufline(a:bufnr, 1,
+            \ a:params.reversed ? reverse(a:lines) : a:lines)
 
-    if current_lines > a:lines->len()
-      silent call deletebufline(a:bufnr, a:lines->len() + 1, '$')
+      if current_lines > a:lines->len()
+        silent call deletebufline(a:bufnr, a:lines->len() + 1, '$')
+      endif
     endif
-  endif
-
-  call setbufvar(a:bufnr, '&modifiable', v:false)
-  call setbufvar(a:bufnr, '&modified', v:false)
+  catch
+    " NOTE: Buffer modify may be failed
+    call ddu#util#print_error(v:exception)
+    return
+  finally
+    call setbufvar(a:bufnr, '&modifiable', v:false)
+    call setbufvar(a:bufnr, '&modified', v:false)
+  endtry
 
   if !a:refreshed && winid->getcurpos() ==# before_cursor
     return
