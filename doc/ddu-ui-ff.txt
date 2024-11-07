@@ -194,6 +194,7 @@ quit
 
 		params:
 			{force}: Force quit buffer if it is non zero.
+				NOTE: You can resume the buffer.
 
                                                      *ddu-ui-ff-action-redraw*
 redraw
