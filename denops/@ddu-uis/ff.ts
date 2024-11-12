@@ -145,6 +145,7 @@ export type Params = {
   previewFloatingTitlePos: "left" | "center" | "right";
   previewFloatingZindex: number;
   previewHeight: ExprNumber;
+  previewMaxSize: number;
   previewRow: ExprNumber;
   previewSplit: "horizontal" | "vertical" | "no";
   previewWidth: ExprNumber;
@@ -346,8 +347,8 @@ export class Ui extends BaseUi<Params> {
     );
 
     const hasNvim = args.denops.meta.host === "nvim";
-    //const floating = args.uiParams.split === "floating";
-    const floating = args.uiParams.split === "floating" && hasNvim;
+    const floating = args.uiParams.split === "floating";
+    //const floating = args.uiParams.split === "floating" && hasNvim;
     const winWidth = Number(args.uiParams.winWidth);
     let winHeight = args.uiParams.autoResize &&
         this.#items.length < Number(args.uiParams.winHeight)
@@ -1500,6 +1501,7 @@ export class Ui extends BaseUi<Params> {
       previewFloatingTitlePos: "left",
       previewFloatingZindex: 100,
       previewHeight: 10,
+      previewMaxSize: 1000000,
       previewRow: 0,
       previewSplit: "horizontal",
       previewWidth: 80,

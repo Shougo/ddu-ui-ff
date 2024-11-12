@@ -499,6 +499,12 @@ previewHeight	(number)
 
 		Default: 10
 
+                                              *ddu-ui-ff-param-previewMaxSize*
+previewMaxSize	(number)
+		Set the maximum file size for preview.
+
+		Default: 1000000
+
                                                   *ddu-ui-ff-param-previewRow*
 previewRow	(number)
 		Set the row position of the preview window if
