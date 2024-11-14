@@ -347,8 +347,8 @@ export class Ui extends BaseUi<Params> {
     );
 
     const hasNvim = args.denops.meta.host === "nvim";
-    const floating = args.uiParams.split === "floating";
-    //const floating = args.uiParams.split === "floating" && hasNvim;
+    //const floating = args.uiParams.split === "floating";
+    const floating = args.uiParams.split === "floating" && hasNvim;
     const winWidth = Number(args.uiParams.winWidth);
     let winHeight = args.uiParams.autoResize &&
         this.#items.length < Number(args.uiParams.winHeight)
