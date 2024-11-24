@@ -36,6 +36,7 @@ function ddu#ui#ff#_update_buffer(
 
   try
     " NOTE: deletebufline() changes cursor position.
+    " NOTE: deletebufline() needs ":silent".
     const before_cursor = a:winid->getcurpos()
     if a:lines->empty()
       " Clear buffer
