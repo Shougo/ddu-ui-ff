@@ -40,7 +40,7 @@ function ddu#ui#ff#_update_buffer(
     if a:lines->empty()
       " Clear buffer
       if current_lines > 1
-        call deletebufline(a:bufnr, 1, '$')
+        silent call deletebufline(a:bufnr, 1, '$')
       else
         call setbufline(a:bufnr, 1, [''])
       endif
