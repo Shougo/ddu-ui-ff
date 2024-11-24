@@ -191,6 +191,7 @@ export class PreviewUi {
           {
             context,
             item,
+            previewContext,
             previewWinId: this.#previewWinId,
           },
         );
@@ -199,6 +200,7 @@ export class PreviewUi {
           denops,
           context,
           item,
+          previewContext,
           previewWinId: this.#previewWinId,
         });
       }

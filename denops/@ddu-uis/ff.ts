@@ -104,6 +104,7 @@ type OnPreviewArguments = {
   denops: Denops;
   context: Context;
   item: DduItem;
+  previewContext: PreviewContext;
   previewWinId: number;
 };
 
