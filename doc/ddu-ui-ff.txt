@@ -414,6 +414,15 @@ immediateAction (string)
 
 		Default: ""
 
+                                           *ddu-ui-ff-param-immediateUiAction*
+immediateUiAction (string)
+		If it is not empty and the number of item is exactly one, it
+		runs |ddu#ui#sync_action| immediately.
+
+		NOTE: It works only if the UI window is not visible.
+
+		Default: ""
+
                                                    *ddu-ui-ff-param-inputFunc*
 inputFunc	(string)
 		Specify the input function name when
