@@ -875,11 +875,6 @@ export class Ui extends BaseUi<Params> {
     }) => {
       const items = await this.#getItems(args.denops);
 
-      const actions = await args.denops.dispatcher.getItemActionNames(
-        args.options.name,
-        items,
-      );
-
       await this.#previewUi.close(args.denops, args.context, args.uiParams);
 
       await args.denops.dispatcher.start({
@@ -889,7 +884,6 @@ export class Ui extends BaseUi<Params> {
           {
             name: "action",
             params: {
-              actions,
               name: args.options.name,
               items,
             },
