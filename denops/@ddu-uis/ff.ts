@@ -135,7 +135,6 @@ export type Params = {
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
-  immediateUiAction: string;
   inputFunc: string;
   maxDisplayItems: number;
   maxHighlightItems: number;
@@ -326,20 +325,6 @@ export class Ui extends BaseUi<Params> {
           args.uiParams.immediateAction,
           this.#items,
           {},
-        );
-        return;
-      }
-
-      if (
-        args.uiParams.immediateUiAction.length != 0 &&
-        this.#items.length === 1
-      ) {
-        // Immediate UI action
-        await args.denops.call(
-          "ddu#ui#sync_action",
-          args.uiParams.immediateUiAction,
-          {},
-          args.options.name,
         );
         return;
       }
@@ -1497,7 +1482,6 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
-      immediateUiAction: "",
       inputFunc: "input",
       maxDisplayItems: 1000,
       maxHighlightItems: 100,
