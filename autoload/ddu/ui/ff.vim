@@ -224,11 +224,6 @@ function ddu#ui#ff#_open_preview_window(
               \   title_pos: a:params.previewFloatingTitlePos,
               \   zindex: a:params.previewFloatingZindex,
               \ }
-        if !has('nvim-0.9.0')
-          " NOTE: "title" and "title_pos" needs neovim 0.9.0+
-          call remove(winopts, 'title')
-          call remove(winopts, 'title_pos')
-        endif
         const winid = nvim_open_win(a:preview_bufnr, v:true, winopts)
       else
         const winopts = #{
@@ -292,11 +287,6 @@ function ddu#ui#ff#_open_preview_window(
               \   title_pos: a:params.previewFloatingTitlePos,
               \   zindex: a:params.previewFloatingZindex,
               \ }
-        if !has('nvim-0.9.0')
-          " NOTE: "title" and "title_pos" needs neovim 0.9.0+
-          call remove(winopts, 'title')
-          call remove(winopts, 'title_pos')
-        endif
         const winid = nvim_open_win(a:preview_bufnr, v:true, winopts)
       else
         if a:params.previewRow <= 0
