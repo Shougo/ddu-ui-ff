@@ -328,9 +328,9 @@ floatingBorder		(string | list)
 		"none": Disabled.
 		"single": A single line box.
 		"double": A double line box.
-		"rounded": neovim only.
-		"solid": neovim only.
-		"shadow": neovim only.
+		"rounded": Neovim only.
+		"solid": Neovim only.
+		"shadow": Neovim only.
 		array: Specifify the eight chars building up the border.
 
 		Default: "none"
@@ -347,7 +347,7 @@ floatingTitlePos	(string)
 		Specify the title position of the window border if
 		|ddu-ui-ff-param-floatingBorder| is not "none".
 		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
+		NOTE: It is Neovim only.
 
 		Default: "left"
 
@@ -427,10 +427,10 @@ inputFunc	(string)
 inputOptsFunc	(string)
 		Specify the input({opts}) function name when
 		|ddu-ui-ff-action-openFilterWindow|.
-		For example: |cmdline#input()|
+		For example: |cmdline#input_opts()|
 		NOTE: The function must have the same interface as |input()|
 		with {opts} argument.
-		NOTE: It is neovim only feature.
+		NOTE: It is Neovim only.
 
 		Default: ""
 
@@ -473,7 +473,7 @@ previewFloatingBorder		(string | list)
 		Specify the style of the preview window border if
 		|ddu-ui-ff-param-previewFloating| is v:true.
 		See |nvim_open_win()| for the detail.
-		NOTE: It is neovim only.
+		NOTE: It is Neovim only.
 
 		Default: "none"
 
@@ -766,7 +766,7 @@ FAQ 9:                                                       |ddu-ui-ff-faq-9|
 
 FAQ 10:                                                     |ddu-ui-ff-faq-10|
 	Why ddu-ui-ff does not support Vim's popup window feature instead of
-	neovim's floating window feature?
+	Neovim's floating window feature?
 
 FAQ 11:                                                     |ddu-ui-ff-faq-11|
 	I want to toggle selected items in visual mode.
@@ -971,7 +971,7 @@ https://github.com/Shougo/qselect.vim
 
                                                             *ddu-ui-ff-faq-10*
 Q: Why ddu-ui-ff does not support Vim's popup window feature instead of
-neovim's floating window feature?
+Neovim's floating window feature?
 https://github.com/Shougo/ddu-ui-ff/issues/48
 
 A: Because Vim's popup window feature is not focusable.
@@ -1254,7 +1254,7 @@ COMPATIBILITY                                        *ddu-ui-ff-compatibility*
 * Remove 'cursorline' set.
 
 2022.11.18
-* Require neovim 0.8.
+* Require Neovim 0.8.
 
 2022.09.06
 * "ddu#ui#ff#execute()" does not execute ":redraw" automatically.
