@@ -423,6 +423,17 @@ inputFunc	(string)
 
 		Default: "input"
 
+                                               *ddu-ui-ff-param-inputOptsFunc*
+inputOptsFunc	(string)
+		Specify the input({opts}) function name when
+		|ddu-ui-ff-action-openFilterWindow|.
+		For example: |cmdline#input()|
+		NOTE: The function must have the same interface as |input()|
+		with {opts} argument.
+		NOTE: It is neovim only feature.
+
+		Default: ""
+
                                              *ddu-ui-ff-param-maxDisplayItems*
 maxDisplayItems (number)
 		The maximum number of displayed items.

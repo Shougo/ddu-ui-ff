@@ -419,8 +419,17 @@ function ddu#ui#ff#_open_filter_window(
   " NOTE: redraw is needed
   redraw
 
-  const new_input = a:params.inputFunc->call(
-        \ [a:params.prompt, a:input, 'custom,ddu#ui#ff#complete_input'])
+  let opts = #{
+        \   prompt: a:params.prompt,
+        \   default:  a:input,
+        \   completion:  'custom,ddu#ui#ff#complete_input',
+        \   cancelreturn:  a:input,
+        \ }
+
+  const new_input = a:params.inputOptsFunc ==# ''
+        \ ? a:params.inputFunc->call(
+        \    [opts.prompt, opts.default, opts.completion])
+        \ : a:params.inputOptsFunc->call([opts])
 
   doautocmd User Ddu:ui:ff:closeFilterWindow
 
