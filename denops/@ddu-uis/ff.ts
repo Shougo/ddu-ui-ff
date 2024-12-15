@@ -7,9 +7,9 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~9.0.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.0.0/ui";
-import { printError } from "jsr:@shougo/ddu-vim@~9.0.0/utils";
+} from "jsr:@shougo/ddu-vim@~9.1.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.1.0/ui";
+import { printError } from "jsr:@shougo/ddu-vim@~9.1.0/utils";
 
 import type { Denops } from "jsr:@denops/std@~7.4.0";
 import { batch } from "jsr:@denops/std@~7.4.0/batch";
@@ -616,7 +616,7 @@ export class Ui extends BaseUi<Params> {
           cursorPos,
         );
         await denops.call(
-          "ddu#ui#ff#_highlight_items",
+          "ddu#ui#ff#_process_items",
           args.uiParams,
           bufnr,
           this.#items.length,

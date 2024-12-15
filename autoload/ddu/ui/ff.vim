@@ -86,22 +86,22 @@ function ddu#ui#ff#_update_buffer(
   endif
 endfunction
 
-function ddu#ui#ff#_highlight_items(
-      \ params, bufnr, max_lines, highlight_items, selected_items) abort
+function ddu#ui#ff#_process_items(
+      \ params, bufnr, max_lines, items, selected_items) abort
   " Buffer must be loaded
   if !a:bufnr->bufloaded()
     return
   endif
 
-  " Clear all highlights
+  " Clear all properties
   if has('nvim')
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
   else
     call prop_clear(1, a:max_lines + 1, #{ bufnr: a:bufnr })
   endif
 
-  " Highlights items
-  for item in a:highlight_items
+  for item in a:items
+    " Highlights items
     for hl in item.highlights
       call ddu#ui#ff#_highlight(
             \ hl.hl_group, hl.name, 1,
