@@ -677,7 +677,7 @@ expression context:
 	winId		(number)
 
 An example of floating the UI window on the left side and the preview window
-on the right side of the screen: >
+on the right side of the screen: >vim
 
 	call ddu#custom#patch_global(#{
 	    \   ui: 'ff',
@@ -714,7 +714,7 @@ Ddu:ui:ff:closeFilterWindow
 
 ==============================================================================
 EXAMPLES                                                  *ddu-ui-ff-examples*
->
+>vim
 	call ddu#custom#patch_global(#{
 	    \   ui: 'ff',
 	    \ })
@@ -836,7 +836,7 @@ A: You can use |input()| like this.
                                                              *ddu-ui-ff-faq-2*
 Q: I want to call default action in the filter window.
 
-A: >
+A: >vim
 	autocmd User Ddu:ui:ff:openFilterWindow
 	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
@@ -864,7 +864,7 @@ Q: I want to move the cursor in the filter window, while in insert mode.
 
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour.
->
+>vim
 	autocmd User Ddu:ui:ff:openFilterWindow
 	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
@@ -889,7 +889,7 @@ must force this behaviour.
 
 If you want to loop the cursor:
 NOTE: It does not support |ddu-ui-ff-param-reversed|.
->
+>vim
 	autocmd User Ddu:ui:ff:openFilterWindow
 	      \ call s:ddu_ff_filter_my_settings()
 	function s:ddu_ff_filter_my_settings() abort
@@ -908,7 +908,7 @@ NOTE: It does not support |ddu-ui-ff-param-reversed|.
                                                              *ddu-ui-ff-faq-4*
 Q: I want to define |ddu-option-name| depend key mappings.
 
-A: You can use "b:ddu_ui_name". >
+A: You can use "b:ddu_ui_name". >vim
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
@@ -921,7 +921,7 @@ A: You can use "b:ddu_ui_name". >
                                                              *ddu-ui-ff-faq-5*
 Q: I want to define kind depend key mappings.
 
-A: You can use |ddu#ui#get_item()|. >
+A: You can use |ddu#ui#get_item()|. >vim
 
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
@@ -934,7 +934,7 @@ A: You can use |ddu#ui#get_item()|. >
                                                              *ddu-ui-ff-faq-6*
 Q: I want to pass params to the action when |ddu-ui-ff-action-chooseAction|.
 
-A: You can pass params like this. >
+A: You can pass params like this. >vim
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
 	  nnoremap <buffer> E
@@ -946,7 +946,7 @@ A: You can pass params like this. >
 Q: I want to use Vim syntax highlight in the buffer.
 
 A: Please set 'syntax' option in |FileType| autocmd.
-If you want to use |treesitter|, you need to stop it manually after quit. >
+If you want to use |treesitter|, you need to stop it manually after quit. >vim
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
 	  if b:ddu_ui_name ==# 'vim'
@@ -981,7 +981,7 @@ acceptable.
                                                             *ddu-ui-ff-faq-11*
 Q: I want to toggle selected items in visual mode.
 
-A: >
+A: >vim
   xnoremap <buffer> <Space>
   \ :call ddu#ui#do_action('toggleSelectItem')<CR>
 <
@@ -989,7 +989,7 @@ A: >
 Q: I want to use "ddu-ui-ff" in insert mode.
 NOTE: It is experimental feature.
 
-A: >
+A: >vim
 	inoremap <C-q> <Cmd>call ddu#start(#{
 	\   name: 'file',
 	\   ui: 'ff',
@@ -1008,7 +1008,7 @@ A: >
 Q: I want to use "ddu-ui-ff" in command line mode.
 NOTE: It is experimental feature.
 
-A: >
+A: >vim
 	cnoremap <C-q> <Cmd>call ddu#start(#{
 	\   name: 'file',
 	\   ui: 'ff',
@@ -1027,7 +1027,7 @@ A: >
                                                             *ddu-ui-ff-faq-14*
 Q: I want to switch sources without clear current filter input.
 
-A: >
+A: >vim
 	nnoremap <buffer> ff
 	\ <Cmd>call ddu#ui#do_action('updateOptions', #{
 	\   sources: [
@@ -1044,7 +1044,7 @@ A: Please use "no" in |ddu-ui-ff-param-previewSplit|.
 Q: ":UniteNext"/":UnitePrevious"/":Denite -resume -cursor-pos=+1 -immediately"
 like commands are available?
 
-A: >
+A: >vim
 	nnoremap <C-n>
 	      \ <Cmd>call ddu#ui#multi_actions(
 	      \   ['cursorNext', 'itemAction'], 'files')<CR>
@@ -1056,7 +1056,7 @@ A: >
 Q: I want to display cursor mark on the left of ddu window like
 "telescope.nvim".
 
-A: >
+A: >vim
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
 	  setlocal signcolumn=yes
@@ -1082,7 +1082,7 @@ A: >
                                                             *ddu-ui-ff-faq-18*
 Q: How do I set the floating title with list style ?
 
-A: >
+A: >vim
 	call ddu#custom#patch_global(#{
 	  \   uiParams: #{
 	  \     ff: #{
@@ -1103,7 +1103,7 @@ filter window, it remains filter window.
 
 A: It is the feature.  Because |ddu#ui#do_action()| does not change any mode.
 You must escape command line mode when leave from the filter window.
->
+>vim
 	cnoremap <ESC>
 	    \ <ESC><Cmd>call ddu#ui#do_action('quit')<CR>
 	cnoremap <CR>
@@ -1113,7 +1113,7 @@ You must escape command line mode when leave from the filter window.
 Q: I cannot see what item is selected in the filter window.
 
 A: You can set 'cursorline' option in ddu buffer.
->
+>vim
 	autocmd FileType ddu-ff call s:ddu_ff_my_settings()
 	function s:ddu_ff_my_settings() abort
 	  setlocal cursorline
@@ -1122,7 +1122,7 @@ A: You can set 'cursorline' option in ddu buffer.
                                                             *ddu-ui-ff-faq-22*
 Q: I want to change preview cursor on the top.
 
-A: >
+A: >vim
 	call ddu#custom#patch_global(#{
 	      \   uiParams: #{
 	      \     ff: #{
@@ -1136,7 +1136,7 @@ A: >
                                                             *ddu-ui-ff-faq-23*
 Q: I want to scroll preview window.
 
-A: >
+A: >vim
 	nnoremap <buffer> <C-p>
 	      \ <Cmd>call ddu#ui#do_action('previewExecute',
 	      \ #{ command: 'execute "normal! \<C-y>"' })<CR>
@@ -1147,7 +1147,7 @@ A: >
                                                             *ddu-ui-ff-faq-24*
 Q: I want to preview selected item automatically.
 
-A: You need to set |ddu-ui-ff-param-autoAction| like this. >
+A: You need to set |ddu-ui-ff-param-autoAction| like this. >vim
 	call ddu#custom#patch_global(#{
 	      \   ui: 'ff',
 	      \   uiParams: #{
@@ -1164,7 +1164,7 @@ Q: I want to start filter window when UI is initialized.
 
 A: It is not supported.  Because it has too many problems.  But you can use
 the function.
->
+>vim
 	call ddu#start()
 	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#async_action('openFilterWindow')
@@ -1175,7 +1175,7 @@ NOTE: It must be |ddu#ui#async_action()|.
 Q: I want to change filter window position.
 
 A: "cmdline.vim" supports the feature.
->
+>vim
 	autocmd User Ddu:ui:ff:openFilterWindow call cmdline#enable()
 <
                                                             *ddu-ui-ff-faq-27*
