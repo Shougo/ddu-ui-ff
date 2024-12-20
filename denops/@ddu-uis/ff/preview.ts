@@ -244,7 +244,15 @@ export class PreviewUi {
     }
 
     if (denops.meta.host === "nvim") {
-      await denops.call("termopen", previewer.cmds, opts);
+      if (await fn.has(denops, "nvim-0.11")) {
+        // NOTE: termopen() is deprecated.
+        await denops.call("termopen", previewer.cmds, {
+          ...opts,
+          term: true,
+        });
+      } else {
+        await denops.call("termopen", previewer.cmds, opts);
+      }
     } else {
       await denops.call("term_start", previewer.cmds, {
         ...opts,
