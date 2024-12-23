@@ -7,9 +7,9 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~9.1.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.1.0/ui";
-import { printError } from "jsr:@shougo/ddu-vim@~9.1.0/utils";
+} from "jsr:@shougo/ddu-vim@~9.2.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.2.0/ui";
+import { printError } from "jsr:@shougo/ddu-vim@~9.2.0/utils";
 
 import type { Denops } from "jsr:@denops/std@~7.4.0";
 import { batch } from "jsr:@denops/std@~7.4.0/batch";
@@ -623,12 +623,11 @@ export class Ui extends BaseUi<Params> {
           this.#items.map((item, index) => {
             return {
               highlights: item.highlights ?? [],
+              info: item.info ?? [],
               row: index + 1,
               prefix: getPrefix(item),
             };
-          }).slice(0, args.uiParams.maxHighlightItems).filter((item, index) =>
-            item.highlights.length > 0 && !this.#selectedItems.has(index)
-          ),
+          }).slice(0, args.uiParams.maxHighlightItems),
           [...this.#selectedItems],
         );
       });

@@ -98,9 +98,14 @@ function ddu#ui#ff#_process_items(
     call nvim_buf_clear_namespace(0, s:namespace, 0, -1)
   else
     call prop_clear(1, a:max_lines + 1, #{ bufnr: a:bufnr })
+    for prop_type in prop_type_list(#{ bufnr: a:bufnr })
+      call prop_type_delete(prop_type, #{ bufnr: a:bufnr })
+    endfor
   endif
 
   for item in a:items
+    call s:add_info_texts(a:bufnr, item.info, item.row)
+
     " Highlights items
     for hl in item.highlights
       call ddu#ui#ff#_highlight(
@@ -123,6 +128,39 @@ function ddu#ui#ff#_process_items(
 
   " NOTE: :redraw is needed
   redraw
+endfunction
+
+function s:add_info_texts(bufnr, info, row) abort
+  if has('nvim')
+    call nvim_buf_set_extmark(0, s:namespace, a:row - 1, 0, #{
+          \   virt_lines: a:info->copy()->map({ _, val ->
+          \        val->has_key('hl_group')
+          \      ? [[val.text, val.hl_group]]
+          \      : [[val.text]]
+          \   }),
+          \ })
+  else
+    for index in a:info->len()->range()
+      let info = a:info[index]
+      let prop_type = 'ddu-ui-info-' .. a:row .. '-' .. index
+
+      let prop_type_opts = #{
+            \   bufnr: a:bufnr,
+            \   priority: 10000,
+            \   override: v:true,
+            \ }
+      if info->has_key('hl_group')
+        let prop_type_opts.highlight = info.hl_group
+      endif
+      call prop_type_add(prop_type, prop_type_opts)
+
+      call prop_add(a:row, 0, #{
+            \   type: prop_type,
+            \   text: info.text,
+            \   text_align: 'below',
+            \ })
+    endfor
+  endif
 endfunction
 
 function ddu#ui#ff#_highlight(
@@ -148,12 +186,12 @@ function ddu#ui#ff#_highlight(
 
   if has('nvim')
     call nvim_buf_add_highlight(
-          \ a:bufnr,
-          \ a:id,
-          \ a:highlight,
-          \ a:row - 1,
-          \ a:col - 1,
-          \ a:col - 1 + a:length
+          \   a:bufnr,
+          \   a:id,
+          \   a:highlight,
+          \   a:row - 1,
+          \   a:col - 1,
+          \   a:col - 1 + a:length
           \ )
   else
     call prop_add(a:row, a:col, #{
