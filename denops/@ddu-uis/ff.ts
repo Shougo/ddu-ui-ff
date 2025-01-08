@@ -7,9 +7,9 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~9.2.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.2.0/ui";
-import { printError } from "jsr:@shougo/ddu-vim@~9.2.0/utils";
+} from "jsr:@shougo/ddu-vim@~9.4.0/types";
+import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~9.4.0/ui";
+import { printError } from "jsr:@shougo/ddu-vim@~9.4.0/utils";
 
 import type { Denops } from "jsr:@denops/std@~7.4.0";
 import { batch } from "jsr:@denops/std@~7.4.0/batch";
@@ -335,7 +335,7 @@ export class Ui extends BaseUi<Params> {
       await fn.bufnr(args.denops, this.#bufferName);
 
     const bufnr = initialized ||
-      await this.#initBuffer(args.denops, this.#bufferName);
+      await initBuffer(args.denops, this.#bufferName);
 
     const augroupName = `ddu-ui-ff-${bufnr}`;
     await args.denops.cmd(`augroup ${augroupName}`);
@@ -364,7 +364,7 @@ export class Ui extends BaseUi<Params> {
     if (prevWinid < 0) {
       // The layout must be saved.
       this.#restcmd = await fn.winrestcmd(args.denops);
-      this.#prevWinInfo = await this.#getWinInfo(args.denops);
+      this.#prevWinInfo = await getWinInfo(args.denops);
     }
 
     const direction = args.uiParams.splitDirection;
@@ -1546,7 +1546,7 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     await this.#previewUi.close(args.denops, args.context, args.uiParams);
     await this.#previewUi.removePreviewedBuffers(args.denops);
-    await this.#resetAutoAction(args.denops);
+    await args.denops.call("ddu#ui#ff#_reset_auto_action");
     await args.denops.call("ddu#ui#ff#_restore_title");
 
     // Move to the UI window.
@@ -1633,7 +1633,7 @@ export class Ui extends BaseUi<Params> {
 
     if (
       this.#restcmd !== "" &&
-      equal(this.#prevWinInfo, await this.#getWinInfo(args.denops))
+      equal(this.#prevWinInfo, await getWinInfo(args.denops))
     ) {
       // Restore the layout.
       await args.denops.cmd(this.#restcmd);
@@ -1785,16 +1785,6 @@ export class Ui extends BaseUi<Params> {
     return ActionFlags.None;
   }
 
-  async #initBuffer(
-    denops: Denops,
-    bufferName: string,
-  ): Promise<number> {
-    const bufnr = await fn.bufadd(denops, bufferName);
-    await fn.setbufvar(denops, bufnr, "&modifiable", false);
-    await fn.bufload(denops, bufnr);
-    return bufnr;
-  }
-
   async #initOptions(
     denops: Denops,
     options: DduOptions,
@@ -1862,7 +1852,7 @@ export class Ui extends BaseUi<Params> {
     const params = Object.assign(uiParams);
     for (const name of uiParams.exprParams) {
       if (name in uiParams) {
-        params[name] = await this.#evalExprParam(
+        params[name] = await evalExprParam(
           denops,
           name,
           params[name],
@@ -1878,33 +1868,6 @@ export class Ui extends BaseUi<Params> {
     }
 
     return params;
-  }
-
-  async #evalExprParam(
-    denops: Denops,
-    name: string,
-    expr: string | unknown,
-    defaultExpr: string | unknown,
-    context: Record<string, unknown>,
-  ): Promise<unknown> {
-    if (!is.String(expr)) {
-      return expr;
-    }
-
-    try {
-      return await denops.eval(expr, context);
-    } catch (e) {
-      await printError(
-        denops,
-        e,
-        `[ddu-ui-ff] invalid expression in option: ${name}`,
-      );
-
-      // Fallback to default param.
-      return is.String(defaultExpr)
-        ? await denops.eval(defaultExpr, context)
-        : defaultExpr;
-    }
   }
 
   async #getBufnr(
@@ -1946,7 +1909,7 @@ export class Ui extends BaseUi<Params> {
       this.#enabledAutoAction;
 
     await batch(denops, async (denops: Denops) => {
-      await this.#resetAutoAction(denops);
+      await denops.call("ddu#ui#ff#_reset_auto_action");
       if (hasAutoAction) {
         const autoAction = Object.assign(
           { delay: 100, params: {}, sync: true },
@@ -1959,10 +1922,6 @@ export class Ui extends BaseUi<Params> {
         );
       }
     });
-  }
-
-  async #resetAutoAction(denops: Denops) {
-    await denops.call("ddu#ui#ff#_reset_auto_action");
   }
 
   async #cursor(
@@ -1991,17 +1950,6 @@ export class Ui extends BaseUi<Params> {
     await this.updateCursor({ denops });
   }
 
-  async #getWinInfo(
-    denops: Denops,
-  ): Promise<WinInfo> {
-    return {
-      columns: await op.columns.getGlobal(denops),
-      lines: await op.lines.getGlobal(denops),
-      winid: await fn.win_getid(denops),
-      tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
-    };
-  }
-
   async #clearSelectedItems(
     denops: Denops,
   ) {
@@ -2009,4 +1957,52 @@ export class Ui extends BaseUi<Params> {
     const bufnr = await this.#getBufnr(denops);
     await fn.setbufvar(denops, bufnr, "ddu_ui_selected_items", []);
   }
+}
+
+async function initBuffer(
+  denops: Denops,
+  bufferName: string,
+): Promise<number> {
+  const bufnr = await fn.bufadd(denops, bufferName);
+  await fn.setbufvar(denops, bufnr, "&modifiable", false);
+  await fn.bufload(denops, bufnr);
+  return bufnr;
+}
+
+async function evalExprParam(
+  denops: Denops,
+  name: string,
+  expr: string | unknown,
+  defaultExpr: string | unknown,
+  context: Record<string, unknown>,
+): Promise<unknown> {
+  if (!is.String(expr)) {
+    return expr;
+  }
+
+  try {
+    return await denops.eval(expr, context);
+  } catch (e) {
+    await printError(
+      denops,
+      e,
+      `[ddu-ui-ff] invalid expression in option: ${name}`,
+    );
+
+    // Fallback to default param.
+    return is.String(defaultExpr)
+      ? await denops.eval(defaultExpr, context)
+      : defaultExpr;
+  }
+}
+
+async function getWinInfo(
+  denops: Denops,
+): Promise<WinInfo> {
+  return {
+    columns: await op.columns.getGlobal(denops),
+    lines: await op.lines.getGlobal(denops),
+    winid: await fn.win_getid(denops),
+    tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
+  };
 }
