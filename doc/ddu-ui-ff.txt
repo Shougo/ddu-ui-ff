@@ -316,6 +316,39 @@ exprParams	(string[])
 		  "winWidth",
 		]
 
+                                        *ddu-ui-ff-param-filterUpdateCallback*
+filterUpdateCallback (string)
+		Specify the callback when update in the filter window.
+		The function argument is {input} and it returns the new input
+		string.
+>vim
+	function! DduFilterCallback(input)
+	  if a:input->stridx('@') != 0
+	    return a:input
+	  endif
+	
+	  " Use file source instead.
+	  call ddu#ui#do_action('updateOptions', #{
+	        \   sources: [
+	        \     #{ name: 'file' },
+	        \   ],
+	        \ })
+	  call ddu#ui#do_action('redraw', #{ method: 'refreshItems' })
+	
+	  return a:input[1:]
+	endfunction
+<
+
+		Default: ""
+
+                                             *ddu-ui-ff-param-filterUpdateMax*
+filterUpdateMax	(number)
+		Specify the maximum item number to update in the filter
+		window.
+		If it is less than equal 0, the feature will be disabled.
+
+		Default: 0
+
                                               *ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
@@ -350,14 +383,6 @@ floatingTitlePos	(string)
 		NOTE: It is Neovim only.
 
 		Default: "left"
-
-                                             *ddu-ui-ff-param-filterUpdateMax*
-filterUpdateMax	(number)
-		Specify the maximum item number to update in the filter
-		window.
-		If it is less than equal 0, the feature will be disabled.
-
-		Default: 0
 
                                                        *ddu-ui-ff-param-focus*
 focus		(boolean)

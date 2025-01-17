@@ -127,6 +127,7 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
+  filterUpdateCallback: string;
   filterUpdateMax: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
@@ -1469,6 +1470,7 @@ export class Ui extends BaseUi<Params> {
         "winHeight",
         "winWidth",
       ],
+      filterUpdateCallback: "",
       filterUpdateMax: 0,
       floatingBorder: "none",
       floatingTitle: "",
