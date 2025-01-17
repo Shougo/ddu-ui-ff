@@ -1803,13 +1803,14 @@ export class Ui extends BaseUi<Params> {
 
       // Set options
       await fn.setwinvar(denops, winid, "&list", 0);
-      await fn.setwinvar(denops, winid, "&colorcolumn", "");
-      await fn.setwinvar(denops, winid, "&foldcolumn", 0);
       await fn.setwinvar(denops, winid, "&foldenable", 0);
       await fn.setwinvar(denops, winid, "&number", 0);
       await fn.setwinvar(denops, winid, "&relativenumber", 0);
       await fn.setwinvar(denops, winid, "&spell", 0);
       await fn.setwinvar(denops, winid, "&wrap", 0);
+      await fn.setwinvar(denops, winid, "&colorcolumn", "");
+      await fn.setwinvar(denops, winid, "&foldcolumn", 0);
+      await fn.setwinvar(denops, winid, "&signcolumn", "no");
       if (existsStatusColumn) {
         await fn.setwinvar(denops, winid, "&statuscolumn", "");
       }
