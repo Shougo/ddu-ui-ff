@@ -141,6 +141,7 @@ export type Params = {
   maxDisplayItems: number;
   maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
+  pathFilter: string;
   previewCol: ExprNumber;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
@@ -245,7 +246,19 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     this.#prevLength = this.#items.length;
     this.#prevInput = args.context.input;
+
     this.#items = args.items.slice(0, args.uiParams.maxDisplayItems);
+    if (args.uiParams.pathFilter !== "") {
+      const pathFilter = new RegExp(args.uiParams.pathFilter);
+      type ActionPath = {
+        path: string;
+      };
+      this.#items = this.#items.filter((item) =>
+        (item?.action as ActionPath)?.path &&
+        pathFilter.test((item?.action as ActionPath)?.path)
+      );
+    }
+
     await this.#clearSelectedItems(args.denops);
     this.#refreshed = true;
 
@@ -1486,6 +1499,7 @@ export class Ui extends BaseUi<Params> {
       onPreview: (_) => {
         return Promise.resolve();
       },
+      pathFilter: "",
       previewCol: 0,
       previewFloating: false,
       previewFloatingBorder: "none",
