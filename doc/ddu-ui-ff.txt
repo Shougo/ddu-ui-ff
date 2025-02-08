@@ -480,6 +480,13 @@ onPreview	(function)
 		|denops#callback#register()|.
 		NOTE: Current window may not be the preview window.
 
+                                                  *ddu-ui-ff-param-pathFilter*
+pathFilter	(string)
+		Filter regexp string for path items.
+		NOTE: It is JavaScript regexp.
+
+		Default: ""
+
                                                   *ddu-ui-ff-param-previewCol*
 previewCol	(number)
 		Set the column position of the preview window if
