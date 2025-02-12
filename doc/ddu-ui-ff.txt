@@ -296,6 +296,7 @@ displaySourceName	(string)
                                                  *ddu-ui-ff-param-displayTree*
 displayTree	(boolean)
 		Display tree structure.
+		NOTE: To use the feature, the sources support tree structure.
 
 		Default: v:false
 
