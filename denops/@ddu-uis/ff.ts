@@ -127,8 +127,6 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
-  filterUpdateCallback: string;
-  filterUpdateMax: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
   floatingTitlePos: "left" | "center" | "right";
@@ -136,8 +134,6 @@ export type Params = {
   highlights: HighlightGroup;
   ignoreEmpty: boolean;
   immediateAction: string;
-  inputFunc: string;
-  inputOptsFunc: string;
   maxDisplayItems: number;
   maxHighlightItems: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
@@ -154,7 +150,6 @@ export type Params = {
   previewSplit: "horizontal" | "vertical" | "no";
   previewWidth: ExprNumber;
   previewWindowOptions: WindowOption[];
-  prompt: string;
   replaceCol: number;
   reversed: boolean;
   split: "horizontal" | "vertical" | "floating" | "tab" | "no";
@@ -1180,6 +1175,7 @@ export class Ui extends BaseUi<Params> {
       denops: Denops;
       context: Context;
       options: DduOptions;
+      uiOptions: UiOptions;
       uiParams: Params;
       actionParams: BaseParams;
       getPreviewer?: (
@@ -1206,8 +1202,8 @@ export class Ui extends BaseUi<Params> {
       const actionParams = args.actionParams as OpenFilterWindowParams;
 
       args.context.input = await args.denops.call(
-        "ddu#ui#ff#_open_filter_window",
-        uiParams,
+        "ddu#ui#_open_filter_window",
+        args.uiOptions,
         actionParams.input ?? args.context.input,
         args.options.name,
         this.#items.length,
@@ -1483,8 +1479,6 @@ export class Ui extends BaseUi<Params> {
         "winHeight",
         "winWidth",
       ],
-      filterUpdateCallback: "",
-      filterUpdateMax: 0,
       floatingBorder: "none",
       floatingTitle: "",
       floatingTitlePos: "left",
@@ -1492,8 +1486,6 @@ export class Ui extends BaseUi<Params> {
       highlights: {},
       ignoreEmpty: false,
       immediateAction: "",
-      inputFunc: "input",
-      inputOptsFunc: "",
       maxDisplayItems: 1000,
       maxHighlightItems: 100,
       onPreview: (_) => {
@@ -1518,7 +1510,6 @@ export class Ui extends BaseUi<Params> {
         ["&number", 0],
         ["&wrap", 0],
       ],
-      prompt: "",
       reversed: false,
       replaceCol: 0,
       split: "horizontal",
