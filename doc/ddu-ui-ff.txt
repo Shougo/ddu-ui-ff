@@ -796,16 +796,16 @@ Q: I want to call default action in the filter window.
 
 A: >vim
 	autocmd User Ddu:uiOpenFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  let s:save_cr = '<CR>'->maparg('c', v:false, v:true)
 
 	  cnoremap <CR>
 	      \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
 	autocmd User Ddu:uiCloseFilterWindow
-	      \ call s:ddu_ff_filter_cleanup()
-	function s:ddu_ff_filter_cleanup() abort
+	      \ call s:ddu_filter_cleanup()
+	function s:ddu_filter_cleanup() abort
 	  if s:save_cr->empty()
 	    cunmap <CR>
 	  else
@@ -824,8 +824,8 @@ A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour.
 >vim
 	autocmd User Ddu:uiOpenFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  set cursorline
 
 	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
@@ -837,8 +837,8 @@ must force this behaviour.
 	endfunction
 
 	autocmd User Ddu:uiCloseFilterWindow
-	      \ call s:ddu_ff_filter_cleanup()
-	function s:ddu_ff_filter_cleanup() abort
+	      \ call s:ddu_filter_cleanup()
+	function s:ddu_filter_cleanup() abort
 	  set nocursorline
 
 	  call ddu#ui#ff#restore_cmaps()
@@ -849,8 +849,8 @@ If you want to loop the cursor:
 NOTE: It does not support |ddu-ui-ff-param-reversed|.
 >vim
 	autocmd User Ddu:uiOpenFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  setlocal cursorline
 
 	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
