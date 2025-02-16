@@ -395,25 +395,6 @@ function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
         \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction
 
-function ddu#ui#ff#_restore_title() abort
-  if !'g:ddu#ui#ff#_save_title'->exists()
-    return
-  endif
-
-  let &titlestring = g:ddu#ui#ff#_save_title
-endfunction
-function ddu#ui#ff#_set_title(bufnr, winid=win_getid()) abort
-  const title = getbufvar(a:bufnr, 'ddu_ui_ff_title', '')
-  if title ==# '' || &titlestring ==# title
-    return
-  endif
-
-  const linenr = "printf('%'.(len(line('$', "
-        \ .. a:winid .. "))).'d/%d',line('.', "
-        \ .. a:winid .. "),line('$', " .. a:winid .. "))"
-  let &titlestring = printf('%s %%{%s}', title, linenr)
-endfunction
-
 function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   if a:pattern !=# ''
     call win_execute(a:winid,

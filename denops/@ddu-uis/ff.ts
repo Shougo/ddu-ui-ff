@@ -572,14 +572,18 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    await this.#setStatusline(
+    await setStatusline(
       args.denops,
       args.context,
       args.options,
       args.uiParams,
-      bufnr,
+      await this.#winId({
+        denops: args.denops,
+        uiParams: args.uiParams,
+      }),
       floating,
       augroupName,
+      this.#items,
     );
 
     // Update main buffer
@@ -945,14 +949,18 @@ export class Ui extends BaseUi<Params> {
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
 
-      await this.#setStatusline(
+      await setStatusline(
         args.denops,
         args.context,
         args.options,
         args.uiParams,
-        bufnr,
+        await this.#winId({
+          denops: args.denops,
+          uiParams: args.uiParams,
+        }),
         floating,
         `ddu-ui-ff-${bufnr}`,
+        this.#items,
       );
 
       return ActionFlags.Persist;
@@ -999,14 +1007,18 @@ export class Ui extends BaseUi<Params> {
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
 
-      await this.#setStatusline(
+      await setStatusline(
         args.denops,
         args.context,
         args.options,
         args.uiParams,
-        bufnr,
+        await this.#winId({
+          denops: args.denops,
+          uiParams: args.uiParams,
+        }),
         floating,
         `ddu-ui-ff-${bufnr}`,
+        this.#items,
       );
 
       return ActionFlags.Persist;
@@ -1554,7 +1566,6 @@ export class Ui extends BaseUi<Params> {
     await this.#previewUi.close(args.denops, args.context, args.uiParams);
     await this.#previewUi.removePreviewedBuffers(args.denops);
     await args.denops.call("ddu#ui#ff#_reset_auto_action");
-    await args.denops.call("ddu#ui#ff#_restore_title");
 
     // Move to the UI window.
     const bufnr = await this.#getBufnr(args.denops);
@@ -1676,84 +1687,6 @@ export class Ui extends BaseUi<Params> {
     }
 
     return items.filter((item) => item);
-  }
-
-  async #setStatusline(
-    denops: Denops,
-    context: Context,
-    options: DduOptions,
-    uiParams: Params,
-    bufnr: number,
-    floating: boolean,
-    augroupName: string,
-  ): Promise<void> {
-    const winid = await this.#winId({
-      denops,
-      uiParams,
-    });
-
-    const statusState = {
-      done: context.done,
-      input: context.input,
-      name: options.name,
-      maxItems: context.maxItems,
-    };
-    await fn.setwinvar(
-      denops,
-      winid,
-      "ddu_ui_ff_status",
-      statusState,
-    );
-
-    if (!uiParams.statusline) {
-      return;
-    }
-
-    const header = `[ddu-${options.name}]` +
-      (this.#items.length !== context.maxItems
-        ? ` ${this.#items.length}/${context.maxItems}`
-        : "");
-
-    const linenr =
-      "printf('%'.(('$'->line())->len()+2).'d/%d','.'->line(),'$'->line())";
-
-    const input = `${context.input.length > 0 ? " " + context.input : ""}`;
-    const async = `${
-      context.done || await fn.mode(denops) == "c" ? "" : " [async]"
-    }`;
-    const footer = `${input}${async}`;
-
-    if (floating || await op.laststatus.get(denops) === 0) {
-      if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
-        await vars.g.set(
-          denops,
-          "ddu#ui#ff#_save_title",
-          await op.titlestring.get(denops),
-        );
-      }
-
-      await denops.cmd(
-        `autocmd ${augroupName} WinClosed,BufLeave <buffer> ++nested` +
-          " call ddu#ui#ff#_restore_title()",
-      );
-      await denops.cmd(
-        `autocmd ${augroupName}` +
-          " WinEnter,BufEnter <buffer> ++nested" +
-          " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))",
-      );
-
-      const titleString = `${header} %*${footer}`;
-      await vars.b.set(denops, "ddu_ui_ff_title", titleString);
-
-      await denops.call("ddu#ui#ff#_set_title", bufnr);
-    } else {
-      await fn.setwinvar(
-        denops,
-        winid,
-        "&statusline",
-        `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${footer}`,
-      );
-    }
   }
 
   async #collapseItemAction(denops: Denops, options: DduOptions) {
@@ -2016,4 +1949,81 @@ async function getWinInfo(
     winid: await fn.win_getid(denops),
     tabpagebuflist: await fn.tabpagebuflist(denops) as number[],
   };
+}
+
+async function setStatusline(
+  denops: Denops,
+  context: Context,
+  options: DduOptions,
+  uiParams: Params,
+  winid: number,
+  floating: boolean,
+  augroupName: string,
+  items: DduItem[],
+): Promise<void> {
+  const statusState = {
+    done: context.done,
+    input: context.input,
+    name: options.name,
+    maxItems: context.maxItems,
+  };
+  await fn.setwinvar(
+    denops,
+    winid,
+    "ddu_ui_ff_status",
+    statusState,
+  );
+
+  if (!uiParams.statusline) {
+    return;
+  }
+
+  const header = `[ddu-${options.name}]` +
+    (items.length !== context.maxItems
+      ? ` ${items.length}/${context.maxItems}`
+      : "");
+
+  const linenr =
+    "printf('%'.(('$'->line())->len()+2).'d/%d','.'->line(),'$'->line())";
+
+  const input = `${context.input.length > 0 ? " " + context.input : ""}`;
+  const async = `${
+    context.done || await fn.mode(denops) == "c" ? "" : " [async]"
+  }`;
+  const footer = `${input}${async}`;
+
+  if (floating || await op.laststatus.get(denops) === 0) {
+    if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
+      await vars.g.set(
+        denops,
+        "ddu#ui#ff#_save_title",
+        await op.titlestring.get(denops),
+      );
+    }
+
+    await denops.cmd(
+      `autocmd ${augroupName} WinClosed,BufLeave <buffer>` +
+        " let &titlestring=g:ddu#ui#ff#_save_title",
+    );
+
+    const titleString = `${header} %{${linenr}}%*${footer}`;
+    await vars.b.set(denops, "ddu_ui_ff_title", titleString);
+
+    await denops.call(
+      "nvim_set_option",
+      "titlestring",
+      titleString,
+    );
+    await denops.cmd(
+      `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
+        " let &titlestring=b:->get('ddu_ui_ff_title', '')",
+    );
+  } else {
+    await fn.setwinvar(
+      denops,
+      winid,
+      "&statusline",
+      `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${footer}`,
+    );
+  }
 }
