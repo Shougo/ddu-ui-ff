@@ -1,32 +1,4 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
-let s:save_maps = {}
-
-function ddu#ui#ff#save_cmaps(keys) abort
-  let s:save_maps = {}
-  for key in a:keys
-    let s:save_maps[key] = key->maparg('c', v:false, v:true)
-  endfor
-endfunction
-function ddu#ui#ff#restore_cmaps() abort
-  for [key, map] in s:save_maps->items()
-    " Remove current map
-    let ff_map = key->maparg('c', v:false, v:true)
-    if !ff_map->empty()
-      if ff_map.buffer
-        execute 'cunmap' '<buffer>' key
-      else
-        execute 'cunmap' key
-      endif
-    endif
-
-    if !map->empty()
-      " Restore old map
-      call mapset('c', 0, map)
-    endif
-  endfor
-
-  let s:save_maps = {}
-endfunction
 
 function ddu#ui#ff#_update_buffer(
       \ params, bufnr, winid, lines, refreshed, pos) abort
