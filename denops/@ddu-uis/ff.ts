@@ -1714,9 +1714,14 @@ export class Ui extends BaseUi<Params> {
         ? ` ${this.#items.length}/${context.maxItems}`
         : "");
 
-    const footer = `${context.input.length > 0 ? " " + context.input : ""}${
+    const linenr =
+      "printf('%'.(('$'->line())->len()+2).'d/%d','.'->line(),'$'->line())";
+
+    const input = `${context.input.length > 0 ? " " + context.input : ""}`;
+    const async = `${
       context.done || await fn.mode(denops) == "c" ? "" : " [async]"
     }`;
+    const footer = `${input}${async}`;
 
     if (floating || await op.laststatus.get(denops) === 0) {
       if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
@@ -1737,13 +1742,11 @@ export class Ui extends BaseUi<Params> {
           " call ddu#ui#ff#_set_title(str2nr(expand('<abuf>')))",
       );
 
-      const titleString = `${header}${footer}`;
+      const titleString = `${header} %*${footer}`;
       await vars.b.set(denops, "ddu_ui_ff_title", titleString);
 
       await denops.call("ddu#ui#ff#_set_title", bufnr);
     } else {
-      const linenr =
-        "printf('%'.(('$'->line())->len()+2).'d/%d','.'->line(),'$'->line())";
       await fn.setwinvar(
         denops,
         winid,
