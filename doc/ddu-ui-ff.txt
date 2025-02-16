@@ -12,7 +12,6 @@ Interface		|ddu-ui-ff-interface|
   Actions		  |ddu-ui-ff-actions|
   Params		  |ddu-ui-ff-params|
   Params expression	  |ddu-ui-ff-params-expression|
-  Autocmds		  |ddu-ui-ff-autocmds|
 Examples		|ddu-ui-ff-examples|
 FAQ			|ddu-ui-ff-faq|
 Compatibility		|ddu-ui-ff-compatibility|
@@ -317,39 +316,6 @@ exprParams	(string[])
 		  "winWidth",
 		]
 
-                                        *ddu-ui-ff-param-filterUpdateCallback*
-filterUpdateCallback (string)
-		Specify the callback when update in the filter window.
-		The function argument is {input} and it returns the new input
-		string.
->vim
-	function! DduFilterCallback(input)
-	  if a:input->stridx('@') != 0
-	    return a:input
-	  endif
-	
-	  " Use file source instead.
-	  call ddu#ui#do_action('updateOptions', #{
-	        \   sources: [
-	        \     #{ name: 'file' },
-	        \   ],
-	        \ })
-	  call ddu#ui#do_action('redraw', #{ method: 'refreshItems' })
-	
-	  return a:input[1:]
-	endfunction
-<
-
-		Default: ""
-
-                                             *ddu-ui-ff-param-filterUpdateMax*
-filterUpdateMax	(number)
-		Specify the maximum item number to update in the filter
-		window.
-		If it is less than equal 0, the feature will be disabled.
-
-		Default: 0
-
                                               *ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
@@ -437,26 +403,6 @@ immediateAction (string)
 		NOTE: You need to set |ddu-option-sync|.  Because UI window
 		may be created before all sources are finished.
 		NOTE: It works only if the UI window is not visible.
-
-		Default: ""
-
-                                                   *ddu-ui-ff-param-inputFunc*
-inputFunc	(string)
-		Specify the input function name when
-		|ddu-ui-ff-action-openFilterWindow|.
-		For example: |cmdline#input()|
-		NOTE: The function must have the same interface as |input()|.
-
-		Default: "input"
-
-                                               *ddu-ui-ff-param-inputOptsFunc*
-inputOptsFunc	(string)
-		Specify the input({opts}) function name when
-		|ddu-ui-ff-action-openFilterWindow|.
-		For example: |cmdline#input_opts()|
-		NOTE: The function must have the same interface as |input()|
-		with {opts} argument.
-		NOTE: It is Neovim only.
 
 		Default: ""
 
@@ -601,13 +547,6 @@ previewWindowOptions	(list)
 			["&wrap", 0],
 		]
 
-                                                      *ddu-ui-ff-param-prompt*
-prompt		(string)
-		Specify the prompt in the filter window.
-		NOTE: It must be one or two width characters.
-
-		Default: ""
-
                                                   *ddu-ui-ff-param-replaceCol*
 replaceCol	(number)
 		Set the column position of the replace current text after
@@ -730,20 +669,6 @@ on the right side of the screen: >vim
 	    \   },
 	    \ })
 <
-
-------------------------------------------------------------------------------
-AUTOCMDS                                                  *ddu-ui-ff-autocmds*
-
-ddu-ui-ff defines some |User| autocmds.
-
-                                *ddu-ui-ff-autocmd-Ddu:ui:ff:openFilterWindow*
-Ddu:ui:ff:openFilterWindow
-		Called after |ddu-ui-ff-action-openFilterWindow| is called.
-
-                               *ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow*
-Ddu:ui:ff:closeFilterWindow
-		Called after filter window is closed.
-
 
 ==============================================================================
 EXAMPLES                                                  *ddu-ui-ff-examples*
@@ -870,17 +795,17 @@ A: You can use |input()| like this.
 Q: I want to call default action in the filter window.
 
 A: >vim
-	autocmd User Ddu:ui:ff:openFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	autocmd User Ddu:uiOpenFilterWindow
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  let s:save_cr = '<CR>'->maparg('c', v:false, v:true)
 
 	  cnoremap <CR>
 	      \ <ESC><Cmd>call ddu#ui#do_action('itemAction')<CR>
 	endfunction
-	autocmd User Ddu:ui:ff:closeFilterWindow
-	      \ call s:ddu_ff_filter_cleanup()
-	function s:ddu_ff_filter_cleanup() abort
+	autocmd User Ddu:uiCloseFilterWindow
+	      \ call s:ddu_filter_cleanup()
+	function s:ddu_filter_cleanup() abort
 	  if s:save_cr->empty()
 	    cunmap <CR>
 	  else
@@ -890,7 +815,7 @@ A: >vim
 <
 
 NOTE: You must restore keys when
-|ddu-ui-ff-autocmd-Ddu:ui:ff:closeFilterWindow|.
+|ddu-autocmd-Ddu:uiCloseFilterWindow|.
 
                                                              *ddu-ui-ff-faq-3*
 Q: I want to move the cursor in the filter window, while in insert mode.
@@ -898,9 +823,9 @@ Q: I want to move the cursor in the filter window, while in insert mode.
 A: Really? It is not the Vim way to move the cursor while in insert mode. You
 must force this behaviour.
 >vim
-	autocmd User Ddu:ui:ff:openFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	autocmd User Ddu:uiOpenFilterWindow
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  set cursorline
 
 	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
@@ -911,9 +836,9 @@ must force this behaviour.
 	        \ <Cmd>call ddu#ui#do_action('cursorPrevious')<CR>
 	endfunction
 
-	autocmd User Ddu:ui:ff:closeFilterWindow
-	      \ call s:ddu_ff_filter_cleanup()
-	function s:ddu_ff_filter_cleanup() abort
+	autocmd User Ddu:uiCloseFilterWindow
+	      \ call s:ddu_filter_cleanup()
+	function s:ddu_filter_cleanup() abort
 	  set nocursorline
 
 	  call ddu#ui#ff#restore_cmaps()
@@ -923,9 +848,9 @@ must force this behaviour.
 If you want to loop the cursor:
 NOTE: It does not support |ddu-ui-ff-param-reversed|.
 >vim
-	autocmd User Ddu:ui:ff:openFilterWindow
-	      \ call s:ddu_ff_filter_my_settings()
-	function s:ddu_ff_filter_my_settings() abort
+	autocmd User Ddu:uiOpenFilterWindow
+	      \ call s:ddu_filter_my_settings()
+	function s:ddu_filter_my_settings() abort
 	  setlocal cursorline
 
 	  call ddu#ui#ff#save_cmaps(['<C-j>', '<C-k>'])
@@ -1209,7 +1134,7 @@ Q: I want to change filter window position.
 
 A: "cmdline.vim" supports the feature.
 >vim
-	autocmd User Ddu:ui:ff:openFilterWindow call cmdline#enable()
+	autocmd User Ddu:uiOpenFilterWindow call cmdline#enable()
 <
                                                             *ddu-ui-ff-faq-27*
 Q: The filter input is cleared when I press <ESC> key.
@@ -1226,6 +1151,10 @@ You can prevent the behavior by |ddu-option-sync|.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2025.02.15
+* Move filter window feature into the ddu core.
+* Remove filter configuration from params.
 
 2024.05.28
 * Remove |ddu-ui-ff-param-split| floating window support in Vim.  Because it

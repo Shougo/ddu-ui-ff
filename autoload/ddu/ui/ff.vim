@@ -395,25 +395,6 @@ function ddu#ui#ff#_restore_cmdline(cmdline, cmdpos) abort
         \ "\<Left>"->repeat(a:cmdline->strchars() - a:cmdpos + 1))
 endfunction
 
-function ddu#ui#ff#_restore_title() abort
-  if !'g:ddu#ui#ff#_save_title'->exists()
-    return
-  endif
-
-  let &titlestring = g:ddu#ui#ff#_save_title
-endfunction
-function ddu#ui#ff#_set_title(bufnr, winid=win_getid()) abort
-  const title = getbufvar(a:bufnr, 'ddu_ui_ff_title', '')
-  if title ==# '' || &titlestring ==# title
-    return
-  endif
-
-  const linenr = "printf('%'.(len(line('$', "
-        \ .. a:winid .. "))).'d/%d',line('.', "
-        \ .. a:winid .. "),line('$', " .. a:winid .. "))"
-  let &titlestring = printf('%s %%{%s}', title, linenr)
-endfunction
-
 function ddu#ui#ff#_jump(winid, pattern, linenr) abort
   if a:pattern !=# ''
     call win_execute(a:winid,
@@ -429,86 +410,6 @@ function ddu#ui#ff#_jump(winid, pattern, linenr) abort
     call win_execute(a:winid, 'normal! zv')
     call win_execute(a:winid, 'normal! zz')
   endif
-endfunction
-
-function ddu#ui#ff#_open_filter_window(
-      \ params, input, name, length, history) abort
-  if !'s:filter_prev_input'->exists()
-    let s:filter_prev_input = a:input
-  endif
-  let s:filter_init_input = a:input
-  let s:filter_history = a:history
-  let s:filter_update_callback = a:params.filterUpdateCallback
-
-  let b:ddu_ui_name = a:name
-
-  augroup ddu-ui-ff-filter
-    autocmd!
-    autocmd User Ddu:ui:ff:openFilterWindow :
-    autocmd User Ddu:ui:ff:closeFilterWindow :
-  augroup END
-
-  if a:params.filterUpdateMax <= 0 || a:length <= a:params.filterUpdateMax
-    autocmd ddu-ui-ff-filter CmdlineChanged *
-          \ ++nested call s:update_input(
-          \   getcmdline(), s:filter_update_callback)
-  endif
-
-  doautocmd User Ddu:ui:ff:openFilterWindow
-
-  " NOTE: redraw is needed
-  redraw
-
-  let opts = #{
-        \   prompt: a:params.prompt,
-        \   default:  a:input,
-        \   completion:  'custom,ddu#ui#ff#complete_input',
-        \   cancelreturn:  a:input,
-        \ }
-
-  let new_input = a:params.inputOptsFunc ==# ''
-        \ ? a:params.inputFunc->call(
-        \    [opts.prompt, opts.default, opts.completion])
-        \ : a:params.inputOptsFunc->call([opts])
-
-  doautocmd User Ddu:ui:ff:closeFilterWindow
-
-  augroup ddu-ui-ff-filter
-    autocmd!
-  augroup END
-
-  let new_input = s:update_input(new_input, a:params.filterUpdateCallback)
-
-  return new_input
-endfunction
-function ddu#ui#ff#complete_input(arglead, cmdline, cursorpos) abort
-  return s:filter_history->join("\n")
-endfunction
-
-function s:update_input(input, callback) abort
-  let input = a:input
-  if a:callback !=# ''
-    let input = a:callback->call([input])
-  endif
-
-  if exists('s:filter_init_input')
-    " Check s:filter_init_input
-    " Because CmdlineChanged is called when default input
-    if s:filter_init_input !=# '' && input !=# s:filter_init_input
-      return input
-    endif
-
-    unlet s:filter_init_input
-  endif
-
-  if input ==# s:filter_prev_input || !'b:ddu_ui_name'->exists()
-    return input
-  endif
-
-  let s:filter_prev_input = input
-
-  call ddu#redraw(b:ddu_ui_name, #{ input: input })
-  return input
 endfunction
 
 let s:cursor_text = ''
