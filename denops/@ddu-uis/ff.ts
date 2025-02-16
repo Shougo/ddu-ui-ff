@@ -2008,12 +2008,8 @@ async function setStatusline(
 
     const titleString = `${header} %{${linenr}}%*${footer}`;
     await vars.b.set(denops, "ddu_ui_ff_title", titleString);
+    await op.titlestring.set(denops, titleString);
 
-    await denops.call(
-      "nvim_set_option",
-      "titlestring",
-      titleString,
-    );
     await denops.cmd(
       `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
         " let &titlestring=b:->get('ddu_ui_ff_title', '')",
