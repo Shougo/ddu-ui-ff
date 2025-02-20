@@ -1352,8 +1352,10 @@ export class Ui extends BaseUi<Params> {
     },
     toggleAllItems: async (args: {
       denops: Denops;
+      context: Context;
     }) => {
-      if (this.#items.length === 0) {
+      // It must not async.
+      if (!args.context.done || this.#items.length === 0) {
         return Promise.resolve(ActionFlags.None);
       }
 
@@ -1438,9 +1440,15 @@ export class Ui extends BaseUi<Params> {
     },
     toggleSelectItem: async (args: {
       denops: Denops;
+      context: Context;
       options: DduOptions;
       uiParams: Params;
     }) => {
+      // It must not async.
+      if (!args.context.done) {
+        return ActionFlags.None;
+      }
+
       const idx = await this.#getIndex(args.denops);
       if (idx < 0) {
         return ActionFlags.None;
