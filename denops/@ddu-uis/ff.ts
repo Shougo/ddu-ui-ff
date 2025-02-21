@@ -162,11 +162,54 @@ export type Params = {
   winWidth: ExprNumber;
 };
 
+class ObjectSet<T extends object> {
+  #items: T[] = [];
+
+  constructor(initialItems?: T[]) {
+    if (initialItems) {
+      initialItems.forEach((item) => this.add(item));
+    }
+  }
+
+  add(item: T): void {
+    if (!this.has(item)) {
+      this.#items.push(item);
+    }
+  }
+
+  has(item: T): boolean {
+    return this.#items.some((existingItem) => equal(existingItem, item));
+  }
+
+  clear(): void {
+    this.#items = [];
+  }
+
+  delete(item: T): boolean {
+    const index = this.#items.findIndex((existingItem) =>
+      equal(existingItem, item)
+    );
+    if (index !== -1) {
+      this.#items.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  values(): T[] {
+    return [...this.#items];
+  }
+
+  forEach(callback: (item: T, index: number, array: T[]) => void): void {
+    this.#items.forEach(callback);
+  }
+}
+
 export class Ui extends BaseUi<Params> {
   #bufferName = "";
   #items: DduItem[] = [];
   #viewItems: DduItem[] = [];
-  #selectedItems: Set<DduItem> = new Set();
+  #selectedItems: ObjectSet<DduItem> = new ObjectSet();
   #saveMode = "";
   #saveCmdline = "";
   #saveCmdpos = 0;
@@ -641,7 +684,7 @@ export class Ui extends BaseUi<Params> {
               prefix: getPrefix(item),
             };
           }).slice(0, args.uiParams.maxHighlightItems),
-          [...this.#selectedItems].map((item) => this.#getItemIndex(item))
+          this.#selectedItems.values().map((item) => this.#getItemIndex(item))
             .filter((index) => index >= 0),
         );
       });
@@ -1673,7 +1716,7 @@ export class Ui extends BaseUi<Params> {
   }
 
   #getSelectedItems(): DduItem[] {
-    return [...this.#selectedItems];
+    return this.#selectedItems.values();
   }
 
   async #getItems(denops: Denops): Promise<DduItem[]> {
@@ -1847,7 +1890,7 @@ export class Ui extends BaseUi<Params> {
 
   #getItemIndex(viewItem: DduItem): number {
     return this.#items.findIndex(
-      (item: DduItem) => item === viewItem,
+      (item: DduItem) => equal(item, viewItem),
     );
   }
 
@@ -1906,8 +1949,8 @@ export class Ui extends BaseUi<Params> {
   async #updateSelectedItems(
     denops: Denops,
   ) {
-    const setItems = new Set(this.#items);
-    const toDelete = new Set<DduItem>();
+    const setItems = new ObjectSet(this.#items);
+    const toDelete = new ObjectSet<DduItem>();
 
     this.#selectedItems.forEach((item) => {
       if (!setItems.has(item)) {
