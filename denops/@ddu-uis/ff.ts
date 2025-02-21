@@ -162,49 +162,6 @@ export type Params = {
   winWidth: ExprNumber;
 };
 
-class ObjectSet<T extends object> {
-  #items: T[] = [];
-
-  constructor(initialItems?: T[]) {
-    if (initialItems) {
-      initialItems.forEach((item) => this.add(item));
-    }
-  }
-
-  add(item: T): void {
-    if (!this.has(item)) {
-      this.#items.push(item);
-    }
-  }
-
-  has(item: T): boolean {
-    return this.#items.some((existingItem) => equal(existingItem, item));
-  }
-
-  clear(): void {
-    this.#items = [];
-  }
-
-  delete(item: T): boolean {
-    const index = this.#items.findIndex((existingItem) =>
-      equal(existingItem, item)
-    );
-    if (index !== -1) {
-      this.#items.splice(index, 1);
-      return true;
-    }
-    return false;
-  }
-
-  values(): T[] {
-    return [...this.#items];
-  }
-
-  forEach(callback: (item: T, index: number, array: T[]) => void): void {
-    this.#items.forEach(callback);
-  }
-}
-
 export class Ui extends BaseUi<Params> {
   #bufferName = "";
   #items: DduItem[] = [];
@@ -239,8 +196,10 @@ export class Ui extends BaseUi<Params> {
     } else {
       this.#saveCol = await fn.col(args.denops, ".") as number;
     }
+
     this.#items = [];
     await this.clearSelectedItems({ denops: args.denops });
+
     this.#enabledAutoAction = args.uiParams.startAutoAction;
 
     // Clear saved cursor
@@ -298,6 +257,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     await this.#updateSelectedItems(args.denops);
+
     this.#refreshed = true;
 
     return Promise.resolve();
@@ -2087,5 +2047,48 @@ async function setStatusline(
       "&statusline",
       `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${footer}`,
     );
+  }
+}
+
+class ObjectSet<T extends object> {
+  #items: T[] = [];
+
+  constructor(initialItems?: T[]) {
+    if (initialItems) {
+      initialItems.forEach((item) => this.add(item));
+    }
+  }
+
+  add(item: T): void {
+    if (!this.has(item)) {
+      this.#items.push(item);
+    }
+  }
+
+  has(item: T): boolean {
+    return this.#items.some((existingItem) => equal(existingItem, item));
+  }
+
+  clear(): void {
+    this.#items = [];
+  }
+
+  delete(item: T): boolean {
+    const index = this.#items.findIndex((existingItem) =>
+      equal(existingItem, item)
+    );
+    if (index !== -1) {
+      this.#items.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  values(): T[] {
+    return [...this.#items];
+  }
+
+  forEach(callback: (item: T, index: number, array: T[]) => void): void {
+    this.#items.forEach(callback);
   }
 }
