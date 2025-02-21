@@ -198,7 +198,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.#items = [];
-    await this.clearSelectedItems({ denops: args.denops });
+    await this.clearSelectedItems(args);
 
     this.#enabledAutoAction = args.uiParams.startAutoAction;
 
@@ -895,7 +895,7 @@ export class Ui extends BaseUi<Params> {
     clearSelectAllItems: async (args: {
       denops: Denops;
     }) => {
-      await this.clearSelectedItems({ denops: args.denops });
+      await this.clearSelectedItems(args);
 
       return Promise.resolve(ActionFlags.Redraw);
     },
@@ -1371,12 +1371,7 @@ export class Ui extends BaseUi<Params> {
         }
       });
 
-      await fn.setbufvar(
-        args.denops,
-        await this.#getBufnr(args.denops),
-        "ddu_ui_selected_items",
-        this.#getSelectedItems(),
-      );
+      await this.#updateSelectedItems(args.denops);
 
       return Promise.resolve(ActionFlags.Redraw);
     },
@@ -1458,12 +1453,7 @@ export class Ui extends BaseUi<Params> {
         this.#selectedItems.add(item);
       }
 
-      await fn.setbufvar(
-        args.denops,
-        await this.#getBufnr(args.denops),
-        "ddu_ui_selected_items",
-        this.#getSelectedItems(),
-      );
+      await this.#updateSelectedItems(args.denops);
 
       return ActionFlags.Redraw;
     },
@@ -1681,7 +1671,7 @@ export class Ui extends BaseUi<Params> {
 
   async #getItems(denops: Denops): Promise<DduItem[]> {
     let items: DduItem[];
-    if (this.#selectedItems.size === 0) {
+    if (this.#selectedItems.size() === 0) {
       const item = await this.#getItem(denops);
       if (!item) {
         return [];
@@ -2071,6 +2061,10 @@ class ObjectSet<T extends object> {
 
   clear(): void {
     this.#items = [];
+  }
+
+  size(): number {
+    return this.#items.length;
   }
 
   delete(item: T): boolean {
