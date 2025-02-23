@@ -195,7 +195,6 @@ redraw
                                              *ddu-ui-ff-action-toggleAllItems*
 toggleAllItems
 		Toggle selected state for the all items.
-		NOTE: It does not work when async mode.
 
                                            *ddu-ui-ff-action-toggleAutoAction*
 toggleAutoAction
@@ -208,7 +207,6 @@ togglePreview
                                            *ddu-ui-ff-action-toggleSelectItem*
 toggleSelectItem
 		Toggle selected state for cursor item.
-		NOTE: It does not work when async mode.
 
                                               *ddu-ui-ff-action-updateOptions*
 updateOptions

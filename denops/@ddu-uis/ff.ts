@@ -166,7 +166,7 @@ export class Ui extends BaseUi<Params> {
   #bufferName = "";
   #items: DduItem[] = [];
   #viewItems: DduItem[] = [];
-  #selectedItems: Set<number> = new Set();
+  #selectedItems: ObjectSet<DduItem> = new ObjectSet();
   #saveMode = "";
   #saveCmdline = "";
   #saveCmdpos = 0;
@@ -196,8 +196,10 @@ export class Ui extends BaseUi<Params> {
     } else {
       this.#saveCol = await fn.col(args.denops, ".") as number;
     }
+
     this.#items = [];
-    await this.#clearSelectedItems(args.denops);
+    await this.clearSelectedItems(args);
+
     this.#enabledAutoAction = args.uiParams.startAutoAction;
 
     // Clear saved cursor
@@ -254,7 +256,8 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    await this.#clearSelectedItems(args.denops);
+    await this.#updateSelectedItems(args.denops);
+
     this.#refreshed = true;
 
     return Promise.resolve();
@@ -641,7 +644,8 @@ export class Ui extends BaseUi<Params> {
               prefix: getPrefix(item),
             };
           }).slice(0, args.uiParams.maxHighlightItems),
-          [...this.#selectedItems],
+          this.#selectedItems.values().map((item) => this.#getItemIndex(item))
+            .filter((index) => index >= 0),
         );
       });
     } catch (e) {
@@ -693,7 +697,9 @@ export class Ui extends BaseUi<Params> {
   override async clearSelectedItems(args: {
     denops: Denops;
   }) {
-    await this.#clearSelectedItems(args.denops);
+    this.#selectedItems.clear();
+    const bufnr = await this.#getBufnr(args.denops);
+    await fn.setbufvar(args.denops, bufnr, "ddu_ui_selected_items", []);
   }
 
   override async quit(args: {
@@ -743,7 +749,7 @@ export class Ui extends BaseUi<Params> {
       this.#items = this.#items.concat(insertItems);
     }
 
-    await this.#clearSelectedItems(args.denops);
+    await this.#updateSelectedItems(args.denops);
 
     return Promise.resolve(prevLength - this.#items.length);
   }
@@ -777,7 +783,7 @@ export class Ui extends BaseUi<Params> {
 
     this.#items[startIndex] = args.item;
 
-    await this.#clearSelectedItems(args.denops);
+    await this.#updateSelectedItems(args.denops);
 
     return Promise.resolve(prevLength - this.#items.length);
   }
@@ -889,7 +895,7 @@ export class Ui extends BaseUi<Params> {
     clearSelectAllItems: async (args: {
       denops: Denops;
     }) => {
-      await this.#clearSelectedItems(args.denops);
+      await this.clearSelectedItems(args);
 
       return Promise.resolve(ActionFlags.Redraw);
     },
@@ -1352,27 +1358,20 @@ export class Ui extends BaseUi<Params> {
     },
     toggleAllItems: async (args: {
       denops: Denops;
-      context: Context;
     }) => {
-      // It must not async.
-      if (!args.context.done || this.#items.length === 0) {
+      if (this.#items.length === 0) {
         return Promise.resolve(ActionFlags.None);
       }
 
-      this.#items.forEach((_, idx) => {
-        if (this.#selectedItems.has(idx)) {
-          this.#selectedItems.delete(idx);
+      this.#items.forEach((item) => {
+        if (this.#selectedItems.has(item)) {
+          this.#selectedItems.delete(item);
         } else {
-          this.#selectedItems.add(idx);
+          this.#selectedItems.add(item);
         }
       });
 
-      await fn.setbufvar(
-        args.denops,
-        await this.#getBufnr(args.denops),
-        "ddu_ui_selected_items",
-        this.#getSelectedItems(),
-      );
+      await this.#updateSelectedItems(args.denops);
 
       return Promise.resolve(ActionFlags.Redraw);
     },
@@ -1440,32 +1439,21 @@ export class Ui extends BaseUi<Params> {
     },
     toggleSelectItem: async (args: {
       denops: Denops;
-      context: Context;
       options: DduOptions;
       uiParams: Params;
     }) => {
-      // It must not async.
-      if (!args.context.done) {
+      const item = await this.#getItem(args.denops);
+      if (!item) {
         return ActionFlags.None;
       }
 
-      const idx = await this.#getIndex(args.denops);
-      if (idx < 0) {
-        return ActionFlags.None;
-      }
-
-      if (this.#selectedItems.has(idx)) {
-        this.#selectedItems.delete(idx);
+      if (this.#selectedItems.has(item)) {
+        this.#selectedItems.delete(item);
       } else {
-        this.#selectedItems.add(idx);
+        this.#selectedItems.add(item);
       }
 
-      await fn.setbufvar(
-        args.denops,
-        await this.#getBufnr(args.denops),
-        "ddu_ui_selected_items",
-        this.#getSelectedItems(),
-      );
+      await this.#updateSelectedItems(args.denops);
 
       return ActionFlags.Redraw;
     },
@@ -1678,12 +1666,12 @@ export class Ui extends BaseUi<Params> {
   }
 
   #getSelectedItems(): DduItem[] {
-    return [...this.#selectedItems].map((i) => this.#items[i]);
+    return this.#selectedItems.values();
   }
 
   async #getItems(denops: Denops): Promise<DduItem[]> {
     let items: DduItem[];
-    if (this.#selectedItems.size === 0) {
+    if (this.#selectedItems.size() === 0) {
       const item = await this.#getItem(denops);
       if (!item) {
         return [];
@@ -1850,6 +1838,12 @@ export class Ui extends BaseUi<Params> {
     );
   }
 
+  #getItemIndex(viewItem: DduItem): number {
+    return this.#items.findIndex(
+      (item: DduItem) => equal(item, viewItem),
+    );
+  }
+
   async #doAutoAction(denops: Denops) {
     if (this.#enabledAutoAction) {
       await denops.call("ddu#ui#ff#_do_auto_action");
@@ -1902,12 +1896,26 @@ export class Ui extends BaseUi<Params> {
     await this.updateCursor({ denops });
   }
 
-  async #clearSelectedItems(
+  async #updateSelectedItems(
     denops: Denops,
   ) {
-    this.#selectedItems.clear();
-    const bufnr = await this.#getBufnr(denops);
-    await fn.setbufvar(denops, bufnr, "ddu_ui_selected_items", []);
+    const setItems = new ObjectSet(this.#items);
+    const toDelete = new ObjectSet<DduItem>();
+
+    this.#selectedItems.forEach((item) => {
+      if (!setItems.has(item)) {
+        toDelete.add(item);
+      }
+    });
+
+    toDelete.forEach((item) => this.#selectedItems.delete(item));
+
+    await fn.setbufvar(
+      denops,
+      await this.#getBufnr(denops),
+      "ddu_ui_selected_items",
+      this.#getSelectedItems(),
+    );
   }
 }
 
@@ -2029,5 +2037,52 @@ async function setStatusline(
       "&statusline",
       `${header.replaceAll("%", "%%")} %#LineNR#%{${linenr}}%*${footer}`,
     );
+  }
+}
+
+class ObjectSet<T extends object> {
+  #items: T[] = [];
+
+  constructor(initialItems?: T[]) {
+    if (initialItems) {
+      initialItems.forEach((item) => this.add(item));
+    }
+  }
+
+  add(item: T): void {
+    if (!this.has(item)) {
+      this.#items.push(item);
+    }
+  }
+
+  has(item: T): boolean {
+    return this.#items.some((existingItem) => equal(existingItem, item));
+  }
+
+  clear(): void {
+    this.#items = [];
+  }
+
+  size(): number {
+    return this.#items.length;
+  }
+
+  delete(item: T): boolean {
+    const index = this.#items.findIndex((existingItem) =>
+      equal(existingItem, item)
+    );
+    if (index !== -1) {
+      this.#items.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  values(): T[] {
+    return [...this.#items];
+  }
+
+  forEach(callback: (item: T, index: number, array: T[]) => void): void {
+    this.#items.forEach(callback);
   }
 }
