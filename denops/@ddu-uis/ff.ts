@@ -11,11 +11,11 @@ import {
 import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~10.0.0/ui";
 import { printError } from "jsr:@shougo/ddu-vim@~10.0.0/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.4.0";
-import { batch } from "jsr:@denops/std@~7.4.0/batch";
-import * as op from "jsr:@denops/std@~7.4.0/option";
-import * as fn from "jsr:@denops/std@~7.4.0/function";
-import * as vars from "jsr:@denops/std@~7.4.0/variable";
+import type { Denops } from "jsr:@denops/std@~7.5.0";
+import { batch } from "jsr:@denops/std@~7.5.0/batch";
+import * as op from "jsr:@denops/std@~7.5.0/option";
+import * as fn from "jsr:@denops/std@~7.5.0/function";
+import * as vars from "jsr:@denops/std@~7.5.0/variable";
 
 import { equal } from "jsr:@std/assert@~1.0.2";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
@@ -1322,6 +1322,8 @@ export class Ui extends BaseUi<Params> {
         uiParams: args.uiParams,
         cancel: true,
       });
+
+      await args.denops.cmd("doautocmd <nomodeline> User Ddu:uiQuit");
 
       if (params.force) {
         const bufnr = await this.#getBufnr(args.denops);

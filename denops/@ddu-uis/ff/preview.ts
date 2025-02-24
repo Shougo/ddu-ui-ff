@@ -11,11 +11,11 @@ import {
 } from "jsr:@shougo/ddu-vim@~10.0.0/types";
 import { printError } from "jsr:@shougo/ddu-vim@~10.0.0/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.4.0";
-import { batch } from "jsr:@denops/std@~7.4.0/batch";
-import { replace } from "jsr:@denops/std@~7.4.0/buffer";
-import * as op from "jsr:@denops/std@~7.4.0/option";
-import * as fn from "jsr:@denops/std@~7.4.0/function";
+import type { Denops } from "jsr:@denops/std@~7.5.0";
+import { batch } from "jsr:@denops/std@~7.5.0/batch";
+import { replace } from "jsr:@denops/std@~7.5.0/buffer";
+import * as op from "jsr:@denops/std@~7.5.0/option";
+import * as fn from "jsr:@denops/std@~7.5.0/function";
 
 import { equal } from "jsr:@std/assert@~1.0.2/equal";
 import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
