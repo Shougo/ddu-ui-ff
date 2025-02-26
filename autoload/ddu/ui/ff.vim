@@ -157,13 +157,15 @@ function ddu#ui#ff#_highlight(
   endif
 
   if has('nvim')
-    call nvim_buf_add_highlight(
+    call nvim_buf_set_extmark(
           \   a:bufnr,
           \   a:id,
-          \   a:highlight,
           \   a:row - 1,
           \   a:col - 1,
-          \   a:col - 1 + a:length
+          \   #{
+          \     end_col: a:col - 1 + a:length,
+          \     hl_group: a:highlight,
+          \   }
           \ )
   else
     call prop_add(a:row, a:col, #{
