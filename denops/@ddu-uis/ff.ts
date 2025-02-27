@@ -417,7 +417,7 @@ export class Ui extends BaseUi<Params> {
       }
     } else if (floating) {
       // statusline must be set for floating window
-      const currentStatusline = await op.statusline.get(args.denops);
+      const currentStatusline = await op.statusline.getLocal(args.denops);
       const floatingHighlight = args.uiParams.highlights?.floating ??
         "NormalFloat";
       const borderHighlight = args.uiParams.highlights?.floatingBorder ??
@@ -437,7 +437,8 @@ export class Ui extends BaseUi<Params> {
           "title_pos": args.uiParams.floatingTitlePos,
         };
         if (
-          prevWinid >= 0 && await fn.bufwinid(args.denops, bufnr) === prevWinid
+          this.#popupId >= 0 &&
+          await fn.bufwinid(args.denops, bufnr) === this.#popupId
         ) {
           await args.denops.call(
             "nvim_win_set_config",
@@ -486,7 +487,10 @@ export class Ui extends BaseUi<Params> {
           default:
             winOpts["borderchars"] = args.uiParams.floatingBorder;
         }
-        if (prevWinid >= 0) {
+        if (
+          this.#popupId >= 0 &&
+          await fn.bufwinid(args.denops, bufnr) === this.#popupId
+        ) {
           await args.denops.call(
             "popup_move",
             this.#popupId,
@@ -1836,7 +1840,7 @@ export class Ui extends BaseUi<Params> {
 
     const viewItem = this.#viewItems[cursorPos[1] - 1];
     return this.#items.findIndex(
-      (item: DduItem) => item === viewItem,
+      (item: DduItem) => equal(item, viewItem),
     );
   }
 
@@ -2010,12 +2014,12 @@ async function setStatusline(
   }`;
   const footer = `${input}${async}`;
 
-  if (floating || await op.laststatus.get(denops) === 0) {
+  if (floating || await op.laststatus.getGlobal(denops) === 0) {
     if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
       await vars.g.set(
         denops,
         "ddu#ui#ff#_save_title",
-        await op.titlestring.get(denops),
+        await op.titlestring.getGlobal(denops),
       );
     }
 
@@ -2026,7 +2030,7 @@ async function setStatusline(
 
     const titleString = `${header} %{${linenr}}%*${footer}`;
     await vars.b.set(denops, "ddu_ui_ff_title", titleString);
-    await op.titlestring.set(denops, titleString);
+    await op.titlestring.setGlobal(denops, titleString);
 
     await denops.cmd(
       `autocmd ${augroupName} WinEnter,BufEnter <buffer>` +
@@ -2047,7 +2051,7 @@ class ObjectSet<T extends object> {
 
   constructor(initialItems?: T[]) {
     if (initialItems) {
-      initialItems.forEach((item) => this.add(item));
+      this.#items = [...initialItems];
     }
   }
 

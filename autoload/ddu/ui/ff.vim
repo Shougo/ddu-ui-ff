@@ -95,7 +95,8 @@ function ddu#ui#ff#_process_items(
           \ selected_highlight, 'ddu-ui-selected', 10000,
           \ s:namespace, a:bufnr,
           \ a:params.reversed ? a:max_lines - item_nr : item_nr + 1,
-          \ 1, 1000)
+          \ 1,
+          \ 0)
   endfor
 
   " NOTE: :redraw is needed
@@ -103,6 +104,11 @@ function ddu#ui#ff#_process_items(
 endfunction
 
 function s:add_info_texts(bufnr, info, row) abort
+  if a:row <= 0 || a:row > line('$')
+    " Invalid range
+    return
+  endif
+
   if has('nvim')
     call nvim_buf_set_extmark(0, s:namespace, a:row - 1, 0, #{
           \   virt_lines: a:info->copy()->map({ _, val ->
@@ -144,6 +150,17 @@ function ddu#ui#ff#_highlight(
     return
   endif
 
+  if a:row <= 0 || a:col <= 0 || a:row > line('$')
+    " Invalid range
+    return
+  endif
+
+  const max_col = getline(a:row)->len()
+  const length =
+        \   a:length <= 0 || a:col + a:length > max_col
+        \ ? max_col - a:col + 1
+        \ : a:length
+
   if !has('nvim')
     " Add prop_type
     if a:prop_type->prop_type_get(#{ bufnr: a:bufnr })->empty()
@@ -163,13 +180,13 @@ function ddu#ui#ff#_highlight(
           \   a:row - 1,
           \   a:col - 1,
           \   #{
-          \     end_col: a:col - 1 + a:length,
+          \     end_col: a:col - 1 + length,
           \     hl_group: a:highlight,
           \   }
           \ )
   else
     call prop_add(a:row, a:col, #{
-          \   length: a:length,
+          \   length: length,
           \   type: a:prop_type,
           \   bufnr: a:bufnr,
           \   id: a:id,
