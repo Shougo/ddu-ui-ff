@@ -460,6 +460,14 @@ previewFloatingZindex		(number)
 
 		Default: 100
 
+                                            *ddu-ui-ff-param-previewFocusable*
+previewFocusable (boolean)
+		Focusable preview window in |ddu-ui-ff-action-preview| if
+		|ddu-ui-ff-param-previewFloating| is v:true.
+		NOTE: It is Neovim only.
+
+		Default: v:true
+
                                                *ddu-ui-ff-param-previewHeight*
 previewHeight	(number)
 		Set the height of the |preview-window| in

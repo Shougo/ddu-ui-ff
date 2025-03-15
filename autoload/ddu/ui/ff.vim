@@ -253,7 +253,8 @@ function ddu#ui#ff#_open_preview_window(
               \   title_pos: a:params.previewFloatingTitlePos,
               \   zindex: a:params.previewFloatingZindex,
               \ }
-        const winid = nvim_open_win(a:preview_bufnr, v:true, winopts)
+        const winid = nvim_open_win(
+              \ a:preview_bufnr, a:params.previewFocusable, winopts)
       else
         const winopts = #{
               \   pos: 'topleft',
