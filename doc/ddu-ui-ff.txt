@@ -1110,7 +1110,8 @@ function.
 	autocmd User Ddu:uiDone ++nested
 	      \ call ddu#ui#async_action('openFilterWindow')
 <
-NOTE: It must be |ddu#ui#async_action()|.
+NOTE: It must be |ddu#ui#async_action()|.  Because, in
+|ddu-autocmd-Ddu:uiDone| autocmd, the redraw is locked.
 
                                                             *ddu-ui-ff-faq-25*
 Q: I want to change filter window position.

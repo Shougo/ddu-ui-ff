@@ -1742,11 +1742,13 @@ export class Ui extends BaseUi<Params> {
       denops,
       uiParams,
     });
+    const tabNr = await fn.tabpagenr(denops);
     const existsStatusColumn = await fn.exists(denops, "+statuscolumn");
     const existsWinFixBuf = await fn.exists(denops, "+winfixbuf");
 
     await batch(denops, async (denops: Denops) => {
       await fn.setbufvar(denops, bufnr, "ddu_ui_name", options.name);
+      await fn.settabvar(denops, tabNr, "ddu_ui_name", options.name);
 
       // Set options
       await fn.setwinvar(denops, winid, "&list", 0);
