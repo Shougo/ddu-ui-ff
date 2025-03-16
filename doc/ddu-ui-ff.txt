@@ -1102,8 +1102,9 @@ A: You need to set |ddu-ui-ff-param-autoAction| like this. >vim
                                                             *ddu-ui-ff-faq-24*
 Q: I want to start filter window when UI is initialized.
 
-A: It is not supported.  Because it has too many problems.  But you can use
-the function.
+A: Unlike other fuzzy finders UI, it is not supported in ddu-ui-ff.  Because
+it has too many asynchronous problems.  It is unstable.  But you can use the
+function.
 >vim
 	call ddu#start()
 	autocmd User Ddu:uiDone ++nested
