@@ -861,6 +861,8 @@ export class Ui extends BaseUi<Params> {
     const item = await this.#getItem(args.denops);
     const bufnr = await this.#getBufnr(args.denops);
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", item ?? {});
+
+    await args.denops.call("ddu#ui#ff#_update_cursor");
   }
 
   override actions: UiActions<Params> = {
