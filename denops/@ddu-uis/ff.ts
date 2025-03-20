@@ -279,7 +279,7 @@ export class Ui extends BaseUi<Params> {
     const pos = this.#items.findIndex(
       (item) =>
         equal(convertTreePath(item.treePath ?? item.word), itemTreePath),
-    ) + 1;
+    );
 
     if (pos <= 0) {
       return;
