@@ -1231,6 +1231,11 @@ export class Ui extends BaseUi<Params> {
 
       const actionParams = args.actionParams as OpenFilterWindowParams;
 
+      // NOTE: Reset saved item when filtering.
+      // Because when filtering, the cursor position should not be restored.
+      const bufnr = await fn.bufnr(args.denops, this.#bufferName);
+      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", {});
+
       args.context.input = await args.denops.call(
         "ddu#ui#_open_filter_window",
         args.uiOptions,
