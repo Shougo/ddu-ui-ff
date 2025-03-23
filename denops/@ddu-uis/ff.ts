@@ -274,21 +274,28 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    // NOTE: Use treePath to search item.  Because item state may be changed.
-    const itemTreePath = convertTreePath(args.item.treePath ?? args.item.word);
-    const pos = this.#items.findIndex(
-      (item) =>
-        equal(convertTreePath(item.treePath ?? item.word), itemTreePath),
+    let index = this.#items.findIndex(
+      (item) => equal(item, args.item),
     );
+    if (index <= 0) {
+      // NOTE: Use treePath to search item.  Because item state may be changed.
+      const itemTreePath = convertTreePath(
+        args.item.treePath ?? args.item.word,
+      );
+      index = this.#items.findIndex(
+        (item) =>
+          equal(convertTreePath(item.treePath ?? item.word), itemTreePath),
+      );
+    }
 
-    if (pos <= 0) {
+    if (index <= 0) {
       return;
     }
 
     // NOTE: cursorPos is not same with item pos when reversed.
     const cursorPos = args.uiParams.reversed
-      ? this.#items.length - pos
-      : pos + 1;
+      ? this.#items.length - index
+      : index + 1;
 
     const winHeight = await fn.winheight(args.denops, 0);
     const maxLine = await fn.line(args.denops, "$");
