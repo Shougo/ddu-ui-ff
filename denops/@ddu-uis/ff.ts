@@ -556,10 +556,7 @@ export class Ui extends BaseUi<Params> {
         await fn.win_gotoid(args.denops, prevWinid);
       } else {
         // NOTE: ":tabnew" creates new empty buffer.
-        await args.denops.cmd("tabnew");
-        const emptyBufnr = await fn.bufnr(args.denops);
-        await args.denops.cmd(`silent keepalt buffer ${bufnr}`);
-        await args.denops.cmd(`bwipeout ${emptyBufnr}`);
+        await args.denops.cmd(`silent keepalt tab sbuffer ${bufnr}`);
       }
     } else if (args.uiParams.split === "no") {
       if (prevWinid < 0) {
