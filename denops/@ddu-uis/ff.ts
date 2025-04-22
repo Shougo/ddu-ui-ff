@@ -203,11 +203,7 @@ export class Ui extends BaseUi<Params> {
 
     this.#enabledAutoAction = args.uiParams.startAutoAction;
 
-    // Clear saved cursor
-    const bufnr = await fn.bufnr(args.denops, this.#bufferName);
-    if (bufnr > 0) {
-      await fn.setbufvar(args.denops, bufnr, "ddu_ui_item", {});
-    }
+    await this.#clearSavedCursor(args.denops);
   }
 
   override async onBeforeAction(args: {
@@ -260,6 +256,8 @@ export class Ui extends BaseUi<Params> {
     await this.#updateSelectedItems(args.denops);
 
     this.#refreshed = true;
+
+    await this.#clearSavedCursor(args.denops);
 
     return Promise.resolve();
   }
@@ -689,17 +687,17 @@ export class Ui extends BaseUi<Params> {
       {},
     ) as DduItem;
 
-    if (!initialized || cursorPos > 0) {
-      // Update current cursor
-      await this.updateCursor({ denops: args.denops });
-    }
-
     if (cursorPos <= 0 && Object.keys(saveItem).length !== 0) {
       this.searchItem({
         denops: args.denops,
         item: saveItem,
         uiParams: args.uiParams,
       });
+    }
+
+    if (!initialized || cursorPos > 0) {
+      // Update current cursor
+      await this.updateCursor({ denops: args.denops });
     }
 
     await this.#doAutoAction(args.denops);
@@ -867,6 +865,7 @@ export class Ui extends BaseUi<Params> {
 
   override async updateCursor(args: {
     denops: Denops;
+    context: Context;
   }) {
     const item = await this.#getItem(args.denops);
     const bufnr = await this.#getBufnr(args.denops);
@@ -1941,6 +1940,13 @@ export class Ui extends BaseUi<Params> {
       "ddu_ui_selected_items",
       this.#getSelectedItems(),
     );
+  }
+
+  async #clearSavedCursor(denops: Denops) {
+    const bufnr = await fn.bufnr(denops, this.#bufferName);
+    if (bufnr > 0) {
+      await fn.setbufvar(denops, bufnr, "ddu_ui_item", {});
+    }
   }
 }
 
