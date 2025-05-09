@@ -20,6 +20,7 @@ import * as vars from "jsr:@denops/std@~7.5.0/variable";
 import { equal } from "jsr:@std/assert@~1.0.2";
 import { is } from "jsr:@core/unknownutil@~4.3.0/is";
 import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
+import { ensure } from "jsr:@denops/std@~7.5.0/buffer";
 
 import { PreviewUi } from "./ff/preview.ts";
 
@@ -640,31 +641,34 @@ export class Ui extends BaseUi<Params> {
         (args.uiParams.reversed && this.#items.length !== this.#prevLength);
       // NOTE: Use batch for screen flicker when highlight items.
       await batch(args.denops, async (denops: Denops) => {
-        await denops.call(
-          "ddu#ui#ff#_update_buffer",
-          args.uiParams,
-          bufnr,
-          winid,
-          this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-          args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
-          cursorPos,
-        );
-        await denops.call(
-          "ddu#ui#ff#_process_items",
-          args.uiParams,
-          bufnr,
-          this.#items.length,
-          this.#items.map((item, index) => {
-            return {
-              highlights: item.highlights ?? [],
-              info: item.info ?? [],
-              row: index + 1,
-              prefix: getPrefix(item),
-            };
-          }).slice(0, args.uiParams.maxHighlightItems),
-          this.#selectedItems.values().map((item) => this.#getItemIndex(item))
-            .filter((index) => index >= 0),
-        );
+        await ensure(args.denops, bufnr, async () => {
+          await denops.call(
+            "ddu#ui#ff#_update_buffer",
+            args.uiParams,
+            bufnr,
+            winid,
+            this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
+            cursorPos,
+          );
+          await denops.call(
+            "ddu#ui#ff#_process_items",
+            args.uiParams,
+            bufnr,
+            this.#items.length,
+            this.#items.map((item, index) => {
+              return {
+                highlights: item.highlights ?? [],
+                info: item.info ?? [],
+                row: index + 1,
+                prefix: getPrefix(item),
+              };
+            }).slice(0, args.uiParams.maxHighlightItems),
+            this.#selectedItems.values()
+              .map((item) => this.#getItemIndex(item))
+              .filter((index) => index >= 0),
+          );
+        });
       });
     } catch (e) {
       await printError(
