@@ -1618,7 +1618,10 @@ export class Ui extends BaseUi<Params> {
           continue;
         }
 
-        if (args.uiParams.split === "no") {
+        if (
+          args.uiParams.split === "no" ||
+          await fn.win_id2win(args.denops, args.context.winId) <= 0
+        ) {
           await fn.win_gotoid(args.denops, winid);
 
           const prevName = await fn.bufname(args.denops, args.context.bufNr);
