@@ -576,7 +576,11 @@ export class Ui extends BaseUi<Params> {
 
     await this.#setAutoAction(args.denops, args.uiParams, winid);
 
-    if (args.uiParams.autoResize && await fn.winnr(args.denops, "$") > 1) {
+    const prevWinnr = await fn.winnr(args.denops, "#");
+    if (
+      args.uiParams.autoResize && prevWinnr > 0 &&
+      prevWinnr !== await fn.winnr(args.denops)
+    ) {
       await fn.win_execute(
         args.denops,
         winid,
@@ -1614,11 +1618,7 @@ export class Ui extends BaseUi<Params> {
           continue;
         }
 
-        if (
-          (args.uiParams.split === "no" ||
-            args.uiParams.split !== "tab" &&
-              (await fn.winnr(args.denops, "$")) === 1)
-        ) {
+        if (args.uiParams.split === "no") {
           await fn.win_gotoid(args.denops, winid);
 
           const prevName = await fn.bufname(args.denops, args.context.bufNr);

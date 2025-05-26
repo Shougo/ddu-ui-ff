@@ -37,7 +37,10 @@ export class PreviewUi {
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
-    if (this.visible() && (await fn.winnr(denops, "$")) !== 1) {
+    const prevWinnr = await fn.winnr(denops, "#");
+    if (
+      this.visible() && prevWinnr > 0 && prevWinnr !== await fn.winnr(denops)
+    ) {
       if (uiParams.previewFloating && denops.meta.host !== "nvim") {
         await denops.call("popup_close", this.#previewWinId);
       } else {
