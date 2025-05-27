@@ -37,28 +37,27 @@ export class PreviewUi {
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
-    const prevWinnr = await fn.winnr(denops, "#");
-    if (
-      this.visible() && prevWinnr > 0 && prevWinnr !== await fn.winnr(denops)
-    ) {
-      if (uiParams.previewFloating && denops.meta.host !== "nvim") {
-        await denops.call("popup_close", this.#previewWinId);
-      } else {
-        const saveId = await fn.win_getid(denops);
-        await batch(denops, async (denops) => {
-          await fn.win_gotoid(denops, this.#previewWinId);
-          if (this.#previewWinId === context.winId) {
-            await denops.cmd(
-              context.bufName === "" ? "enew" : `buffer ${context.bufNr}`,
-            );
-          } else {
-            await denops.cmd("close!");
-          }
-          await fn.win_gotoid(denops, saveId);
-        });
-      }
-      this.#previewWinId = -1;
+    if (!this.visible()) {
+      return;
     }
+
+    if (uiParams.previewFloating && denops.meta.host !== "nvim") {
+      await denops.call("popup_close", this.#previewWinId);
+    } else {
+      const saveId = await fn.win_getid(denops);
+      await batch(denops, async (denops) => {
+        await fn.win_gotoid(denops, this.#previewWinId);
+        if (this.#previewWinId === context.winId) {
+          await denops.cmd(
+            context.bufName === "" ? "enew" : `buffer ${context.bufNr}`,
+          );
+        } else {
+          await denops.cmd("close!");
+        }
+        await fn.win_gotoid(denops, saveId);
+      });
+    }
+    this.#previewWinId = -1;
   }
 
   async removePreviewedBuffers(denops: Denops) {
