@@ -1622,7 +1622,7 @@ export class Ui extends BaseUi<Params> {
           (args.uiParams.split === "tab" &&
             await fn.tabpagenr(args.denops, "$") > 1) ||
           (args.uiParams.split !== "no" &&
-            await fn.win_id2win(args.denops, args.context.winId) <= 0)
+            await fn.winnr(args.denops, "$") > 1)
         ) {
           await fn.win_gotoid(args.denops, winid);
           await args.denops.cmd("close!");
@@ -1631,6 +1631,8 @@ export class Ui extends BaseUi<Params> {
           await fn.win_gotoid(args.denops, args.context.winId);
         } else {
           await fn.win_gotoid(args.denops, winid);
+
+          await fn.setwinvar(args.denops, winid, "&winfixbuf", false);
 
           const prevName = await fn.bufname(args.denops, args.context.bufNr);
           await args.denops.cmd(
