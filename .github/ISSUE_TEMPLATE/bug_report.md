@@ -1,3 +1,11 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: bug
+assignees: ''
+---
+
 **Warning: I will close the issue without the minimal init.vim and the
 reproduction instructions.**
 
@@ -7,7 +15,7 @@ reproduction instructions.**
 
 ## Environment Information
 
-- ddu-ui-ff version (SHA1):
+- ddu.vim version (SHA1):
 
 - denops.vim version (SHA1):
 
@@ -15,16 +23,16 @@ reproduction instructions.**
 
 - OS:
 
-- neovim/Vim `:version` output:
+- Neovim/Vim `:version` output:
 
 ## Provide a minimal init.vim/vimrc without plugin managers (Required!)
 
 ```vim
 " Your minimal init.vim/vimrc
-set runtimepath+=~/path/to/ddu-ui-ff
+set runtimepath+=~/path/to/ddu.vim/
 ```
 
-## How to reproduce the problem from neovim/Vim startup (Required!)
+## How to reproduce the problem from Neovim/Vim startup (Required!)
 
 1. foo
 2. bar
