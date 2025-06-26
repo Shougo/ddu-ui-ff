@@ -18,11 +18,16 @@ function ddu#ui#ff#_update_buffer(
         call setbufline(a:bufnr, 1, [''])
       endif
     else
+      const footer_width = a:params.maxWidth / 3
+      const lines = a:lines->map({ _, val ->
+            \   ddu#ui#ff#_truncate(
+            \     val, a:params.maxWidth, footer_width, '..')
+            \ })
       call setbufline(a:bufnr, 1,
-            \ a:params.reversed ? reverse(a:lines) : a:lines)
+            \ a:params.reversed ? reverse(lines) : lines)
 
-      if current_lines > a:lines->len()
-        silent call deletebufline(a:bufnr, a:lines->len() + 1, '$')
+      if current_lines > lines->len()
+        silent call deletebufline(a:bufnr, lines->len() + 1, '$')
       endif
     endif
   catch
@@ -477,4 +482,45 @@ function s:stop_debounce_timer(timer_name) abort
     silent! call timer_stop({a:timer_name})
     unlet {a:timer_name}
   endif
+endfunction
+
+function ddu#ui#ff#_truncate(str, max, footer_width, separator) abort
+  const width = a:str->strwidth()
+  if width <= a:max
+    const ret = a:str
+  else
+    const header_width = a:max - a:separator->strwidth() - a:footer_width
+    const ret = s:strwidthpart(a:str, header_width) .. a:separator
+         \ .. s:strwidthpart_reverse(a:str, a:footer_width)
+  endif
+  return s:truncate(ret, a:max)
+endfunction
+function s:truncate(str, width) abort
+  " Original function is from mattn.
+  " http://github.com/mattn/googlereader-vim/tree/master
+
+  if a:str =~# '^[\x00-\x7f]*$'
+    return a:str->len() < a:width
+          \ ? printf('%-' .. a:width .. 's', a:str)
+          \ : a:str->strpart(0, a:width)
+  endif
+
+  let ret = a:str
+  let width = a:str->strwidth()
+  if width > a:width
+    let ret = s:strwidthpart(ret, a:width)
+    let width = ret->strwidth()
+  endif
+
+  return ret
+endfunction
+function s:strwidthpart(str, width) abort
+  const str = a:str->tr("\t", ' ')
+  const vcol = a:width + 2
+  return str->matchstr('.*\%<' .. (vcol < 0 ? 0 : vcol) .. 'v')
+endfunction
+function s:strwidthpart_reverse(str, width) abort
+  const str = a:str->tr("\t", ' ')
+  const vcol = str->strwidth() - a:width
+  return str->matchstr('\%>' .. (vcol < 0 ? 0 : vcol) .. 'v.*')
 endfunction

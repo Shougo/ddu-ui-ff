@@ -402,6 +402,12 @@ maxHighlightItems (number)
 
 		Default: 100
 
+                                                    *ddu-ui-ff-param-maxWidth*
+maxWidth	(number)
+		The maximum number of width.
+
+		Default: 200
+
                                                    *ddu-ui-ff-param-onPreview*
 onPreview	(function)
 		It is called when |ddu-ui-ff-action-preview| is fired.

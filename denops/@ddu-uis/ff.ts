@@ -137,6 +137,7 @@ export type Params = {
   immediateAction: string;
   maxDisplayItems: number;
   maxHighlightItems: number;
+  maxWidth: number;
   onPreview: string | ((args: OnPreviewArguments) => Promise<void>);
   pathFilter: string;
   previewCol: ExprNumber;
@@ -265,6 +266,7 @@ export class Ui extends BaseUi<Params> {
 
   override async searchItem(args: {
     denops: Denops;
+    context: Context;
     item: DduItem;
     uiParams: Params;
   }) {
@@ -302,7 +304,7 @@ export class Ui extends BaseUi<Params> {
       // Adjust cursor position when cursor is near bottom.
       await args.denops.cmd("normal! Gzb");
     }
-    await this.#cursor(args.denops, [cursorPos, 0]);
+    await this.#cursor(args.denops, args.context, [cursorPos, 0]);
     if (cursorPos < winHeight / 2) {
       // Adjust cursor position when cursor is near top.
       await args.denops.cmd("normal! zb");
@@ -698,6 +700,7 @@ export class Ui extends BaseUi<Params> {
     if (cursorPos <= 0 && Object.keys(saveItem).length !== 0) {
       this.searchItem({
         denops: args.denops,
+        context: args.context,
         item: saveItem,
         uiParams: args.uiParams,
       });
@@ -705,7 +708,7 @@ export class Ui extends BaseUi<Params> {
 
     if (!initialized || cursorPos > 0) {
       // Update current cursor
-      await this.updateCursor({ denops: args.denops });
+      await this.updateCursor({ denops: args.denops, context: args.context });
     }
 
     await this.#doAutoAction(args.denops);
@@ -977,7 +980,10 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, args.context, [
+        cursorPos[1],
+        cursorPos[2],
+      ]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -1035,7 +1041,10 @@ export class Ui extends BaseUi<Params> {
         cursorPos[1] = loop ? 1 : this.#viewItems.length;
       }
 
-      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, args.context, [
+        cursorPos[1],
+        cursorPos[2],
+      ]);
 
       const floating = args.uiParams.split === "floating" &&
         args.denops.meta.host === "nvim";
@@ -1058,6 +1067,7 @@ export class Ui extends BaseUi<Params> {
     },
     cursorTreeBottom: async (args: {
       denops: Denops;
+      context: Context;
       uiParams: Params;
       actionParams: BaseParams;
     }) => {
@@ -1090,12 +1100,16 @@ export class Ui extends BaseUi<Params> {
       }
       cursorPos[1] = minIndex + 1;
 
-      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, args.context, [
+        cursorPos[1],
+        cursorPos[2],
+      ]);
 
       return ActionFlags.Persist;
     },
     cursorTreeTop: async (args: {
       denops: Denops;
+      context: Context;
       uiParams: Params;
       actionParams: BaseParams;
     }) => {
@@ -1128,7 +1142,10 @@ export class Ui extends BaseUi<Params> {
       }
       cursorPos[1] = minIndex + 1;
 
-      await this.#cursor(args.denops, [cursorPos[1], cursorPos[2]]);
+      await this.#cursor(args.denops, args.context, [
+        cursorPos[1],
+        cursorPos[2],
+      ]);
 
       return ActionFlags.Persist;
     },
@@ -1525,6 +1542,7 @@ export class Ui extends BaseUi<Params> {
       immediateAction: "",
       maxDisplayItems: 1000,
       maxHighlightItems: 100,
+      maxWidth: 200,
       onPreview: (_) => {
         return Promise.resolve();
       },
@@ -1907,6 +1925,7 @@ export class Ui extends BaseUi<Params> {
 
   async #cursor(
     denops: Denops,
+    context: Context,
     pos: CursorPos,
   ): Promise<void> {
     if (pos.length !== 0) {
@@ -1928,7 +1947,7 @@ export class Ui extends BaseUi<Params> {
       newPos[2] = pos[1];
     }
 
-    await this.updateCursor({ denops });
+    await this.updateCursor({ denops, context });
   }
 
   async #updateSelectedItems(
