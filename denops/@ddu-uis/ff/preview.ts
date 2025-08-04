@@ -8,20 +8,20 @@ import {
   type PreviewContext,
   type Previewer,
   type TerminalPreviewer,
-} from "jsr:@shougo/ddu-vim@~10.3.0/types";
-import { printError } from "jsr:@shougo/ddu-vim@~10.3.0/utils";
+} from "@shougo/ddu-vim/types";
+import { printError } from "@shougo/ddu-vim/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.5.0";
-import { batch } from "jsr:@denops/std@~7.5.0/batch";
-import { replace } from "jsr:@denops/std@~7.5.0/buffer";
-import * as op from "jsr:@denops/std@~7.5.0/option";
-import * as fn from "jsr:@denops/std@~7.5.0/function";
+import type { Denops } from "@denops/std";
+import { batch } from "@denops/std/batch";
+import { replace } from "@denops/std/buffer";
+import * as op from "@denops/std/option";
+import * as fn from "@denops/std/function";
 
-import { equal } from "jsr:@std/assert@~1.0.2/equal";
-import { ensure } from "jsr:@core/unknownutil@~4.3.0/ensure";
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
+import { equal } from "@std/assert/equal";
+import { ensure } from "@core/unknownutil/ensure";
+import { is } from "@core/unknownutil/is";
 
-import type { Params } from "../ff.ts";
+import type { Params } from "./main.ts";
 
 type PreviewParams = {
   syntaxLimitChars?: number;
