@@ -922,6 +922,30 @@ export class Ui extends BaseUi<Params> {
 
       return ActionFlags.None;
     },
+    chooseInput: async (args: {
+      denops: Denops;
+      context: Context;
+      options: DduOptions;
+      uiParams: Params;
+      actionParams: BaseParams;
+    }) => {
+      await this.#previewUi.close(args.denops, args.context, args.uiParams);
+
+      await args.denops.dispatcher.start({
+        name: args.options.name,
+        push: true,
+        sources: [
+          {
+            name: "input_history",
+            params: {
+              name: args.options.name,
+            },
+          },
+        ],
+      });
+
+      return ActionFlags.None;
+    },
     clearSelectAllItems: async (args: {
       denops: Denops;
     }) => {
