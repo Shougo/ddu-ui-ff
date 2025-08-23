@@ -1,4 +1,13 @@
 {
+  "name": "@shougo/ddu-ui-ff",
+  "exports": {
+    ".": "./ff.ts"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts"
+    ]
+  },
   "imports": {
     "@core/unknownutil": "jsr:@core/unknownutil@~4.3.0",
     "@denops/std": "jsr:@denops/std@~7.6.0",
