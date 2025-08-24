@@ -456,11 +456,15 @@ export class Ui extends BaseUi<Params> {
           this.#popupId >= 0 &&
           await fn.bufwinid(args.denops, bufnr) === this.#popupId
         ) {
-          await args.denops.call(
-            "nvim_win_set_config",
-            this.#popupId,
-            winOpts,
-          );
+          try {
+            await args.denops.call(
+              "nvim_win_set_config",
+              this.#popupId,
+              winOpts,
+            );
+          } catch (_) {
+            // The window may be closed.
+          }
         } else {
           this.#popupId = await args.denops.call(
             "nvim_open_win",
