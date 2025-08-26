@@ -7,22 +7,22 @@ import {
   type PreviewContext,
   type Previewer,
   type UiOptions,
-} from "jsr:@shougo/ddu-vim@~10.3.0/types";
-import { BaseUi, type UiActions } from "jsr:@shougo/ddu-vim@~10.3.0/ui";
-import { convertTreePath, printError } from "jsr:@shougo/ddu-vim@~10.3.0/utils";
+} from "@shougo/ddu-vim/types";
+import { BaseUi, type UiActions } from "@shougo/ddu-vim/ui";
+import { convertTreePath, printError } from "@shougo/ddu-vim/utils";
 
-import type { Denops } from "jsr:@denops/std@~7.5.0";
-import { batch } from "jsr:@denops/std@~7.5.0/batch";
-import * as op from "jsr:@denops/std@~7.5.0/option";
-import * as fn from "jsr:@denops/std@~7.5.0/function";
-import * as vars from "jsr:@denops/std@~7.5.0/variable";
+import type { Denops } from "@denops/std";
+import { batch } from "@denops/std/batch";
+import * as op from "@denops/std/option";
+import * as fn from "@denops/std/function";
+import * as vars from "@denops/std/variable";
 
-import { equal } from "jsr:@std/assert@~1.0.2";
-import { is } from "jsr:@core/unknownutil@~4.3.0/is";
-import { SEPARATOR as pathsep } from "jsr:@std/path@~1.0.2/constants";
-import { ensure } from "jsr:@denops/std@~7.5.0/buffer";
+import { equal } from "@std/assert";
+import { is } from "@core/unknownutil/is";
+import { SEPARATOR as pathsep } from "@std/path/constants";
+import { ensure } from "@denops/std/buffer";
 
-import { PreviewUi } from "./ff/preview.ts";
+import { PreviewUi } from "./preview.ts";
 
 type HighlightGroup = {
   filterText?: string;
@@ -456,11 +456,15 @@ export class Ui extends BaseUi<Params> {
           this.#popupId >= 0 &&
           await fn.bufwinid(args.denops, bufnr) === this.#popupId
         ) {
-          await args.denops.call(
-            "nvim_win_set_config",
-            this.#popupId,
-            winOpts,
-          );
+          try {
+            await args.denops.call(
+              "nvim_win_set_config",
+              this.#popupId,
+              winOpts,
+            );
+          } catch (_) {
+            // The window may be closed.
+          }
         } else {
           this.#popupId = await args.denops.call(
             "nvim_open_win",
