@@ -772,14 +772,15 @@ export class Ui extends BaseUi<Params> {
         // Replace parent
         this.#items[index] = insertItems[0];
       } else {
-        this.#items = this.#items.slice(0, index + 1).concat(insertItems)
-          .concat(
-            this.#items.slice(index + 1),
-          );
+        this.#items = [
+          ...this.#items.slice(0, index + 1),
+          ...insertItems,
+          ...this.#items.slice(index + 1),
+        ];
         this.#items[index] = args.parent;
       }
     } else {
-      this.#items = this.#items.concat(insertItems);
+      this.#items = [...this.#items, ...insertItems];
     }
 
     await this.#updateSelectedItems(args.denops);
@@ -809,9 +810,10 @@ export class Ui extends BaseUi<Params> {
     if (endIndex < 0) {
       this.#items = this.#items.slice(0, startIndex + 1);
     } else {
-      this.#items = this.#items.slice(0, startIndex + 1).concat(
-        this.#items.slice(startIndex + endIndex + 1),
-      );
+      this.#items = [
+        ...this.#items.slice(0, startIndex + 1),
+        ...this.#items.slice(startIndex + endIndex + 1),
+      ];
     }
 
     this.#items[startIndex] = args.item;
