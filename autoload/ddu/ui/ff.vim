@@ -116,7 +116,7 @@ function s:add_info_texts(bufnr, info, row) abort
 
   if has('nvim')
     call nvim_buf_set_extmark(0, s:namespace, a:row - 1, 0, #{
-          \   virt_lines: a:info->copy()->map({ _, val ->
+          \   virt_lines: a:info->mapnew({ _, val ->
           \        val->has_key('hl_group')
           \      ? [[val.text, val.hl_group]]
           \      : [[val.text]]
