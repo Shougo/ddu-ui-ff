@@ -80,16 +80,18 @@ function ddu#ui#ff#_process_items(
     endfor
   endif
 
+  echomsg 'hl'
   for item in a:items
     call s:add_info_texts(a:bufnr, item.info, item.row)
 
     " Highlights items
     for hl in item.highlights
       call ddu#ui#ff#_highlight(
-            \ hl.hl_group, hl.name, 1,
-            \ s:namespace, a:bufnr,
-            \ a:params.reversed ? a:max_lines - item.row + 1 : item.row,
-            \ hl.col + item.prefix->strlen(), hl.width)
+            \   hl.hl_group, hl.name, 1,
+            \   s:namespace, a:bufnr,
+            \   a:params.reversed ? a:max_lines - item.row + 1 : item.row,
+            \   hl.col + item.prefix->strlen(), hl.width
+            \ )
     endfor
   endfor
 
@@ -97,11 +99,12 @@ function ddu#ui#ff#_process_items(
   let selected_highlight = a:params.highlights->get('selected', 'Statement')
   for item_nr in a:selected_items
     call ddu#ui#ff#_highlight(
-          \ selected_highlight, 'ddu-ui-selected', 10000,
-          \ s:namespace, a:bufnr,
-          \ a:params.reversed ? a:max_lines - item_nr : item_nr + 1,
-          \ 1,
-          \ 0)
+          \   selected_highlight, 'ddu-ui-selected', 10000,
+          \   s:namespace, a:bufnr,
+          \   a:params.reversed ? a:max_lines - item_nr : item_nr + 1,
+          \   1,
+          \   0
+          \ )
   endfor
 
   " NOTE: :redraw is needed
@@ -155,9 +158,11 @@ function ddu#ui#ff#_highlight(
     return
   endif
 
-  const max_col = getline(a:row)->len()
+  const max_col = a:bufnr->getbufoneline(a:row)->len()
 
-  if a:row <= 0 || a:col <= 0 || a:row > line('$') || a:col > max_col
+  if a:row <= 0 || a:col <= 0
+        \ || a:row > a:bufnr->getbufline(1, '$')->len()
+        \ || a:col > max_col
     " Invalid range
     return
   endif

@@ -719,10 +719,12 @@ export class Ui extends BaseUi<Params> {
 
     await fn.setbufvar(args.denops, bufnr, "ddu_ui_items", this.#items);
 
-    await fn.win_gotoid(
-      args.denops,
-      args.uiParams.focus ? winid : args.context.winId,
-    );
+    if (!existsUI) {
+      await fn.win_gotoid(
+        args.denops,
+        args.uiParams.focus ? winid : args.context.winId,
+      );
+    }
 
     this.#refreshed = false;
   }
