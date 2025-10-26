@@ -470,6 +470,8 @@ export class PreviewUi {
       : 0;
 
     const winid = this.#previewWinId;
+    const maxRow = await denops.call("ddu#ui#ff#_max_row", bufnr);
+
     if (previewer.lineNr) {
       await denops.call(
         "ddu#ui#ff#_highlight",
@@ -479,7 +481,9 @@ export class PreviewUi {
         ns,
         bufnr,
         previewer.lineNr,
+        maxRow,
         1,
+        await denops.call("ddu#ui#ff#_max_col", bufnr, previewer.lineNr),
         await op.columns.get(denops),
       );
     } else if (previewer.pattern) {
@@ -509,7 +513,9 @@ export class PreviewUi {
           ns,
           bufnr,
           hl.row,
+          maxRow,
           hl.col,
+          await denops.call("ddu#ui#ff#_max_col", bufnr, hl.row),
           hl.width,
         );
       }

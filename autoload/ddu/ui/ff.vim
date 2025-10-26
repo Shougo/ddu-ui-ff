@@ -80,16 +80,24 @@ function ddu#ui#ff#_process_items(
     endfor
   endif
 
+  const max_row = ddu#ui#ff#_max_row(a:bufnr)
+
   for item in a:items
     call s:add_info_texts(a:bufnr, item.info, item.row)
+
+    let row = a:params.reversed ? a:max_lines - item.row + 1 : item.row
+    let max_col = ddu#ui#ff#_max_col(a:bufnr, row)
 
     " Highlights items
     for hl in item.highlights
       call ddu#ui#ff#_highlight(
             \   hl.hl_group, hl.name, 1,
             \   s:namespace, a:bufnr,
-            \   a:params.reversed ? a:max_lines - item.row + 1 : item.row,
-            \   hl.col + item.prefix->strlen(), hl.width
+            \   row,
+            \   max_row,
+            \   hl.col + item.prefix->strlen(),
+            \   max_col,
+            \   hl.width
             \ )
     endfor
   endfor
@@ -97,11 +105,16 @@ function ddu#ui#ff#_process_items(
   " Selected items highlights
   let selected_highlight = a:params.highlights->get('selected', 'Statement')
   for item_nr in a:selected_items
+    let row = a:params.reversed ? a:max_lines - item_nr : item_nr + 1
+    let max_col = ddu#ui#ff#_max_col(a:bufnr, row)
+
     call ddu#ui#ff#_highlight(
           \   selected_highlight, 'ddu-ui-selected', 10000,
           \   s:namespace, a:bufnr,
-          \   a:params.reversed ? a:max_lines - item_nr : item_nr + 1,
+          \   row,
+          \   max_row,
           \   1,
+          \   max_col,
           \   0
           \ )
   endfor
@@ -148,8 +161,18 @@ function s:add_info_texts(bufnr, info, row) abort
   endif
 endfunction
 
+function ddu#ui#ff#_max_row(bufnr)
+  return a:bufnr->getbufinfo()
+        \ ->get(0, #{ linecount: 0 })->get('linecount', 0)
+endfunction
+
+function ddu#ui#ff#_max_col(bufnr, row)
+  return a:bufnr->getbufoneline(a:row)->len()
+endfunction
+
 function ddu#ui#ff#_highlight(
-      \ highlight, prop_type, priority, id, bufnr, row, col, length) abort
+      \ highlight, prop_type, priority, id, bufnr,
+      \ row, max_row, col, max_col, length) abort
 
   if !a:highlight->hlexists()
     call ddu#util#print_error(
@@ -157,18 +180,14 @@ function ddu#ui#ff#_highlight(
     return
   endif
 
-  const max_col = a:bufnr->getbufoneline(a:row)->len()
-
-  if a:row <= 0 || a:col <= 0
-        \ || a:row > a:bufnr->getbufline(1, '$')->len()
-        \ || a:col > max_col
+  if a:row <= 0 || a:col <= 0 || a:row > a:max_row || a:col > a:max_col
     " Invalid range
     return
   endif
 
   const length =
-        \   a:length <= 0 || a:col + a:length > max_col
-        \ ? max_col - a:col + 1
+        \   a:length <= 0 || a:col + a:length > a:max_col
+        \ ? a:max_col - a:col + 1
         \ : a:length
 
   if !has('nvim')
