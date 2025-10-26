@@ -80,7 +80,6 @@ function ddu#ui#ff#_process_items(
     endfor
   endif
 
-  echomsg 'hl'
   for item in a:items
     call s:add_info_texts(a:bufnr, item.info, item.row)
 
