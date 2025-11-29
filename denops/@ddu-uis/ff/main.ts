@@ -613,7 +613,6 @@ export class Ui extends BaseUi<Params> {
         denops: args.denops,
         uiParams: args.uiParams,
       }),
-      floating,
       augroupName,
       this.#items,
     );
@@ -1017,9 +1016,6 @@ export class Ui extends BaseUi<Params> {
         cursorPos[2],
       ]);
 
-      const floating = args.uiParams.split === "floating" &&
-        args.denops.meta.host === "nvim";
-
       await setStatusline(
         args.denops,
         args.context,
@@ -1029,7 +1025,6 @@ export class Ui extends BaseUi<Params> {
           denops: args.denops,
           uiParams: args.uiParams,
         }),
-        floating,
         `ddu-ui-ff-${bufnr}`,
         this.#items,
       );
@@ -1078,9 +1073,6 @@ export class Ui extends BaseUi<Params> {
         cursorPos[2],
       ]);
 
-      const floating = args.uiParams.split === "floating" &&
-        args.denops.meta.host === "nvim";
-
       await setStatusline(
         args.denops,
         args.context,
@@ -1090,7 +1082,6 @@ export class Ui extends BaseUi<Params> {
           denops: args.denops,
           uiParams: args.uiParams,
         }),
-        floating,
         `ddu-ui-ff-${bufnr}`,
         this.#items,
       );
@@ -2067,7 +2058,6 @@ async function setStatusline(
   options: DduOptions,
   uiParams: Params,
   winid: number,
-  floating: boolean,
   augroupName: string,
   items: DduItem[],
 ): Promise<void> {
@@ -2102,7 +2092,7 @@ async function setStatusline(
   }`;
   const footer = `${input}${async}`;
 
-  if (floating || await op.laststatus.getGlobal(denops) === 0) {
+  if (await op.laststatus.getGlobal(denops) === 0) {
     if (await vars.g.get(denops, "ddu#ui#ff#_save_title", "") === "") {
       await vars.g.set(
         denops,
