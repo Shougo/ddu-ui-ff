@@ -422,6 +422,22 @@ onPreview	(function)
 		|denops#callback#register()|.
 		NOTE: Current window may not be the preview window.
 
+                                         *ddu-ui-ff-param-overwriteStatusline*
+overwriteStatusline (boolean)
+		If it is true, the original 'statusline' value is set on the
+		buffer.
+
+		Default: v:true
+
+                                              *ddu-ui-ff-param-overwriteTitle*
+overwriteTitle (boolean)
+		If it is true, the original 'titlestring' value is set on the
+		buffer.
+
+		Default:
+			v:false
+			v:true (When 'laststatus' is 0)
+
                                                   *ddu-ui-ff-param-pathFilter*
 pathFilter	(string)
 		Filter regexp string for path items.
@@ -595,13 +611,6 @@ startAutoAction	(boolean)
 		Note: It must be set before UI initialization.
 
 		Default: v:false
-
-                                                  *ddu-ui-ff-param-statusline*
-statusline	(boolean)
-		If it is true, the original 'statusline' value is set on the
-		buffer.
-
-		Default: v:true
 
                                                       *ddu-ui-ff-param-winCol*
 winCol		(number | string)
@@ -1148,6 +1157,9 @@ You can prevent the behavior by |ddu-option-sync|.
 
 ==============================================================================
 COMPATIBILITY                                        *ddu-ui-ff-compatibility*
+
+2025.12.02
+* Rename "statusline" param to "overwriteStatusline".
 
 2025.02.15
 * Move filter window feature into the ddu core.
