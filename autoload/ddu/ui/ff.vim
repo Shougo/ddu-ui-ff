@@ -57,10 +57,6 @@ function ddu#ui#ff#_update_buffer(
     call win_execute(a:winid, 'normal! Gzb')
   endif
   call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
-  if lnum < win_height / 2
-    " Adjust cursor position when cursor is near top.
-    call win_execute(a:winid, 'normal! zb')
-  endif
 endfunction
 
 function ddu#ui#ff#_process_items(
