@@ -529,7 +529,11 @@ export class PreviewUi {
     const winid = this.#previewWinId;
 
     if (this.#matchIds[winid] > 0 && await fn.winbufnr(denops, winid) > 0) {
-      await fn.matchdelete(denops, this.#matchIds[winid], winid);
+      try {
+        await fn.matchdelete(denops, this.#matchIds[winid], winid);
+      } catch (_: unknown) {
+        // workaround: The match may already have been deleted before calling matchdelete
+      }
     }
     if (denops.meta.host === "nvim") {
       const ns = await denops.call(
