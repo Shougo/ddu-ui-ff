@@ -532,9 +532,11 @@ export class PreviewUi {
       try {
         await fn.matchdelete(denops, this.#matchIds[winid], winid);
       } catch (_: unknown) {
-        // workaround: The match may already have been deleted before calling matchdelete
+        // Ignore error
       }
+      this.#matchIds[winid] = 0;
     }
+
     if (denops.meta.host === "nvim") {
       const ns = await denops.call(
         "nvim_create_namespace",
