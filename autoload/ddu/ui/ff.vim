@@ -225,7 +225,8 @@ function ddu#ui#ff#_open_preview_window(
   const use_winfixbuf =
         \ '+winfixbuf'->exists() && a:params.previewSplit !=# 'no'
 
-  if a:preview_winid >= 0 && (!a:params.previewFloating || has('nvim'))
+  if a:preview_winid >= 0 && win_id2win(a:preview_winid) > 0
+        \ && (!a:params.previewFloating || has('nvim'))
     call win_gotoid(a:preview_winid)
 
     if use_winfixbuf
