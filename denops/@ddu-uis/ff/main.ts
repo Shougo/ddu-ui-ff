@@ -101,6 +101,14 @@ type OpenFilterWindowParams = {
   input?: string;
 };
 
+type CheckPreviewArguments = {
+  denops: Denops;
+  context: Context;
+  item: DduItem;
+  previewContext: PreviewContext;
+  previewer: Previewer;
+};
+
 type OnPreviewArguments = {
   denops: Denops;
   context: Context;
@@ -124,6 +132,7 @@ type QuitParams = {
 export type Params = {
   autoAction: AutoAction;
   autoResize: boolean;
+  checkPreview: string | ((args: CheckPreviewArguments) => Promise<boolean>);
   cursorPos: number;
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
@@ -1544,6 +1553,9 @@ export class Ui extends BaseUi<Params> {
     return {
       autoAction: {},
       autoResize: false,
+      checkPreview: (_) => {
+        return Promise.resolve(false);
+      },
       cursorPos: 0,
       displaySourceName: "no",
       displayTree: false,
