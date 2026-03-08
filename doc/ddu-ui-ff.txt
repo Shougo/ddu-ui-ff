@@ -266,7 +266,7 @@ autoResize	(boolean)
                                                 *ddu-ui-ff-param-checkPreview*
 checkPreview	(function)
 		It is called before |ddu-ui-ff-action-preview| is fired.
-		If it returns |v:false|, preview action is skipped.
+		If it returns |v:true|, preview action is skipped.
 		NOTE: The function must be registered by
 		|denops#callback#register()|.
 
