@@ -285,7 +285,7 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    let index = this.#items.findIndex(
+    let index = this.#viewItems.findIndex(
       (item) => equal(item, args.item),
     );
     if (index < 0) {
@@ -293,7 +293,7 @@ export class Ui extends BaseUi<Params> {
       const itemTreePath = convertTreePath(
         args.item.treePath ?? args.item.word,
       );
-      index = this.#items.findIndex(
+      index = this.#viewItems.findIndex(
         (item) =>
           equal(convertTreePath(item.treePath ?? item.word), itemTreePath),
       );
@@ -303,10 +303,7 @@ export class Ui extends BaseUi<Params> {
       return;
     }
 
-    // NOTE: cursorPos is not same with item pos when reversed.
-    const cursorPos = args.uiParams.reversed
-      ? this.#items.length - index
-      : index + 1;
+    const cursorPos = index + 1;
 
     const winHeight = await fn.winheight(args.denops, 0);
     const maxLine = await fn.line(args.denops, "$");

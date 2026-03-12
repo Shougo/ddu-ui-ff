@@ -6,10 +6,11 @@ function ddu#ui#ff#_update_buffer(
 
   call setbufvar(a:bufnr, '&modifiable', v:true)
 
+  const before_cursor = a:winid->getcurpos()
+  const before_line = a:bufnr->getbufline(before_cursor[1])->get(0, '')
   try
     " NOTE: deletebufline() changes cursor position.
     " NOTE: deletebufline() needs ":silent".
-    const before_cursor = a:winid->getcurpos()
     if a:lines->empty()
       " Clear buffer
       if current_lines > 1
@@ -39,24 +40,36 @@ function ddu#ui#ff#_update_buffer(
     call setbufvar(a:bufnr, '&modified', v:false)
   endtry
 
-  if !a:refreshed && a:winid->getcurpos() ==# before_cursor
+  if !a:refreshed
+    if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
+      " Restore the cursor position
+      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
+
+      if cursor > 0
+        " Restore cursor
+        call s:init_cursor(a:winid, cursor)
+      endif
+    endif
+
     return
   endif
 
   " Init the cursor
-  const lnum =
+  call s:init_cursor(a:winid,
         \   a:pos <= 0
         \ ? before_cursor[1]
         \ : a:params.reversed
         \ ? a:lines->len() - a:pos
-        \ : a:pos
+        \ : a:pos)
+endfunction
+function s:init_cursor(winid, lnum)
   const win_height = a:winid->winheight()
   const max_line = '$'->line(a:winid)
-  if max_line - lnum < win_height / 2
+  if max_line - a:lnum < win_height / 2
     " Adjust cursor position when cursor is near bottom.
     call win_execute(a:winid, 'normal! Gzb')
   endif
-  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
+  call win_execute(a:winid, 'call cursor(' .. a:lnum .. ', 0)')
 endfunction
 
 function ddu#ui#ff#_process_items(
