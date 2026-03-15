@@ -170,6 +170,132 @@ function s:add_info_texts(bufnr, info, row) abort
   endif
 endfunction
 
+function ddu#ui#ff#_apply_updates(
+      \ params, bufnr, winid, lines, items, selected_items,
+      \ refreshed, pos) abort
+  " Batch update: combines _update_buffer and _process_items into one RPC call.
+  if !bufexists(a:bufnr)
+    return
+  endif
+  call bufload(a:bufnr)
+
+  " --- Buffer line update (equivalent to _update_buffer) ---
+  const current_line_count = '$'->line(a:winid)
+
+  call setbufvar(a:bufnr, '&modifiable', v:true)
+
+  const before_cursor = a:winid->getcurpos()
+  const before_line = a:bufnr->getbufline(before_cursor[1])->get(0, '')
+  try
+    if a:lines->empty()
+      " Clear buffer
+      if current_line_count > 1
+        silent call deletebufline(a:bufnr, 1, '$')
+      else
+        call setbufline(a:bufnr, 1, [''])
+      endif
+    else
+      const footer_width = a:params.maxWidth / 3
+      const lines = a:lines->map({ _, val ->
+            \   ddu#ui#ff#_truncate(
+            \     val, a:params.maxWidth, footer_width, '..')
+            \ })
+      call setbufline(a:bufnr, 1,
+            \ a:params.reversed ? reverse(lines) : lines)
+
+      if current_line_count > lines->len()
+        silent call deletebufline(a:bufnr, lines->len() + 1, '$')
+      endif
+    endif
+  catch
+    " NOTE: Buffer modify may be failed
+    call ddu#util#print_error(v:exception)
+    return
+  finally
+    call setbufvar(a:bufnr, '&modifiable', v:false)
+    call setbufvar(a:bufnr, '&modified', v:false)
+  endtry
+
+  if !a:refreshed
+    if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
+      " Restore the cursor position
+      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
+
+      if cursor > 0
+        " Restore cursor
+        call s:init_cursor(a:winid, cursor)
+      endif
+    endif
+  else
+    " Init the cursor
+    call s:init_cursor(a:winid,
+          \   a:pos <= 0
+          \ ? before_cursor[1]
+          \ : a:params.reversed
+          \ ? a:lines->len() - a:pos
+          \ : a:pos)
+  endif
+
+  " --- Highlights and info processing (equivalent to _process_items) ---
+  if !a:bufnr->bufloaded()
+    return
+  endif
+
+  " Clear all properties
+  if has('nvim')
+    call nvim_buf_clear_namespace(a:bufnr, s:namespace, 0, -1)
+  else
+    const max_lines_for_clear = a:lines->len()
+    call prop_clear(1, max_lines_for_clear + 1, #{ bufnr: a:bufnr })
+    for prop_type in prop_type_list(#{ bufnr: a:bufnr })
+      call prop_type_delete(prop_type, #{ bufnr: a:bufnr })
+    endfor
+  endif
+
+  const max_row = ddu#ui#ff#_max_row(a:bufnr)
+  const max_lines = a:lines->len()
+
+  for item in a:items
+    call s:add_info_texts(a:bufnr, item.info, item.row)
+
+    let row = a:params.reversed ? max_lines - item.row + 1 : item.row
+    let max_col = ddu#ui#ff#_max_col(a:bufnr, row)
+
+    " Highlights items
+    for hl in item.highlights
+      call ddu#ui#ff#_highlight(
+            \   hl.hl_group, hl.name, 1,
+            \   s:namespace, a:bufnr,
+            \   row,
+            \   max_row,
+            \   hl.col + item.prefix->strlen(),
+            \   max_col,
+            \   hl.width
+            \ )
+    endfor
+  endfor
+
+  " Selected items highlights
+  let selected_highlight = a:params.highlights->get('selected', 'Statement')
+  for item_nr in a:selected_items
+    let row = a:params.reversed ? max_lines - item_nr : item_nr + 1
+    let max_col = ddu#ui#ff#_max_col(a:bufnr, row)
+
+    call ddu#ui#ff#_highlight(
+          \   selected_highlight, 'ddu-ui-selected', 10000,
+          \   s:namespace, a:bufnr,
+          \   row,
+          \   max_row,
+          \   1,
+          \   max_col,
+          \   0
+          \ )
+  endfor
+
+  " NOTE: :redraw is needed
+  redraw
+endfunction
+
 function ddu#ui#ff#_max_row(bufnr)
   return a:bufnr->getbufinfo()
         \ ->get(0, #{ linecount: 0 })->get('linecount', 0)
