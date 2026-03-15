@@ -452,12 +452,32 @@ pathFilter	(string)
 
 		Default: ""
 
+                                                  *ddu-ui-ff-param-previewCacheEnabled*
+previewCacheEnabled	(boolean)
+		When v:true, the preview window is not re-rendered if the new
+		request targets the same content (identified by file path, size,
+		line number and previewer kind) as what is already displayed.
+		This avoids redundant redraws caused by rapid cursor movement.
+		Set to v:false to disable the cache and always re-render.
+
+		Default: v:true
+
                                                   *ddu-ui-ff-param-previewCol*
 previewCol	(number)
 		Set the column position of the preview window if
 		|ddu-ui-ff-param-previewFloating| is v:true.
 
 		Default: 0
+
+                                             *ddu-ui-ff-param-previewDebounceMs*
+previewDebounceMs	(number)
+		Milliseconds to wait before starting a preview render.  When
+		the cursor moves quickly, each movement cancels the previous
+		pending render so that only the last position triggers the
+		actual (expensive) preview work.  Set to 0 to disable
+		debouncing.
+
+		Default: 80
 
                                              *ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
@@ -527,6 +547,17 @@ previewRow	(number)
 		|ddu-ui-ff-param-previewFloating| is v:true.
 
 		Default: 0
+
+                              *ddu-ui-ff-param-previewSkipSyntaxForLargeFiles*
+previewSkipSyntaxForLargeFiles	(boolean)
+		When v:true (the default), syntax highlighting and filetype
+		detection are skipped for preview buffers whose content
+		exceeds the syntaxLimitChars threshold (default 400000
+		characters).  Disabling syntax processing for large files
+		prevents noticeable UI lag during preview.
+		Set to v:false to always apply syntax regardless of file size.
+
+		Default: v:true
 
                                                 *ddu-ui-ff-param-previewSplit*
 previewSplit	(string)
