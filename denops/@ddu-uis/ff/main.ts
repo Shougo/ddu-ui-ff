@@ -656,22 +656,15 @@ export class Ui extends BaseUi<Params> {
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
         (args.uiParams.reversed && this.#items.length !== this.#prevLength);
       // NOTE: Use batch for screen flicker when highlight items.
+      // Single RPC call to apply buffer content, highlights and info at once.
       await batch(args.denops, async (denops: Denops) => {
         await ensure(args.denops, bufnr, async () => {
           await denops.call(
-            "ddu#ui#ff#_update_buffer",
+            "ddu#ui#ff#_apply_updates",
             args.uiParams,
             bufnr,
             winid,
             this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
-            cursorPos,
-          );
-          await denops.call(
-            "ddu#ui#ff#_process_items",
-            args.uiParams,
-            bufnr,
-            this.#items.length,
             this.#items.map((item, index) => {
               return {
                 highlights: item.highlights ?? [],
@@ -683,6 +676,8 @@ export class Ui extends BaseUi<Params> {
             this.#selectedItems.values()
               .map((item) => this.#getItemIndex(item))
               .filter((index) => index >= 0),
+            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
+            cursorPos,
           );
         });
       });
