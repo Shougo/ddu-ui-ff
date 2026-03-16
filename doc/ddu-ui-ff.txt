@@ -452,13 +452,14 @@ pathFilter	(string)
 
 		Default: ""
 
-                                                  *ddu-ui-ff-param-previewCacheEnabled*
+                                         *ddu-ui-ff-param-previewCacheEnabled*
 previewCacheEnabled	(boolean)
-		When v:true, the preview window is not re-rendered if the new
-		request targets the same content (identified by file path, size,
-		line number and previewer kind) as what is already displayed.
+		When it is true, the preview window is not re-rendered if the
+		new request targets the same content (identified by file path,
+		size, line number and previewer kind) as what is already
+		displayed.
 		This avoids redundant redraws caused by rapid cursor movement.
-		Set to v:false to disable the cache and always re-render.
+		Set to false to disable the cache and always re-render.
 
 		Default: v:true
 
@@ -469,7 +470,7 @@ previewCol	(number)
 
 		Default: 0
 
-                                             *ddu-ui-ff-param-previewDebounceMs*
+                                           *ddu-ui-ff-param-previewDebounceMs*
 previewDebounceMs	(number)
 		Milliseconds to wait before starting a preview render.  When
 		the cursor moves quickly, each movement cancels the previous
