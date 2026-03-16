@@ -35,6 +35,16 @@ export class PreviewUi {
   #matchIds: Record<number, number> = {};
   #previewedBufnrs: Set<number> = new Set();
 
+  // Optimization: sequence counter for stale-result detection
+  #currentSequence = 0;
+
+  // Optimization: cache key for last previewed content
+  #previewCacheKey: string | undefined;
+
+  // Optimization: debounce state
+  #debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  #debounceCancel: (() => void) | undefined;
+
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
@@ -59,6 +69,7 @@ export class PreviewUi {
       });
     }
     this.#previewWinId = -1;
+    this.#previewCacheKey = undefined;
   }
 
   async removePreviewedBuffers(denops: Denops) {
@@ -124,7 +135,44 @@ export class PreviewUi {
       return ActionFlags.None;
     }
 
+    // Sequence token: incremented on every new request so stale async
+    // results can be detected and discarded after any await point.
+    const mySeq = ++this.#currentSequence;
+
+    // Debounce: wait for the configured period; if a newer request arrives
+    // it will cancel this timer and resolve this Promise early (making the
+    // stale-sequence check below return ActionFlags.None).
+    if (uiParams.previewDebounceMs > 0) {
+      // Cancel any previously pending debounce timer
+      if (this.#debounceTimer !== undefined) {
+        clearTimeout(this.#debounceTimer);
+        this.#debounceTimer = undefined;
+      }
+      if (this.#debounceCancel) {
+        this.#debounceCancel();
+        this.#debounceCancel = undefined;
+      }
+
+      await new Promise<void>((resolve) => {
+        this.#debounceCancel = resolve;
+        this.#debounceTimer = setTimeout(() => {
+          this.#debounceTimer = undefined;
+          this.#debounceCancel = undefined;
+          resolve();
+        }, uiParams.previewDebounceMs);
+      });
+
+      if (mySeq !== this.#currentSequence) {
+        return ActionFlags.None;
+      }
+    }
+
     const prevId = await fn.win_getid(denops);
+
+    if (mySeq !== this.#currentSequence) {
+      return ActionFlags.None;
+    }
+
     const previewParams = ensureUnknown(
       actionParams,
       is.Record,
@@ -146,6 +194,19 @@ export class PreviewUi {
     );
     if (!previewer) {
       return ActionFlags.None;
+    }
+
+    if (mySeq !== this.#currentSequence) {
+      return ActionFlags.None;
+    }
+
+    // Cache check: if the window is visible and the content identity matches
+    // the last rendered content, skip re-rendering.
+    if (uiParams.previewCacheEnabled) {
+      const cacheKey = this.#buildCacheKey(previewer, item);
+      if (this.visible() && cacheKey === this.#previewCacheKey) {
+        return ActionFlags.Persist;
+      }
     }
 
     if (uiParams.checkPreview) {
@@ -177,6 +238,10 @@ export class PreviewUi {
       }
     }
 
+    if (mySeq !== this.#currentSequence) {
+      return ActionFlags.None;
+    }
+
     let flag: ActionFlags;
     // Render the preview
     if (previewer.kind === "terminal") {
@@ -198,6 +263,11 @@ export class PreviewUi {
         item,
       );
     }
+
+    if (mySeq !== this.#currentSequence) {
+      return ActionFlags.None;
+    }
+
     if (flag === ActionFlags.None) {
       return flag;
     }
@@ -244,6 +314,12 @@ export class PreviewUi {
     this.#previewedBufnrs.add(await fn.bufnr(denops));
     this.#previewedTarget = item;
     this.#previewedUiParams = uiParams;
+
+    // Update the cache key after a successful render
+    if (uiParams.previewCacheEnabled) {
+      this.#previewCacheKey = this.#buildCacheKey(previewer, item);
+    }
+
     await fn.win_gotoid(denops, prevId);
 
     return ActionFlags.Persist;
@@ -346,37 +422,41 @@ export class PreviewUi {
       this.#previewWinId,
     ) as number;
 
-    const limit = actionParams.syntaxLimitChars ?? 400000;
-    if (!err && contents.join("\n").length < limit) {
-      if (previewer.filetype) {
-        await fn.setbufvar(
-          denops,
-          previewBufnr,
-          "&filetype",
-          previewer.filetype,
-        );
-      }
+    // Determine syntax limit: when previewSkipSyntaxForLargeFiles is true
+    // (the default) honour the syntaxLimitChars threshold so that large
+    // files are shown as plain text without heavy syntax processing.
+    // Setting the option to false disables the limit entirely.
+    const syntaxLimit = uiParams.previewSkipSyntaxForLargeFiles
+      ? (actionParams.syntaxLimitChars ?? 400000)
+      : Number.POSITIVE_INFINITY;
 
-      if (previewer.syntax) {
-        await fn.setbufvar(
-          denops,
-          previewBufnr,
-          "&syntax",
-          previewer.syntax,
-        );
-      }
+    if (!err && contents.join("\n").length < syntaxLimit) {
+      // Batch filetype and syntax writes into a single RPC round-trip.
+      await batch(denops, async (denops: Denops) => {
+        if (previewer.filetype) {
+          await fn.setbufvar(
+            denops,
+            previewBufnr,
+            "&filetype",
+            previewer.filetype,
+          );
+        }
 
-      const filetype = await fn.getbufvar(
-        denops,
-        previewBufnr,
-        "&filetype",
-      ) as string;
-      const syntax = await fn.getbufvar(
-        denops,
-        previewBufnr,
-        "&syntax",
-      ) as string;
-      if (filetype.length === 0 && syntax.length === 0) {
+        if (previewer.syntax) {
+          await fn.setbufvar(
+            denops,
+            previewBufnr,
+            "&syntax",
+            previewer.syntax,
+          );
+        }
+      });
+
+      // If the previewer did not supply an explicit filetype or syntax, fall
+      // back to Vim's built-in filetype detection via the BufRead autocmd.
+      // We can infer that neither is set without extra RPC calls when the
+      // previewer itself didn't provide them.
+      if (!previewer.filetype && !previewer.syntax) {
         // NOTE: Call filetype detection by "BufRead" autocmd.
         // "filetype detect" is broken for the window.
         await fn.win_execute(
@@ -387,7 +467,7 @@ export class PreviewUi {
       }
     }
 
-    // Set options
+    // Set window options (already batched).
     await batch(denops, async (denops: Denops) => {
       for (const [option, value] of uiParams.previewWindowOptions) {
         await fn.setwinvar(denops, this.#previewWinId, option, value);
@@ -590,6 +670,41 @@ export class PreviewUi {
         },
       );
     }
+  }
+
+  /**
+   * Build a stable cache key that represents the identity of preview content.
+   *
+   * The key encodes enough information to decide whether the preview window
+   * already shows exactly what the user wants to see, so re-rendering can be
+   * skipped when the key matches the previously cached one.
+   */
+  #buildCacheKey(previewer: Previewer, item: DduItem): string {
+    const size = item.status?.size ?? -1;
+
+    if (previewer.kind === "terminal") {
+      return `terminal:${previewer.cmds.join("\0")}:${previewer.cwd ?? ""}`;
+    }
+
+    if (previewer.kind === "buffer") {
+      // Fall back to item.word when neither path nor expr is available so
+      // that distinct items without a path don't share the same cache key.
+      const id = previewer.path ??
+        (previewer.expr !== undefined ? String(previewer.expr) : item.word);
+      const lineNr = previewer.lineNr ?? 0;
+      const pattern = previewer.pattern ?? "";
+      return `buffer:${id}:${size}:${lineNr}:${pattern}`;
+    }
+
+    // nofile: build a lightweight fingerprint from length plus three
+    // distributed lines (first, middle, last) to reduce collision risk while
+    // staying O(1).
+    const lines = previewer.contents ?? [];
+    const mid = lines[Math.floor(lines.length / 2)] ?? "";
+    const fingerprint = `${lines.length}:${lines[0] ?? ""}:${mid}:${
+      lines[lines.length - 1] ?? ""
+    }`;
+    return `nofile:${fingerprint}`;
   }
 }
 

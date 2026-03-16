@@ -151,7 +151,9 @@ export type Params = {
   overwriteStatusline: boolean;
   overwriteTitle: boolean;
   pathFilter: string;
+  previewCacheEnabled: boolean;
   previewCol: ExprNumber;
+  previewDebounceMs: number;
   previewFocusable: boolean;
   previewFloating: boolean;
   previewFloatingBorder: FloatingBorder;
@@ -161,6 +163,7 @@ export type Params = {
   previewHeight: ExprNumber;
   previewMaxSize: number;
   previewRow: ExprNumber;
+  previewSkipSyntaxForLargeFiles: boolean;
   previewSplit: "horizontal" | "vertical" | "no";
   previewWidth: ExprNumber;
   previewWindowOptions: WindowOption[];
@@ -1577,7 +1580,9 @@ export class Ui extends BaseUi<Params> {
       overwriteStatusline: true,
       overwriteTitle: false,
       pathFilter: "",
+      previewCacheEnabled: true,
       previewCol: 0,
+      previewDebounceMs: 80,
       previewFocusable: true,
       previewFloating: false,
       previewFloatingBorder: "none",
@@ -1587,6 +1592,7 @@ export class Ui extends BaseUi<Params> {
       previewHeight: 10,
       previewMaxSize: 1000000,
       previewRow: 0,
+      previewSkipSyntaxForLargeFiles: true,
       previewSplit: "horizontal",
       previewWidth: 80,
       previewWindowOptions: [
