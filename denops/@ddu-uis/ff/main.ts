@@ -194,6 +194,13 @@ export class Ui extends BaseUi<Params> {
   #previewUi = new PreviewUi();
   #popupId = -1;
   #enabledAutoAction = false;
+  // Optimization: debounce and sequence control for autoAction
+  #autoActionTimer: ReturnType<typeof setTimeout> | undefined;
+  #autoActionCancel: (() => void) | undefined;
+  #autoActionSeq = 0;
+  #latestAppliedAutoActionSeq = 0;
+  // Stores uiParams.autoAction.delay for use inside #doAutoAction.
+  #autoActionDelay: number | undefined = undefined;
   #restcmd = "";
   #closing = false;
 
@@ -1936,14 +1943,81 @@ export class Ui extends BaseUi<Params> {
   }
 
   async #doAutoAction(denops: Denops) {
-    if (this.#enabledAutoAction) {
+    if (!this.#enabledAutoAction) {
+      return;
+    }
+
+    // TypeScript-side debounce delay.
+    // uiParams.autoAction.delay is respected when set; otherwise default 80 ms.
+    // A value of 0 disables debouncing entirely (immediate execution).
+    const delay = this.#autoActionDelay !== undefined
+      ? this.#autoActionDelay
+      : 80;
+
+    // Sequence token: incremented on every new request so stale async
+    // results can be detected and discarded after any await point.
+    const localSeq = ++this.#autoActionSeq;
+
+    if (delay > 0) {
+      // Debounce: cancel any pending timer and start a fresh one.
+      if (this.#autoActionTimer !== undefined) {
+        clearTimeout(this.#autoActionTimer);
+        this.#autoActionTimer = undefined;
+      }
+      if (this.#autoActionCancel) {
+        this.#autoActionCancel();
+        this.#autoActionCancel = undefined;
+      }
+
+      await new Promise<void>((resolve) => {
+        this.#autoActionCancel = resolve;
+        this.#autoActionTimer = setTimeout(() => {
+          this.#autoActionTimer = undefined;
+          this.#autoActionCancel = undefined;
+          resolve();
+        }, delay);
+      });
+
+      // Stale-sequence check: if a newer request arrived during the wait,
+      // discard this execution.
+      if (localSeq !== this.#autoActionSeq) {
+        return;
+      }
+    }
+
+    try {
       await denops.call("ddu#ui#ff#_do_auto_action");
+
+      // Discard result if a newer autoAction execution has already started.
+      if (localSeq !== this.#autoActionSeq) {
+        return;
+      }
+      this.#latestAppliedAutoActionSeq = localSeq;
+    } catch (e) {
+      // Log the error without breaking the UI.
+      console.error(
+        `[ddu-ui-ff] autoAction error (seq=${localSeq}):`,
+        e,
+      );
     }
   }
 
   async #setAutoAction(denops: Denops, uiParams: Params, winId: number) {
     const hasAutoAction = "name" in uiParams.autoAction &&
       this.#enabledAutoAction;
+
+    // Store the TypeScript-side debounce delay for use in #doAutoAction.
+    this.#autoActionDelay = uiParams.autoAction.delay;
+
+    // Clear any pending debounce timer when autoAction state changes.
+    if (this.#autoActionTimer !== undefined) {
+      clearTimeout(this.#autoActionTimer);
+      this.#autoActionTimer = undefined;
+    }
+    if (this.#autoActionCancel) {
+      this.#autoActionCancel();
+      this.#autoActionCancel = undefined;
+    }
 
     await batch(denops, async (denops: Denops) => {
       await denops.call("ddu#ui#ff#_reset_auto_action");
