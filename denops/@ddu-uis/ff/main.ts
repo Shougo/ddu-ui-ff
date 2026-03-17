@@ -1948,7 +1948,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     // TypeScript-side debounce delay.
-    // uiParams.autoAction.delay is respected when set; otherwise default 80 ms.
+    // uiParams.autoAction.delay is respected when set; otherwise default 80ms.
     // A value of 0 disables debouncing entirely (immediate execution).
     const delay = this.#autoActionDelay !== undefined
       ? this.#autoActionDelay
