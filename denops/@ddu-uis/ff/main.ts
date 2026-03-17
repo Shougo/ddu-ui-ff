@@ -1995,9 +1995,9 @@ export class Ui extends BaseUi<Params> {
       this.#latestAppliedAutoActionSeq = localSeq;
     } catch (e) {
       // Log the error without breaking the UI.
-      console.error(
-        `[ddu-ui-ff] autoAction error (seq=${localSeq}):`,
-        e,
+      await printError(
+        denops,
+        `autoAction error (seq=${localSeq}): ${e}`,
       );
     }
   }
