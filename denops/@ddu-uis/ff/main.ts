@@ -23,6 +23,7 @@ import { SEPARATOR as pathsep } from "@std/path/constants";
 import { ensure } from "@denops/std/buffer";
 
 import { PreviewUi } from "./preview.ts";
+import { computeLineDiff } from "./diff.ts";
 
 type HighlightGroup = {
   filterText?: string;
@@ -134,6 +135,7 @@ export type Params = {
   autoResize: boolean;
   checkPreview: string | ((args: CheckPreviewArguments) => Promise<boolean>);
   cursorPos: number;
+  diffUpdateThreshold: number;
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
@@ -181,6 +183,7 @@ export type Params = {
 export class Ui extends BaseUi<Params> {
   #bufferName = "";
   #items: DduItem[] = [];
+  #prevLines: string[] = [];
   #viewItems: DduItem[] = [];
   #selectedItems: ObjectSet<DduItem> = new ObjectSet();
   #saveMode = "";
@@ -221,6 +224,7 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.#items = [];
+    this.#prevLines = [];
     await this.clearSelectedItems(args);
 
     this.#enabledAutoAction = args.uiParams.startAutoAction;
@@ -665,6 +669,23 @@ export class Ui extends BaseUi<Params> {
       const checkRefreshed = args.context.input !== this.#prevInput ||
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
         (args.uiParams.reversed && this.#items.length !== this.#prevLength);
+
+      const newLines = this.#items.map((c) =>
+        getPrefix(c) + (c.display ?? c.word)
+      );
+
+      // Compute a minimal line diff.  For reversed buffers the VimL side
+      // inverts line order before writing to the buffer, so any partial
+      // line index we compute here would be incorrect when applied to the
+      // reversed display.  Fall back to a full replace in that case.
+      const diffInfo = args.uiParams.reversed
+        ? { type: "full" as const }
+        : computeLineDiff(
+          this.#prevLines,
+          newLines,
+          args.uiParams.diffUpdateThreshold,
+        );
+
       // NOTE: Use batch for screen flicker when highlight items.
       // Single RPC call to apply buffer content, highlights and info at once.
       await batch(args.denops, async (denops: Denops) => {
@@ -674,7 +695,7 @@ export class Ui extends BaseUi<Params> {
             args.uiParams,
             bufnr,
             winid,
-            this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+            newLines,
             this.#items.map((item, index) => {
               return {
                 highlights: item.highlights ?? [],
@@ -688,9 +709,12 @@ export class Ui extends BaseUi<Params> {
               .filter((index) => index >= 0),
             args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
             cursorPos,
+            diffInfo,
           );
         });
       });
+
+      this.#prevLines = newLines;
     } catch (e) {
       await printError(
         args.denops,
@@ -1559,6 +1583,7 @@ export class Ui extends BaseUi<Params> {
         return Promise.resolve(false);
       },
       cursorPos: 0,
+      diffUpdateThreshold: 0.3,
       displaySourceName: "no",
       displayTree: false,
       exprParams: [

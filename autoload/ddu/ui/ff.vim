@@ -172,7 +172,7 @@ endfunction
 
 function ddu#ui#ff#_apply_updates(
       \ params, bufnr, winid, lines, items, selected_items,
-      \ refreshed, pos) abort
+      \ refreshed, pos, diff_info) abort
   " Batch update: combines _update_buffer and _process_items into one RPC call.
   if !bufexists(a:bufnr)
     return
@@ -196,15 +196,46 @@ function ddu#ui#ff#_apply_updates(
       endif
     else
       const footer_width = a:params.maxWidth / 3
-      const lines = a:lines->map({ _, val ->
-            \   ddu#ui#ff#_truncate(
-            \     val, a:params.maxWidth, footer_width, '..')
-            \ })
-      call setbufline(a:bufnr, 1,
-            \ a:params.reversed ? reverse(lines) : lines)
+      const diff_type = a:diff_info->get('type', 'full')
 
-      if current_line_count > lines->len()
-        silent call deletebufline(a:bufnr, lines->len() + 1, '$')
+      if diff_type ==# 'noop'
+        " No line changes — skip buffer write entirely.
+
+      elseif diff_type ==# 'append'
+        " Only new lines appended at the end.
+        const new_lines = a:diff_info.lines->map({ _, val ->
+              \   ddu#ui#ff#_truncate(
+              \     val, a:params.maxWidth, footer_width, '..')
+              \ })
+        call setbufline(a:bufnr, a:diff_info.startLine, new_lines)
+
+      elseif diff_type ==# 'shrink'
+        " Lines removed from the tail only.
+        if a:diff_info.keepLines < current_line_count
+          silent call deletebufline(
+                \   a:bufnr, a:diff_info.keepLines + 1, '$')
+        endif
+
+      elseif diff_type ==# 'update'
+        " Contiguous range of lines changed (same total length).
+        const changed_lines = a:diff_info.lines->map({ _, val ->
+              \   ddu#ui#ff#_truncate(
+              \     val, a:params.maxWidth, footer_width, '..')
+              \ })
+        call setbufline(a:bufnr, a:diff_info.startLine, changed_lines)
+
+      else
+        " Full replace (diff_type == 'full' or unknown).
+        const lines = a:lines->map({ _, val ->
+              \   ddu#ui#ff#_truncate(
+              \     val, a:params.maxWidth, footer_width, '..')
+              \ })
+        call setbufline(a:bufnr, 1,
+              \ a:params.reversed ? reverse(lines) : lines)
+
+        if current_line_count > lines->len()
+          silent call deletebufline(a:bufnr, lines->len() + 1, '$')
+        endif
       endif
     endif
   catch
