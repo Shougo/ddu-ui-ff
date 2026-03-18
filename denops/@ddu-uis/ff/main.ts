@@ -198,7 +198,6 @@ export class Ui extends BaseUi<Params> {
   #autoActionTimer: ReturnType<typeof setTimeout> | undefined;
   #autoActionCancel: (() => void) | undefined;
   #autoActionSeq = 0;
-  #latestAppliedAutoActionSeq = 0;
   // Stores uiParams.autoAction.delay for use inside #doAutoAction.
   #autoActionDelay: number | undefined = undefined;
   #restcmd = "";
@@ -1992,7 +1991,6 @@ export class Ui extends BaseUi<Params> {
       if (localSeq !== this.#autoActionSeq) {
         return;
       }
-      this.#latestAppliedAutoActionSeq = localSeq;
     } catch (e) {
       // Log the error without breaking the UI.
       await printError(
