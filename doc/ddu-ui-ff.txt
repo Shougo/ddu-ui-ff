@@ -277,6 +277,40 @@ cursorPos	(number)
 
 		Default: 0
 
+                                         *ddu-ui-ff-param-diffUpdateThreshold*
+diffUpdateThreshold	(number)
+		A threshold used to decide between performing a partial (diff)
+		update and falling back to a full redraw (full replace of
+		buffer lines). When the fraction of changed lines compared to
+		the total number of lines exceeds this threshold (a value
+		between 0.0 and 1.0), the UI will perform a full replace. If
+		the fraction is below the threshold, the UI will attempt a
+		partial update that applies only the computed differences,
+		which can significantly reduce RPC round-trips and repaint
+		cost.
+
+		Default: 0.30
+
+		Examples:
+			- 0.30: If more than 30% of lines changed, fall back
+			  to a full replace.
+			- 1.00: Always attempt diff updates (even for large
+			  changes).
+			- 0.00: Always perform full replace (disable diff
+			  updates).
+
+		Notes:
+			- Computing diffs itself incurs a small CPU cost, but
+			  this is usually outweighed by the savings from
+			  reducing denops <-> Neovim/Vim RPC calls.
+			- The best threshold depends on the environment (RPC
+			  latency, buffer size, and the typical change
+			  patterns). Adjust this value based on end-to-end
+			  benchmarks for your setup.
+			- If you encounter unexpected performance regressions,
+			  increase the threshold to favor full replaces, or
+			  set it to 0.0 to disable diff updates.
+
                                            *ddu-ui-ff-param-displaySourceName*
 displaySourceName	(string)
 		Display source name in the buffer. Following values are
