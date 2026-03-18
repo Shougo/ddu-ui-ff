@@ -740,19 +740,50 @@ function ddu#ui#ff#_apply_operations(bufnr, ops) abort
       if e < s - 1
         let e = s - 1
       endif
-      " fast full replace
-      if s == 1 && e >= '$'->line()
-        call deletebufline(a:bufnr, 1, '$')
-        if lines->len() > 0
-          call appendbufline(a:bufnr, 0, lines)
+      " Use Neovim API when available for faster range replacement
+      if has('nvim')
+        " nvim_buf_set_lines uses 0-based start and exclusive end.
+        let start_idx = [0, s - 1]->max()
+        if e >= '$'->line()
+          let end_idx = -1
+        else
+          " convert 1-based inclusive 'e' to exclusive end index for
+          " "nvim_buf_set_lines()"
+          let end_idx = e
         endif
+        try
+          call nvim_buf_set_lines(a:bufnr, start_idx, end_idx, v:false, lines)
+        catch
+          " Fallback to Vimscript operations on error
+          if start_idx == 0 && (end_idx == -1 || end_idx >= '$'->line())
+            call deletebufline(a:bufnr, 1, '$')
+            if lines->len() > 0
+              call appendbufline(a:bufnr, 0, lines)
+            endif
+          else
+            if end_idx >= start_idx
+              " convert back to 1-based inclusive indexes for deletebufline
+              call deletebufline(a:bufnr, start_idx + 1, end_idx)
+            endif
+            if lines->len() > 0
+              call appendbufline(a:bufnr, start_idx, lines)
+            endif
+          endif
+        endtry
       else
-        " delete range then insert
-        if e >= s
-          call deletebufline(a:bufnr, s, e)
-        endif
-        if lines->len() > 0
-          call appendbufline(a:bufnr, s - 1, lines)
+        " fallback for classic Vim: delete range then insert
+        if s == 1 && e >= '$'->line()
+          call deletebufline(a:bufnr, 1, '$')
+          if lines->len() > 0
+            call appendbufline(a:bufnr, 0, lines)
+          endif
+        else
+          if e >= s
+            call deletebufline(a:bufnr, s, e)
+          endif
+          if lines->len() > 0
+            call appendbufline(a:bufnr, s - 1, lines)
+          endif
         endif
       endif
     else
