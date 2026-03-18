@@ -23,6 +23,7 @@ import { ensure } from "@denops/std/buffer";
 import { is } from "@core/unknownutil/is";
 
 import type { Params } from "./main.ts";
+import { run } from "./bench-e2e.ts";
 
 type PreviewParams = {
   syntaxLimitChars?: number;
@@ -321,6 +322,8 @@ export class PreviewUi {
     }
 
     await fn.win_gotoid(denops, prevId);
+
+    await run(denops);
 
     return ActionFlags.Persist;
   }
