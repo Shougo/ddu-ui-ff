@@ -714,3 +714,55 @@ function s:strwidthpart_reverse(str, width) abort
   const vcol = str->strwidth() - a:width
   return str->matchstr('\%>' .. (vcol < 0 ? 0 : vcol) .. 'v.*')
 endfunction
+
+function ddu#ui#ff#_apply_operations(bufnr, ops) abort
+  if !a:bufnr->bufexists()
+    return
+  endif
+  call bufload(a:bufnr)
+
+  " make buffer modifiable during updates
+  let save_mod = a:bufnr->getbufvar('&modifiable', 1)
+  call setbufvar(a:bufnr, '&modifiable', 1)
+
+  for op in a:ops
+    if !op->has_key('op')
+      continue
+    endif
+    if op.op ==# 'replace_lines'
+      let s = op->get('start', 1)
+      let e = op->get('end', line('$'))
+      let lines = op->get('lines', [])
+      " normalize bounds
+      if s < 1
+        let s = 1
+      endif
+      if e < s - 1
+        let e = s - 1
+      endif
+      " fast full replace
+      if s == 1 && e >= '$'->line()
+        call deletebufline(a:bufnr, 1, '$')
+        if lines->len() > 0
+          call appendbufline(a:bufnr, 0, lines)
+        endif
+      else
+        " delete range then insert
+        if e >= s
+          call deletebufline(a:bufnr, s, e)
+        endif
+        if lines->len() > 0
+          call appendbufline(a:bufnr, s - 1, lines)
+        endif
+      endif
+    else
+      " unsupported op in minimal handler: ignore
+      continue
+    endif
+  endfor
+
+  " restore modifiable flag
+  call setbufvar(a:bufnr, '&modifiable', save_mod)
+
+  redraw
+endfunction
