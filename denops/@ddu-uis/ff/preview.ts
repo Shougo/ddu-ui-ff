@@ -398,12 +398,15 @@ export class PreviewUi {
     if (err || !exists || previewer.kind === "nofile") {
       // Create new buffer
       previewBufnr = await fn.bufadd(denops, buffer.bufname);
+
+      // NOTE: set "buftype" before bufload().
+      await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
+
       await fn.bufload(denops, previewBufnr);
       await replace(denops, previewBufnr, []);
 
       await batch(denops, async (denops: Denops) => {
         await ensure(denops, previewBufnr, async () => {
-          await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
           await fn.setbufvar(denops, previewBufnr, "&swapfile", 0);
           await fn.setbufvar(denops, previewBufnr, "&bufhidden", "hide");
           await fn.setbufvar(denops, previewBufnr, "&modeline", 1);
