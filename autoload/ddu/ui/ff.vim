@@ -42,8 +42,27 @@ function ddu#ui#ff#_update_buffer(
 
   if !a:refreshed
     if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
-      " Restore the cursor position
-      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
+      " Restore the cursor position (nearest match)
+      let lines_all = a:bufnr->getbufline(1, '$')
+      let matches = []
+      for i in range(0, lines_all->len() - 1)
+        if lines_all[i] ==# before_line
+          call add(matches, i + 1)
+        endif
+      endfor
+      if !empty(matches)
+        let nearest = matches[0]
+        let best_dist = abs(nearest - before_cursor[1])
+        for m in matches
+          if abs(m - before_cursor[1]) < best_dist
+            let nearest = m
+            let best_dist = abs(m - before_cursor[1])
+          endif
+        endfor
+        let cursor = nearest
+      else
+        let cursor = 0
+      endif
 
       if cursor > 0
         " Restore cursor
@@ -218,8 +237,27 @@ function ddu#ui#ff#_apply_updates(
 
   if !a:refreshed
     if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
-      " Restore the cursor position
-      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
+      " Restore the cursor position (nearest match)
+      let lines_all = a:bufnr->getbufline(1, '$')
+      let matches = []
+      for i in range(0, lines_all->len() - 1)
+        if lines_all[i] ==# before_line
+          call add(matches, i + 1)
+        endif
+      endfor
+      if !empty(matches)
+        let nearest = matches[0]
+        let best_dist = abs(nearest - before_cursor[1])
+        for m in matches
+          if abs(m - before_cursor[1]) < best_dist
+            let nearest = m
+            let best_dist = abs(m - before_cursor[1])
+          endif
+        endfor
+        let cursor = nearest
+      else
+        let cursor = 0
+      endif
 
       if cursor > 0
         " Restore cursor
