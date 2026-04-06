@@ -59,7 +59,7 @@ function ddu#ui#ff#_update_buffer(
         \   a:pos <= 0
         \ ? before_cursor[1]
         \ : a:params.reversed
-        \ ? a:lines->len() - a:pos
+        \ ? a:lines->len() - a:pos + 1
         \ : a:pos)
 endfunction
 function s:init_cursor(winid, lnum)
@@ -232,7 +232,7 @@ function ddu#ui#ff#_apply_updates(
           \   a:pos <= 0
           \ ? before_cursor[1]
           \ : a:params.reversed
-          \ ? a:lines->len() - a:pos
+          \ ? a:lines->len() - a:pos + 1
           \ : a:pos)
   endif
 
