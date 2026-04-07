@@ -54,7 +54,31 @@ function ddu#ui#ff#_update_buffer(
         \ ? a:lines->len() - a:pos + 1
         \ : a:pos)
 endfunction
-function s:restore_cursor(bufnr, winid, before_line, before_cursor)
+function s:restore_cursor(
+      \ bufnr, winid, before_line, before_cursor, saved_line='')
+  " Try to restore by saved_line (item display text) first
+  if a:saved_line !=# ''
+    let lines_all = a:bufnr->getbufline(1, '$')
+    let matches = []
+    for i in range(0, lines_all->len() - 1)
+      if lines_all[i] ==# a:saved_line
+        call add(matches, i + 1)
+      endif
+    endfor
+    if !matches->empty()
+      let nearest = matches[0]
+      let best_dist = (nearest - a:before_cursor[1])->abs()
+      for m in matches
+        if (m - a:before_cursor[1])->abs() < best_dist
+          let nearest = m
+          let best_dist = (m - a:before_cursor[1])->abs()
+        endif
+      endfor
+      call s:init_cursor(a:winid, nearest)
+      return
+    endif
+  endif
+
   if a:before_line ==# a:bufnr->getbufline(a:before_cursor[1])->get(0, '')
     return
   endif
@@ -73,7 +97,7 @@ function s:restore_cursor(bufnr, winid, before_line, before_cursor)
     for m in matches
       if (m - a:before_cursor[1])->abs() < best_dist
         let nearest = m
-        let best_dist = abs(m - a:before_cursor[1])
+        let best_dist = (m - a:before_cursor[1])->abs()
       endif
     endfor
     let cursor = nearest
@@ -196,7 +220,7 @@ endfunction
 
 function ddu#ui#ff#_apply_updates(
       \ params, bufnr, winid, lines, items, selected_items,
-      \ refreshed, pos) abort
+      \ refreshed, pos, saved_line) abort
   " Batch update: combines _update_buffer and _process_items into one RPC call.
   if !bufexists(a:bufnr)
     return
@@ -241,7 +265,8 @@ function ddu#ui#ff#_apply_updates(
   endtry
 
   if !a:refreshed
-    call s:restore_cursor(a:bufnr, a:winid, before_line, before_cursor)
+    call s:restore_cursor(
+          \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
   else
     " Init the cursor
     call s:init_cursor(a:winid,

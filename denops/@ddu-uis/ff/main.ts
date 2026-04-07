@@ -660,6 +660,11 @@ export class Ui extends BaseUi<Params> {
     };
 
     // Update main buffer
+    const cursorItem = await this.#getItem(args.denops);
+    const savedLine = cursorItem
+      ? getPrefix(cursorItem) + (cursorItem.display ?? cursorItem.word)
+      : "";
+
     try {
       const checkRefreshed = args.context.input !== this.#prevInput ||
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
@@ -687,6 +692,7 @@ export class Ui extends BaseUi<Params> {
               .filter((index) => index >= 0),
             args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
             cursorPos,
+            savedLine,
           );
         });
       });
