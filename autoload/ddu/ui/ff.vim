@@ -41,15 +41,7 @@ function ddu#ui#ff#_update_buffer(
   endtry
 
   if !a:refreshed
-    if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
-      " Restore the cursor position
-      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
-
-      if cursor > 0
-        " Restore cursor
-        call s:init_cursor(a:winid, cursor)
-      endif
-    endif
+    call s:restore_cursor(a:bufnr, a:winid, before_line, before_cursor)
 
     return
   endif
@@ -61,6 +53,38 @@ function ddu#ui#ff#_update_buffer(
         \ : a:params.reversed
         \ ? a:lines->len() - a:pos + 1
         \ : a:pos)
+endfunction
+function s:restore_cursor(bufnr, winid, before_line, before_cursor)
+  if a:before_line ==# a:bufnr->getbufline(a:before_cursor[1])->get(0, '')
+    return
+  endif
+
+  " Restore the cursor position (nearest match)
+  let lines_all = a:bufnr->getbufline(1, '$')
+  let matches = []
+  for i in range(0, lines_all->len() - 1)
+    if lines_all[i] ==# a:before_line
+      call add(matches, i + 1)
+    endif
+  endfor
+  if !matches->empty()
+    let nearest = matches[0]
+    let best_dist = (nearest - a:before_cursor[1])->abs()
+    for m in matches
+      if (m - a:before_cursor[1])->abs() < best_dist
+        let nearest = m
+        let best_dist = abs(m - a:before_cursor[1])
+      endif
+    endfor
+    let cursor = nearest
+  else
+    let cursor = 0
+  endif
+
+  if cursor > 0
+    " Restore cursor
+    call s:init_cursor(a:winid, cursor)
+  endif
 endfunction
 function s:init_cursor(winid, lnum)
   const win_height = a:winid->winheight()
@@ -217,15 +241,7 @@ function ddu#ui#ff#_apply_updates(
   endtry
 
   if !a:refreshed
-    if before_line !=# a:bufnr->getbufline(before_cursor[1])->get(0, '')
-      " Restore the cursor position
-      const cursor = a:bufnr->getbufline(1, '$')->index(before_line) + 1
-
-      if cursor > 0
-        " Restore cursor
-        call s:init_cursor(a:winid, cursor)
-      endif
-    endif
+    call s:restore_cursor(a:bufnr, a:winid, before_line, before_cursor)
   else
     " Init the cursor
     call s:init_cursor(a:winid,
