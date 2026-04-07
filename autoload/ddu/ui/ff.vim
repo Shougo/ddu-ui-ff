@@ -54,15 +54,14 @@ function ddu#ui#ff#_update_buffer(
         \ ? a:lines->len() - a:pos + 1
         \ : a:pos)
 endfunction
-function s:restore_cursor(bufnr, winid, before_line, before_cursor, ...)
-  const saved_line = a:0 > 0 ? a:1 : ''
-
+function s:restore_cursor(
+      \ bufnr, winid, before_line, before_cursor, saved_line='')
   " Try to restore by saved_line (item display text) first
-  if saved_line !=# ''
+  if a:saved_line !=# ''
     let lines_all = a:bufnr->getbufline(1, '$')
     let matches = []
     for i in range(0, lines_all->len() - 1)
-      if lines_all[i] ==# saved_line
+      if lines_all[i] ==# a:saved_line
         call add(matches, i + 1)
       endif
     endfor
@@ -266,7 +265,8 @@ function ddu#ui#ff#_apply_updates(
   endtry
 
   if !a:refreshed
-    call s:restore_cursor(a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
+    call s:restore_cursor(
+          \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
   else
     " Init the cursor
     call s:init_cursor(a:winid,
