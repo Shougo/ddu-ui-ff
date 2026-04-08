@@ -673,27 +673,29 @@ export class Ui extends BaseUi<Params> {
       // NOTE: Use ensure to run in the correct buffer context.
       // Capture the return value to know whether Vimscript restored the cursor.
       await ensure(args.denops, bufnr, async () => {
-        restored = Number(await args.denops.call(
-          "ddu#ui#ff#_apply_updates",
-          args.uiParams,
-          bufnr,
-          winid,
-          this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-          this.#items.map((item, index) => {
-            return {
-              highlights: item.highlights ?? [],
-              info: item.info ?? [],
-              row: index + 1,
-              prefix: getPrefix(item),
-            };
-          }).slice(0, args.uiParams.maxHighlightItems),
-          this.#selectedItems.values()
-            .map((item) => this.#getItemIndex(item))
-            .filter((index) => index >= 0),
-          args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
-          cursorPos,
-          savedLine,
-        ));
+        restored = Number(
+          await args.denops.call(
+            "ddu#ui#ff#_apply_updates",
+            args.uiParams,
+            bufnr,
+            winid,
+            this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+            this.#items.map((item, index) => {
+              return {
+                highlights: item.highlights ?? [],
+                info: item.info ?? [],
+                row: index + 1,
+                prefix: getPrefix(item),
+              };
+            }).slice(0, args.uiParams.maxHighlightItems),
+            this.#selectedItems.values()
+              .map((item) => this.#getItemIndex(item))
+              .filter((index) => index >= 0),
+            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
+            cursorPos,
+            savedLine,
+          ),
+        );
       });
     } catch (e) {
       await printError(
