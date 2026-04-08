@@ -24,6 +24,10 @@ import { is } from "@core/unknownutil/is";
 
 import type { Params } from "./main.ts";
 
+// Delay (ms) after closing a window to let Vim/Neovim flush its internal
+// window list before callers check winIds (prevents stale-state race).
+const WINDOW_CLOSE_DELAY_MS = 30;
+
 type PreviewParams = {
   syntaxLimitChars?: number;
 };
@@ -54,6 +58,8 @@ export class PreviewUi {
 
     if (uiParams.previewFloating && denops.meta.host !== "nvim") {
       await denops.call("popup_close", this.#previewWinId);
+      await denops.cmd("redraw!");
+      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
     } else {
       const saveId = await fn.win_getid(denops);
       await batch(denops, async (denops) => {
@@ -67,6 +73,8 @@ export class PreviewUi {
         }
         await fn.win_gotoid(denops, saveId);
       });
+      await denops.cmd("redraw!");
+      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
     }
     this.#previewWinId = -1;
     this.#previewCacheKey = undefined;

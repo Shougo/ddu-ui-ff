@@ -24,6 +24,10 @@ import { ensure } from "@denops/std/buffer";
 
 import { PreviewUi } from "./preview.ts";
 
+// Delay (ms) after closing a window to let Vim/Neovim flush its internal
+// window list before callers check winIds (prevents stale-state race).
+const WINDOW_CLOSE_DELAY_MS = 30;
+
 type HighlightGroup = {
   filterText?: string;
   floating?: string;
@@ -1675,6 +1679,7 @@ export class Ui extends BaseUi<Params> {
       // Close popup
       await args.denops.call("popup_close", this.#popupId);
       await args.denops.cmd("redraw!");
+      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
       this.#popupId = -1;
     } else {
       const winIds = await fn.win_findbuf(args.denops, bufnr) as number[];
@@ -1706,6 +1711,8 @@ export class Ui extends BaseUi<Params> {
           );
         }
       }
+      await args.denops.cmd("redraw!");
+      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
     }
 
     // Restore mode
