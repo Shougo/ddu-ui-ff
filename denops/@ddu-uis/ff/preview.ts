@@ -58,8 +58,6 @@ export class PreviewUi {
 
     if (uiParams.previewFloating && denops.meta.host !== "nvim") {
       await denops.call("popup_close", this.#previewWinId);
-      await denops.cmd("redraw!");
-      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
     } else {
       const saveId = await fn.win_getid(denops);
       await batch(denops, async (denops) => {
@@ -73,9 +71,11 @@ export class PreviewUi {
         }
         await fn.win_gotoid(denops, saveId);
       });
-      await denops.cmd("redraw!");
-      await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
     }
+
+    await denops.cmd("redraw!");
+    await new Promise((r) => setTimeout(r, WINDOW_CLOSE_DELAY_MS));
+
     this.#previewWinId = -1;
     this.#previewCacheKey = undefined;
   }
