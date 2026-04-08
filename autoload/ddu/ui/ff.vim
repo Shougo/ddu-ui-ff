@@ -75,12 +75,12 @@ function s:restore_cursor(
         endif
       endfor
       call s:init_cursor(a:winid, nearest)
-      return
+      return 1
     endif
   endif
 
   if a:before_line ==# a:bufnr->getbufline(a:before_cursor[1])->get(0, '')
-    return
+    return 0
   endif
 
   " Restore the cursor position (nearest match)
@@ -109,6 +109,7 @@ function s:restore_cursor(
     " Restore cursor
     call s:init_cursor(a:winid, cursor)
   endif
+  return cursor > 0
 endfunction
 function s:init_cursor(winid, lnum)
   const win_height = a:winid->winheight()
@@ -264,8 +265,9 @@ function ddu#ui#ff#_apply_updates(
     call setbufvar(a:bufnr, '&modified', v:false)
   endtry
 
+  let restored = 0
   if !a:refreshed
-    call s:restore_cursor(
+    let restored = s:restore_cursor(
           \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
   else
     " Init the cursor
@@ -279,7 +281,7 @@ function ddu#ui#ff#_apply_updates(
 
   " --- Highlights and info processing (equivalent to _process_items) ---
   if !a:bufnr->bufloaded()
-    return
+    return restored
   endif
 
   " Clear all properties
@@ -335,6 +337,7 @@ function ddu#ui#ff#_apply_updates(
 
   " NOTE: :redraw is needed
   redraw
+  return restored
 endfunction
 
 function ddu#ui#ff#_max_row(bufnr)
