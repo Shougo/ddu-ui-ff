@@ -669,36 +669,35 @@ export class Ui extends BaseUi<Params> {
       ? getPrefix(cursorItem) + (cursorItem.display ?? cursorItem.word)
       : "";
 
+    let restored = 0;
     try {
       const checkRefreshed = args.context.input !== this.#prevInput ||
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
         (args.uiParams.reversed && this.#items.length !== this.#prevLength);
-      // NOTE: Use batch for screen flicker when highlight items.
-      // Single RPC call to apply buffer content, highlights and info at once.
-      await batch(args.denops, async (denops: Denops) => {
-        await ensure(args.denops, bufnr, async () => {
-          await denops.call(
-            "ddu#ui#ff#_apply_updates",
-            args.uiParams,
-            bufnr,
-            winid,
-            this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-            this.#items.map((item, index) => {
-              return {
-                highlights: item.highlights ?? [],
-                info: item.info ?? [],
-                row: index + 1,
-                prefix: getPrefix(item),
-              };
-            }).slice(0, args.uiParams.maxHighlightItems),
-            this.#selectedItems.values()
-              .map((item) => this.#getItemIndex(item))
-              .filter((index) => index >= 0),
-            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
-            cursorPos,
-            savedLine,
-          );
-        });
+      // NOTE: Use ensure to run in the correct buffer context.
+      // Capture the return value to know whether Vimscript restored the cursor.
+      await ensure(args.denops, bufnr, async () => {
+        restored = Number(await args.denops.call(
+          "ddu#ui#ff#_apply_updates",
+          args.uiParams,
+          bufnr,
+          winid,
+          this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+          this.#items.map((item, index) => {
+            return {
+              highlights: item.highlights ?? [],
+              info: item.info ?? [],
+              row: index + 1,
+              prefix: getPrefix(item),
+            };
+          }).slice(0, args.uiParams.maxHighlightItems),
+          this.#selectedItems.values()
+            .map((item) => this.#getItemIndex(item))
+            .filter((index) => index >= 0),
+          args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
+          cursorPos,
+          savedLine,
+        ));
       });
     } catch (e) {
       await printError(
@@ -721,7 +720,7 @@ export class Ui extends BaseUi<Params> {
       {},
     ) as DduItem;
 
-    if (cursorPos <= 0 && Object.keys(saveItem).length !== 0) {
+    if (cursorPos <= 0 && Object.keys(saveItem).length !== 0 && !restored) {
       this.searchItem({
         denops: args.denops,
         context: args.context,
