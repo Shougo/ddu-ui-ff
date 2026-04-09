@@ -202,6 +202,8 @@ export class Ui extends BaseUi<Params> {
   #autoActionTimer: ReturnType<typeof setTimeout> | undefined;
   #autoActionCancel: (() => void) | undefined;
   #autoActionSeq = 0;
+  // Sequence counter to detect stale async redraw results
+  #redrawSeq = 0;
   // Stores uiParams.autoAction.delay for use inside #doAutoAction.
   #autoActionDelay: number | undefined = undefined;
   #restcmd = "";
@@ -670,6 +672,7 @@ export class Ui extends BaseUi<Params> {
       : "";
 
     let restored = 0;
+    const localSeq = ++this.#redrawSeq;
     try {
       const checkRefreshed = args.context.input !== this.#prevInput ||
         (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
@@ -723,12 +726,17 @@ export class Ui extends BaseUi<Params> {
     ) as DduItem;
 
     if (cursorPos <= 0 && Object.keys(saveItem).length !== 0 && !restored) {
-      this.searchItem({
-        denops: args.denops,
-        context: args.context,
-        item: saveItem,
-        uiParams: args.uiParams,
-      });
+      // Only act on cursor moves if this redraw result is the latest one.
+      // A stale result (localSeq !== this.#redrawSeq) must not overwrite a
+      // cursor position that was already set by a newer redraw.
+      if (localSeq === this.#redrawSeq) {
+        this.searchItem({
+          denops: args.denops,
+          context: args.context,
+          item: saveItem,
+          uiParams: args.uiParams,
+        });
+      }
     }
 
     if (!initialized || cursorPos > 0) {
