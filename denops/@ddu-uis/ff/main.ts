@@ -624,7 +624,7 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    if (!initialized || winid < 0) {
+    if (!initialized || prevWinid < 0) {
       await this.#initOptions(args.denops, args.options, args.uiParams, bufnr);
     }
     if (!initialized) {
@@ -632,6 +632,20 @@ export class Ui extends BaseUi<Params> {
       await args.denops.cmd(
         "autocmd CursorMoved <buffer> call ddu#ui#ff#_update_cursor()",
       );
+    }
+
+    // NOTE: When the buffer is reused (hidden buffer reopened in a new window),
+    // setbufvar() does not fire FileType because the option value is unchanged.
+    // Explicitly trigger the FileType autocmd so that user-defined FileType
+    // handlers (e.g. buffer-local mappings) are applied on every window open.
+    if (initialized && prevWinid < 0) {
+      await ensure(args.denops, bufnr, async () => {
+        await fn.win_execute(
+          args.denops,
+          winid,
+          "doautocmd <nomodeline> FileType ddu-ff",
+        );
+      });
     }
 
     await setStatusline(
