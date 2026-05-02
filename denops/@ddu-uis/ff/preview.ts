@@ -411,7 +411,6 @@ export class PreviewUi {
       await fn.setbufvar(denops, previewBufnr, "&buftype", "nofile");
 
       await fn.bufload(denops, previewBufnr);
-      await replace(denops, previewBufnr, []);
 
       await batch(denops, async (denops: Denops) => {
         await ensure(denops, previewBufnr, async () => {
