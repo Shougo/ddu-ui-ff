@@ -639,11 +639,13 @@ export class Ui extends BaseUi<Params> {
     // Explicitly trigger the FileType autocmd so that user-defined FileType
     // handlers (e.g. buffer-local mappings) are applied on every window open.
     if (initialized && prevWinid < 0) {
-      await fn.win_execute(
-        args.denops,
-        winid,
-        "doautocmd <nomodeline> FileType ddu-ff",
-      );
+      await ensure(args.denops, bufnr, async () => {
+        await fn.win_execute(
+          args.denops,
+          winid,
+          "doautocmd <nomodeline> FileType ddu-ff",
+        );
+      });
     }
 
     await setStatusline(
