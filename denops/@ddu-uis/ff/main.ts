@@ -141,6 +141,7 @@ export type Params = {
   displaySourceName: "long" | "short" | "no";
   displayTree: boolean;
   exprParams: (keyof Params)[];
+  floatingBlend: number;
   floatingBorder: FloatingBorder;
   floatingTitle: FloatingTitle;
   floatingTitlePos: "left" | "center" | "right";
@@ -554,6 +555,13 @@ export class Ui extends BaseUi<Params> {
           "&winhighlight",
           `Normal:${floatingHighlight},FloatBorder:${borderHighlight},` +
             `CursorLine:${cursorLineHighlight}`,
+        );
+
+        await fn.setwinvar(
+          args.denops,
+          this.#popupId,
+          "&winblend",
+          args.uiParams.floatingBlend,
         );
 
         await fn.setwinvar(
@@ -1589,6 +1597,7 @@ export class Ui extends BaseUi<Params> {
         "winHeight",
         "winWidth",
       ],
+      floatingBlend: 0,
       floatingBorder: "none",
       floatingTitle: "",
       floatingTitlePos: "left",

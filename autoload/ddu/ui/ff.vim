@@ -581,6 +581,9 @@ function ddu#ui#ff#_open_preview_window(
   if use_winfixbuf
     call setwinvar(winid, '&winfixbuf', v:true)
   endif
+  if a:params.previewFloating && has('nvim')
+    call setwinvar(winid, '&winblend', a:params.floatingBlend)
+  endif
 
   return winid
 endfunction

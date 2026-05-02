@@ -312,6 +312,16 @@ exprParams	(string[])
 		  "winWidth",
 		]
 
+                                               *ddu-ui-ff-param-floatingBlend*
+floatingBlend	(number)
+		Specify popup window transparency.
+		The valid values are in the range of 0 for fully opaque
+		popupmenu (disabled) to 100.
+
+		NOTE: It is neovim only.
+
+		Default: 0
+
                                               *ddu-ui-ff-param-floatingBorder*
 floatingBorder		(string | list)
 		Specify the style of the window border if
