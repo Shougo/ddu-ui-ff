@@ -275,7 +275,8 @@ function ddu#ui#ff#_apply_updates(
   else
     " Init the cursor after a refresh (items changed/filtered).
     if a:pos > 0
-      " Explicit position: use it directly (e.g., cursorPos param on first load).
+      " Explicit position: use it directly (e.g., cursorPos param on first
+      " load).
       call s:init_cursor(a:winid,
             \   a:params.reversed
             \ ? a:lines->len() - a:pos + 1

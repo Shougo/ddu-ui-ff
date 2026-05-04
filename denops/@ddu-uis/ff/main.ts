@@ -700,8 +700,8 @@ export class Ui extends BaseUi<Params> {
       (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
       (args.uiParams.reversed && this.#items.length !== this.#prevLength);
     try {
-      // NOTE: Use ensure to run in the correct buffer context.
-      // Capture the return value to know whether Vimscript restored the cursor.
+      // NOTE: Use ensure to run in the correct buffer context. Capture the
+      // return value to know whether Vimscript restored the cursor.
       await ensure(args.denops, bufnr, async () => {
         restored = Number(
           await args.denops.call(
