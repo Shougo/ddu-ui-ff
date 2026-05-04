@@ -696,10 +696,10 @@ export class Ui extends BaseUi<Params> {
 
     let restored = 0;
     const localSeq = ++this.#redrawSeq;
+    const checkRefreshed = args.context.input !== this.#prevInput ||
+      (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
+      (args.uiParams.reversed && this.#items.length !== this.#prevLength);
     try {
-      const checkRefreshed = args.context.input !== this.#prevInput ||
-        (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
-        (args.uiParams.reversed && this.#items.length !== this.#prevLength);
       // NOTE: Use ensure to run in the correct buffer context.
       // Capture the return value to know whether Vimscript restored the cursor.
       await ensure(args.denops, bufnr, async () => {
@@ -762,8 +762,13 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (!initialized || cursorPos > 0) {
-      // Update current cursor
+    if (!initialized || cursorPos > 0 || (this.#refreshed && checkRefreshed)) {
+      // Update current cursor.
+      // When a refresh occurred (refreshItems cleared ddu_ui_item), we must
+      // repopulate ddu_ui_item here so subsequent actions find the correct
+      // item at the restored cursor position.  The Vimscript side already
+      // updated ddu_ui_ff_cursor_pos synchronously before returning, so
+      // #getIndex() will return the right index even before CursorMoved fires.
       await this.updateCursor({ denops: args.denops, context: args.context });
     }
 

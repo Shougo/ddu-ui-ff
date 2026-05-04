@@ -114,11 +114,14 @@ endfunction
 function s:init_cursor(winid, lnum)
   const win_height = a:winid->winheight()
   const max_line = '$'->line(a:winid)
-  if max_line - a:lnum < win_height / 2
+  " Clamp lnum to a valid line range [1, max_line] to avoid cursor jumping
+  " past the end of the buffer.
+  const lnum = max([1, min([a:lnum, max_line])])
+  if max_line - lnum < win_height / 2
     " Adjust cursor position when cursor is near bottom.
     call win_execute(a:winid, 'normal! Gzb')
   endif
-  call win_execute(a:winid, 'call cursor(' .. a:lnum .. ', 0)')
+  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
 endfunction
 
 function ddu#ui#ff#_process_items(
@@ -270,13 +273,35 @@ function ddu#ui#ff#_apply_updates(
     let restored = s:restore_cursor(
           \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
   else
-    " Init the cursor
-    call s:init_cursor(a:winid,
-          \   a:pos <= 0
-          \ ? before_cursor[1]
-          \ : a:params.reversed
-          \ ? a:lines->len() - a:pos + 1
-          \ : a:pos)
+    " Init the cursor after a refresh (items changed/filtered).
+    if a:pos > 0
+      " Explicit position: use it directly (e.g., cursorPos param on first load).
+      call s:init_cursor(a:winid,
+            \   a:params.reversed
+            \ ? a:lines->len() - a:pos + 1
+            \ : a:pos)
+    else
+      " No explicit position: try to restore the cursor to the previously
+      " selected item, then fall back to a clamped line number.
+      " NOTE: `restored` is already initialised to 0 above; it is only updated
+      " here when saved_line is non-empty and restore_cursor succeeds.
+      if a:saved_line !=# ''
+        let restored = s:restore_cursor(
+              \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
+      endif
+      if !restored
+        " Fall back: clamp cursor to valid line range so it does not jump past
+        " the end of the buffer when items were removed.
+        " s:init_cursor handles clamping internally.
+        call s:init_cursor(a:winid, before_cursor[1])
+      endif
+    endif
+  endif
+
+  " Explicitly sync the cursor-position buffer variable so TypeScript can
+  " read the correct value before the CursorMoved autocmd is processed.
+  if a:winid->win_id2win() > 0
+    call setbufvar(a:bufnr, 'ddu_ui_ff_cursor_pos', a:winid->getcurpos())
   endif
 
   " --- Highlights and info processing (equivalent to _process_items) ---
