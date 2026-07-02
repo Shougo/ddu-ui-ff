@@ -192,9 +192,7 @@ export class Ui extends BaseUi<Params> {
   #saveCmdline = "";
   #saveCmdpos = 0;
   #saveCol = 0;
-  #refreshed = false;
-  #prevLength = -1;
-  #prevInput = "";
+  #prevDone = false;
   #prevWinInfo: WinInfo | null = null;
   #previewUi = new PreviewUi();
   #popupId = -1;
@@ -266,9 +264,6 @@ export class Ui extends BaseUi<Params> {
     uiParams: Params;
     items: DduItem[];
   }): Promise<void> {
-    this.#prevLength = this.#items.length;
-    this.#prevInput = args.context.input;
-
     this.#items = args.items.slice(0, args.uiParams.maxDisplayItems);
     if (args.uiParams.pathFilter !== "") {
       const pathFilter = new RegExp(args.uiParams.pathFilter);
@@ -282,8 +277,6 @@ export class Ui extends BaseUi<Params> {
     }
 
     await this.#updateSelectedItems(args.denops);
-
-    this.#refreshed = true;
 
     await this.#clearSavedCursor(args.denops);
 
@@ -675,8 +668,8 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const cursorPos = Number(args.uiParams.cursorPos) > 0 && this.#refreshed &&
-        this.#prevLength == 0
+    const checkRefreshed = !this.#prevDone && args.context.done;
+    const cursorPos = Number(args.uiParams.cursorPos) > 0 && checkRefreshed
       ? Number(args.uiParams.cursorPos)
       : 0;
 
@@ -696,9 +689,6 @@ export class Ui extends BaseUi<Params> {
 
     let restored = 0;
     const localSeq = ++this.#redrawSeq;
-    const checkRefreshed = args.context.input !== this.#prevInput ||
-      (this.#prevLength > 0 && this.#items.length < this.#prevLength) ||
-      (args.uiParams.reversed && this.#items.length !== this.#prevLength);
     try {
       // NOTE: Use ensure to run in the correct buffer context. Capture the
       // return value to know whether Vimscript restored the cursor.
@@ -721,7 +711,7 @@ export class Ui extends BaseUi<Params> {
             this.#selectedItems.values()
               .map((item) => this.#getItemIndex(item))
               .filter((index) => index >= 0),
-            args.uiParams.cursorPos > 0 || (this.#refreshed && checkRefreshed),
+            args.uiParams.cursorPos > 0 || checkRefreshed,
             cursorPos,
             savedLine,
           ),
@@ -762,13 +752,8 @@ export class Ui extends BaseUi<Params> {
       }
     }
 
-    if (!initialized || cursorPos > 0 || (this.#refreshed && checkRefreshed)) {
+    if (!initialized || cursorPos > 0 || checkRefreshed) {
       // Update current cursor.
-      // When a refresh occurred (refreshItems cleared ddu_ui_item), we must
-      // repopulate ddu_ui_item here so subsequent actions find the correct
-      // item at the restored cursor position.  The Vimscript side already
-      // updated ddu_ui_ff_cursor_pos synchronously before returning, so
-      // #getIndex() will return the right index even before CursorMoved fires.
       await this.updateCursor({ denops: args.denops, context: args.context });
     }
 
@@ -783,7 +768,7 @@ export class Ui extends BaseUi<Params> {
       );
     }
 
-    this.#refreshed = false;
+    this.#prevDone = args.context.done;
   }
 
   override async clearSelectedItems(args: {
