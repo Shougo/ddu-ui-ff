@@ -338,6 +338,7 @@ export class Ui extends BaseUi<Params> {
   }): Promise<void> {
     if (args.options.sync && !args.context.done) {
       // Skip redraw if all items are not done
+      this.#prevDone = args.context.done;
       return;
     }
 
