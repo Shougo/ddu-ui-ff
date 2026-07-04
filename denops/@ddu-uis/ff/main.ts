@@ -201,8 +201,6 @@ export class Ui extends BaseUi<Params> {
   #autoActionTimer: ReturnType<typeof setTimeout> | undefined;
   #autoActionCancel: (() => void) | undefined;
   #autoActionSeq = 0;
-  // Sequence counter to detect stale async redraw results
-  #redrawSeq = 0;
   // Stores uiParams.autoAction.delay for use inside #doAutoAction.
   #autoActionDelay: number | undefined = undefined;
   #restcmd = "";
@@ -688,34 +686,30 @@ export class Ui extends BaseUi<Params> {
       ? getPrefix(cursorItem) + (cursorItem.display ?? cursorItem.word)
       : "";
 
-    let restored = 0;
-    const localSeq = ++this.#redrawSeq;
     try {
       // NOTE: Use ensure to run in the correct buffer context. Capture the
       // return value to know whether Vimscript restored the cursor.
       await ensure(args.denops, bufnr, async () => {
-        restored = Number(
-          await args.denops.call(
-            "ddu#ui#ff#_apply_updates",
-            args.uiParams,
-            bufnr,
-            winid,
-            this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
-            this.#items.map((item, index) => {
-              return {
-                highlights: item.highlights ?? [],
-                info: item.info ?? [],
-                row: index + 1,
-                prefix: getPrefix(item),
-              };
-            }).slice(0, args.uiParams.maxHighlightItems),
-            this.#selectedItems.values()
-              .map((item) => this.#getItemIndex(item))
-              .filter((index) => index >= 0),
-            args.uiParams.cursorPos > 0 || checkRefreshed,
-            cursorPos,
-            savedLine,
-          ),
+        await args.denops.call(
+          "ddu#ui#ff#_apply_updates",
+          args.uiParams,
+          bufnr,
+          winid,
+          this.#items.map((c) => getPrefix(c) + (c.display ?? c.word)),
+          this.#items.map((item, index) => {
+            return {
+              highlights: item.highlights ?? [],
+              info: item.info ?? [],
+              row: index + 1,
+              prefix: getPrefix(item),
+            };
+          }).slice(0, args.uiParams.maxHighlightItems),
+          this.#selectedItems.values()
+            .map((item) => this.#getItemIndex(item))
+            .filter((index) => index >= 0),
+          args.uiParams.cursorPos > 0 || checkRefreshed,
+          cursorPos,
+          savedLine,
         );
       });
     } catch (e) {
@@ -730,27 +724,6 @@ export class Ui extends BaseUi<Params> {
     this.#viewItems = Array.from(this.#items);
     if (args.uiParams.reversed) {
       this.#viewItems = this.#viewItems.reverse();
-    }
-
-    const saveItem = await fn.getbufvar(
-      args.denops,
-      bufnr,
-      "ddu_ui_item",
-      {},
-    ) as DduItem;
-
-    if (cursorPos <= 0 && Object.keys(saveItem).length !== 0 && !restored) {
-      // Only act on cursor moves if this redraw result is the latest one.
-      // A stale result (localSeq !== this.#redrawSeq) must not overwrite a
-      // cursor position that was already set by a newer redraw.
-      if (localSeq === this.#redrawSeq) {
-        this.searchItem({
-          denops: args.denops,
-          context: args.context,
-          item: saveItem,
-          uiParams: args.uiParams,
-        });
-      }
     }
 
     if (!initialized || cursorPos > 0 || checkRefreshed) {

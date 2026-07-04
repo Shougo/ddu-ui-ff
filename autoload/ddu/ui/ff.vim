@@ -1,129 +1,5 @@
 let s:namespace = has('nvim') ? nvim_create_namespace('ddu-ui-ff') : 0
 
-function ddu#ui#ff#_update_buffer(
-      \ params, bufnr, winid, lines, refreshed, pos) abort
-  const current_lines = '$'->line(a:winid)
-
-  call setbufvar(a:bufnr, '&modifiable', v:true)
-
-  const before_cursor = a:winid->getcurpos()
-  const before_line = a:bufnr->getbufline(before_cursor[1])->get(0, '')
-  try
-    " NOTE: deletebufline() changes cursor position.
-    " NOTE: deletebufline() needs ":silent".
-    if a:lines->empty()
-      " Clear buffer
-      if current_lines > 1
-        silent call deletebufline(a:bufnr, 1, '$')
-      else
-        call setbufline(a:bufnr, 1, [''])
-      endif
-    else
-      const footer_width = a:params.maxWidth / 3
-      const lines = a:lines->map({ _, val ->
-            \   ddu#ui#ff#_truncate(
-            \     val, a:params.maxWidth, footer_width, '..')
-            \ })
-      call setbufline(a:bufnr, 1,
-            \ a:params.reversed ? reverse(lines) : lines)
-
-      if current_lines > lines->len()
-        silent call deletebufline(a:bufnr, lines->len() + 1, '$')
-      endif
-    endif
-  catch
-    " NOTE: Buffer modify may be failed
-    call ddu#util#print_error(v:exception)
-    return
-  finally
-    call setbufvar(a:bufnr, '&modifiable', v:false)
-    call setbufvar(a:bufnr, '&modified', v:false)
-  endtry
-
-  if !a:refreshed
-    call s:restore_cursor(a:bufnr, a:winid, before_line, before_cursor)
-
-    return
-  endif
-
-  " Init the cursor
-  call s:init_cursor(a:winid,
-        \   a:pos <= 0
-        \ ? before_cursor[1]
-        \ : a:params.reversed
-        \ ? a:lines->len() - a:pos + 1
-        \ : a:pos)
-endfunction
-function s:restore_cursor(
-      \ bufnr, winid, before_line, before_cursor, saved_line='')
-  " Try to restore by saved_line (item display text) first
-  if a:saved_line !=# ''
-    let lines_all = a:bufnr->getbufline(1, '$')
-    let matches = []
-    for i in range(0, lines_all->len() - 1)
-      if lines_all[i] ==# a:saved_line
-        call add(matches, i + 1)
-      endif
-    endfor
-    if !matches->empty()
-      let nearest = matches[0]
-      let best_dist = (nearest - a:before_cursor[1])->abs()
-      for m in matches
-        if (m - a:before_cursor[1])->abs() < best_dist
-          let nearest = m
-          let best_dist = (m - a:before_cursor[1])->abs()
-        endif
-      endfor
-      call s:init_cursor(a:winid, nearest)
-      return 1
-    endif
-  endif
-
-  if a:before_line ==# a:bufnr->getbufline(a:before_cursor[1])->get(0, '')
-    return 0
-  endif
-
-  " Restore the cursor position (nearest match)
-  let lines_all = a:bufnr->getbufline(1, '$')
-  let matches = []
-  for i in range(0, lines_all->len() - 1)
-    if lines_all[i] ==# a:before_line
-      call add(matches, i + 1)
-    endif
-  endfor
-  if !matches->empty()
-    let nearest = matches[0]
-    let best_dist = (nearest - a:before_cursor[1])->abs()
-    for m in matches
-      if (m - a:before_cursor[1])->abs() < best_dist
-        let nearest = m
-        let best_dist = (m - a:before_cursor[1])->abs()
-      endif
-    endfor
-    let cursor = nearest
-  else
-    let cursor = 0
-  endif
-
-  if cursor > 0
-    " Restore cursor
-    call s:init_cursor(a:winid, cursor)
-  endif
-  return cursor > 0
-endfunction
-function s:init_cursor(winid, lnum)
-  const win_height = a:winid->winheight()
-  const max_line = '$'->line(a:winid)
-  " Clamp lnum to a valid line range [1, max_line] to avoid cursor jumping
-  " past the end of the buffer.
-  const lnum = max([1, min([a:lnum, max_line])])
-  if max_line - lnum < win_height / 2
-    " Adjust cursor position when cursor is near bottom.
-    call win_execute(a:winid, 'normal! Gzb')
-  endif
-  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
-endfunction
-
 function ddu#ui#ff#_process_items(
       \ params, bufnr, max_lines, items, selected_items) abort
   " Buffer must be loaded
@@ -269,34 +145,15 @@ function ddu#ui#ff#_apply_updates(
   endtry
 
   let restored = 0
-  if !a:refreshed
+  if a:refreshed
+    " Init the cursor after a refresh (items changed/filtered).
+    call s:init_cursor(a:winid,
+          \   a:params.reversed
+          \ ? a:lines->len() - a:pos + 1
+          \ : a:pos)
+  else
     let restored = s:restore_cursor(
           \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
-  else
-    " Init the cursor after a refresh (items changed/filtered).
-    if a:pos > 0
-      " Explicit position: use it directly (e.g., cursorPos param on first
-      " load).
-      call s:init_cursor(a:winid,
-            \   a:params.reversed
-            \ ? a:lines->len() - a:pos + 1
-            \ : a:pos)
-    else
-      " No explicit position: try to restore the cursor to the previously
-      " selected item, then fall back to a clamped line number.
-      " NOTE: `restored` is already initialised to 0 above; it is only updated
-      " here when saved_line is non-empty and restore_cursor succeeds.
-      if a:saved_line !=# ''
-        let restored = s:restore_cursor(
-              \ a:bufnr, a:winid, before_line, before_cursor, a:saved_line)
-      endif
-      if !restored
-        " Fall back: clamp cursor to valid line range so it does not jump past
-        " the end of the buffer when items were removed.
-        " s:init_cursor handles clamping internally.
-        call s:init_cursor(a:winid, before_cursor[1])
-      endif
-    endif
   endif
 
   " Explicitly sync the cursor-position buffer variable so TypeScript can
@@ -364,6 +221,76 @@ function ddu#ui#ff#_apply_updates(
   " NOTE: :redraw is needed
   redraw
   return restored
+endfunction
+
+function s:restore_cursor(
+      \ bufnr, winid, before_line, before_cursor, saved_line='')
+  " Try to restore by saved_line (item display text) first
+  if a:saved_line !=# ''
+    let lines_all = a:bufnr->getbufline(1, '$')
+    let matches = []
+    for i in range(0, lines_all->len() - 1)
+      if lines_all[i] ==# a:saved_line
+        call add(matches, i + 1)
+      endif
+    endfor
+    if !matches->empty()
+      let nearest = matches[0]
+      let best_dist = (nearest - a:before_cursor[1])->abs()
+      for m in matches
+        if (m - a:before_cursor[1])->abs() < best_dist
+          let nearest = m
+          let best_dist = (m - a:before_cursor[1])->abs()
+        endif
+      endfor
+      call s:init_cursor(a:winid, nearest)
+      return 1
+    endif
+  endif
+
+  if a:before_line ==# a:bufnr->getbufline(a:before_cursor[1])->get(0, '')
+    return 0
+  endif
+
+  " Restore the cursor position (nearest match)
+  let lines_all = a:bufnr->getbufline(1, '$')
+  let matches = []
+  for i in range(0, lines_all->len() - 1)
+    if lines_all[i] ==# a:before_line
+      call add(matches, i + 1)
+    endif
+  endfor
+  if !matches->empty()
+    let nearest = matches[0]
+    let best_dist = (nearest - a:before_cursor[1])->abs()
+    for m in matches
+      if (m - a:before_cursor[1])->abs() < best_dist
+        let nearest = m
+        let best_dist = (m - a:before_cursor[1])->abs()
+      endif
+    endfor
+    let cursor = nearest
+  else
+    let cursor = 0
+  endif
+
+  if cursor > 0
+    " Restore cursor
+    call s:init_cursor(a:winid, cursor)
+  endif
+  return cursor > 0
+endfunction
+function s:init_cursor(winid, lnum)
+  const win_height = a:winid->winheight()
+  const max_line = '$'->line(a:winid)
+  " Clamp lnum to a valid line range [1, max_line] to avoid cursor jumping
+  " past the end of the buffer.
+  const lnum = max([1, min([a:lnum, max_line])])
+  if max_line - lnum < win_height / 2
+    " Adjust cursor position when cursor is near bottom.
+    call win_execute(a:winid, 'normal! Gzb')
+  endif
+  call win_execute(a:winid, 'call cursor(' .. lnum .. ', 0)')
 endfunction
 
 function ddu#ui#ff#_max_row(bufnr)
