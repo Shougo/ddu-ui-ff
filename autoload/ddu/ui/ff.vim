@@ -307,8 +307,6 @@ function ddu#ui#ff#_highlight(
       \ row, max_row, col, max_col, length) abort
 
   if !a:highlight->hlexists()
-    call ddu#util#print_error(
-          \ printf('highlight "%s" does not exist', a:highlight))
     return
   endif
 
