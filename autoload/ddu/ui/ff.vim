@@ -622,9 +622,6 @@ function s:do_auto_action() abort
   if text ==# s:cursor_text
     return
   endif
-  if text ==# s:cursor_text
-    return
-  endif
 
   if s:auto_action.sync
     call ddu#ui#sync_action(s:auto_action.name, s:auto_action.params)
