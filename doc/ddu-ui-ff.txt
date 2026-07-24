@@ -493,6 +493,8 @@ previewDebounceMs	(number)
                                              *ddu-ui-ff-param-previewFloating*
 previewFloating	(boolean)
 		Use floating window in |ddu-ui-ff-action-preview|.
+		If Neovim and 'previewpopup' option is available,
+		'previewpopup' is used. 
 
 		Default: v:false
 
