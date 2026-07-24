@@ -359,7 +359,6 @@ function ddu#ui#ff#_open_preview_window(
   const use_popup = a:params.previewFloating
         \ && a:params.split !=# "floating" && has('nvim')
         \ && exists('&previewpopup') && &previewpopup !=# ''
-  const use_popup = v:false
   const use_winfixbuf =
         \ '+winfixbuf'->exists() && a:params.previewSplit !=# 'no'
         \ && !use_popup

@@ -52,12 +52,20 @@ export class PreviewUi {
   async close(denops: Denops, context: Context, uiParams: Params) {
     await this.clearHighlight(denops);
 
-    if (!this.visible()) {
+    const visible = await this.visible(denops);
+    if (!visible) {
+      this.#previewWinId = -1;
+      this.#previewCacheKey = undefined;
+
       return;
     }
 
-    if (uiParams.previewFloating && denops.meta.host !== "nvim") {
-      await denops.call("popup_close", this.#previewWinId);
+    if (uiParams.previewFloating) {
+      if (denops.meta.host === "nvim") {
+        await denops.call("nvim_win_close", this.#previewWinId, true);
+      } else {
+        await denops.call("popup_close", this.#previewWinId);
+      }
     } else {
       const saveId = await fn.win_getid(denops);
       await batch(denops, async (denops) => {
@@ -94,7 +102,8 @@ export class PreviewUi {
     denops: Denops,
     command: string,
   ) {
-    if (!this.visible()) {
+    const visible = await this.visible(denops);
+    if (!visible) {
       return;
     }
     await fn.win_execute(denops, this.#previewWinId, command);
@@ -104,16 +113,31 @@ export class PreviewUi {
     return this.#previewWinId;
   }
 
-  isAlreadyPreviewed(item: DduItem): boolean {
-    return this.visible() && equal(item, this.#previewedTarget);
+  async isAlreadyPreviewed(denops: Denops, item: DduItem): Promise<boolean> {
+    return await this.visible(denops) && equal(item, this.#previewedTarget);
   }
 
   isChangedUiParams(params: Params): boolean {
     return equal(params, this.#previewedUiParams);
   }
 
-  visible(): boolean {
-    return this.#previewWinId > 0;
+  async visible(denops: Denops): Promise<boolean> {
+    if (this.#previewWinId <= 0) {
+      return false;
+    }
+
+    if (denops.meta.host === "nvim") {
+      return await denops.call(
+        "nvim_win_is_valid",
+        this.#previewWinId,
+      ) as boolean;
+    } else if (await fn.win_id2win(denops, this.#previewWinId) > 0) {
+      // Check for normal window
+      return true;
+    } else {
+      // Check popup
+      return await denops.call("popup_visible", this.#previewWinId) as boolean;
+    }
   }
 
   async previewContents(
@@ -130,7 +154,7 @@ export class PreviewUi {
       previewContext: PreviewContext,
     ) => Promise<Previewer | undefined>,
   ): Promise<ActionFlags> {
-    if (this.isAlreadyPreviewed(item) || !getPreviewer) {
+    if (await this.isAlreadyPreviewed(denops, item) || !getPreviewer) {
       return ActionFlags.None;
     }
 
@@ -212,7 +236,7 @@ export class PreviewUi {
     // the last rendered content, skip re-rendering.
     if (uiParams.previewCacheEnabled) {
       const cacheKey = this.#buildCacheKey(previewer, item);
-      if (this.visible() && cacheKey === this.#previewCacheKey) {
+      if (await this.visible(denops) && cacheKey === this.#previewCacheKey) {
         return ActionFlags.Persist;
       }
     }
@@ -340,7 +364,8 @@ export class PreviewUi {
     bufnr: number,
     previousWinId: number,
   ): Promise<ActionFlags> {
-    if (!this.visible()) {
+    const visible = await this.visible(denops);
+    if (!visible) {
       this.#previewWinId = await denops.call(
         "ddu#ui#ff#_open_preview_window",
         uiParams,
@@ -650,7 +675,8 @@ export class PreviewUi {
   }
 
   async clearHighlight(denops: Denops) {
-    if (!this.visible()) {
+    const visible = await this.visible(denops);
+    if (!visible) {
       return;
     }
     const winid = this.#previewWinId;
