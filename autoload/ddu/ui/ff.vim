@@ -686,3 +686,17 @@ function s:strwidthpart_reverse(str, width) abort
   const vcol = str->strwidth() - a:width
   return str->matchstr('\%>' .. (vcol < 0 ? 0 : vcol) .. 'v.*')
 endfunction
+
+function ddu#ui#ff#_check_popup(winid) abort
+  if a:winid < 0
+    return v:false
+  endif
+
+  if has('nvim')
+    return a:winid->nvim_win_is_valid()
+  elseif a:winid->win_id2win() > 0
+    return v:true
+  else
+    return a:winid->popup_getpos()->len() > 0
+  endif
+endfunction

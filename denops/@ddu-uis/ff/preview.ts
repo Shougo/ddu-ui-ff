@@ -122,22 +122,10 @@ export class PreviewUi {
   }
 
   async visible(denops: Denops): Promise<boolean> {
-    if (this.#previewWinId <= 0) {
-      return false;
-    }
-
-    if (denops.meta.host === "nvim") {
-      return await denops.call(
-        "nvim_win_is_valid",
-        this.#previewWinId,
-      ) as boolean;
-    } else if (await fn.win_id2win(denops, this.#previewWinId) > 0) {
-      // Check for normal window
-      return true;
-    } else {
-      // Check popup
-      return await denops.call("popup_visible", this.#previewWinId) as boolean;
-    }
+    return await denops.call(
+      "ddu#ui#ff#_check_popup",
+      this.#previewWinId,
+    ) as boolean;
   }
 
   async previewContents(
