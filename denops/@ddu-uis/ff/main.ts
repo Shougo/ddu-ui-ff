@@ -193,6 +193,7 @@ export class Ui extends BaseUi<Params> {
   #saveCmdpos = 0;
   #saveCol = 0;
   #prevDone = false;
+  #prevWinId = -1;
   #prevWinInfo: WinInfo | null = null;
   #previewUi = new PreviewUi();
   #popupId = -1;
@@ -363,6 +364,7 @@ export class Ui extends BaseUi<Params> {
         this.#items.length === 1
       ) {
         // Immediate action
+        await this.#clearWinFixBuf(args.denops, args.context.winId);
         await args.denops.call(
           "ddu#item_action",
           args.options.name,
@@ -408,6 +410,7 @@ export class Ui extends BaseUi<Params> {
       // The layout must be saved.
       this.#restcmd = await fn.winrestcmd(args.denops);
       this.#prevWinInfo = await getWinInfo(args.denops);
+      this.#prevWinId = args.context.winId;
     }
 
     const direction = args.uiParams.splitDirection;
@@ -863,6 +866,18 @@ export class Ui extends BaseUi<Params> {
     }
   }
 
+  async #clearWinFixBuf(
+    denops: Denops,
+    winId: number,
+  ): Promise<void> {
+    if (winId <= 0) {
+      return;
+    }
+    if (await fn.exists(denops, "+winfixbuf")) {
+      await fn.setwinvar(denops, winId, "&winfixbuf", false);
+    }
+  }
+
   async #winId(args: {
     denops: Denops;
     uiParams: Params;
@@ -1263,6 +1278,7 @@ export class Ui extends BaseUi<Params> {
         return ActionFlags.Persist;
       }
 
+      await this.#clearWinFixBuf(args.denops, this.#prevWinId);
       await args.denops.call(
         "ddu#item_action",
         args.options.name,
