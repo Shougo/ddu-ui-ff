@@ -359,23 +359,12 @@ function ddu#ui#ff#_open_preview_window(
   const use_popup = a:params.previewFloating
         \ && a:params.split !=# "floating" && has('nvim')
         \ && exists('&previewpopup') && &previewpopup !=# ''
-  const use_winfixbuf =
-        \ '+winfixbuf'->exists() && a:params.previewSplit !=# 'no'
-        \ && !use_popup
 
   if a:preview_winid >= 0 && win_id2win(a:preview_winid) > 0
         \ && (!a:params.previewFloating || has('nvim'))
     call win_gotoid(a:preview_winid)
 
-    if use_winfixbuf
-      call setwinvar(a:preview_winid, '&winfixbuf', v:false)
-    endif
-
     execute 'buffer' a:preview_bufnr
-
-    if use_winfixbuf
-      call setwinvar(a:preview_winid, '&winfixbuf', v:true)
-    endif
 
     return a:preview_winid
   endif
@@ -537,9 +526,6 @@ function ddu#ui#ff#_open_preview_window(
     call setwinvar(winid, '&previewwindow', v:true)
   endif
   call setwinvar(winid, '&cursorline', v:false)
-  if use_winfixbuf
-    call setwinvar(winid, '&winfixbuf', v:true)
-  endif
   if a:params.previewFloating && has('nvim')
     call setwinvar(winid, '&winblend', a:params.floatingBlend)
   endif
