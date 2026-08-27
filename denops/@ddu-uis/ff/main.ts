@@ -193,6 +193,9 @@ export class Ui extends BaseUi<Params> {
   #saveCmdpos = 0;
   #saveCol = 0;
   #prevDone = false;
+  // True while an async search session is in progress (set when done===false,
+  // cleared after the completion update has been rendered).
+  #asyncSession = false;
   #prevWinInfo: WinInfo | null = null;
   #previewUi = new PreviewUi();
   #popupId = -1;
@@ -667,8 +670,22 @@ export class Ui extends BaseUi<Params> {
       }
       return "";
     };
-    const checkRefreshed = !this.#prevDone && args.context.done;
-    const cursorPos = Number(args.uiParams.cursorPos) > 0 && checkRefreshed
+    // Determine whether this update should initialize the cursor to the
+    // start position (cursorPos / top), or restore the previous cursor.
+    //
+    // Restore when:
+    //   - UI is being resumed (!existsUI && initialized): the window was
+    //     closed but the buffer still exists; keep the previous position.
+    //   - An async search session is active (#asyncSession || !done): keep
+    //     the cursor stable during incremental updates, including the final
+    //     completion update.
+    //
+    // Initialize (move to cursorPos or top) only on the very first display
+    // of this buffer (!initialized).
+    const isResume = !!initialized && !existsUI;
+    const isAsyncUpdate = this.#asyncSession || !args.context.done;
+    const initializeCursor = !initialized && !isResume && !isAsyncUpdate;
+    const cursorPos = initializeCursor && Number(args.uiParams.cursorPos) > 0
       ? Number(args.uiParams.cursorPos)
       : 0;
 
@@ -707,7 +724,7 @@ export class Ui extends BaseUi<Params> {
           this.#selectedItems.values()
             .map((item) => this.#getItemIndex(item))
             .filter((index) => index >= 0),
-          args.uiParams.cursorPos > 0 || checkRefreshed,
+          initializeCursor,
           cursorPos,
           savedLine,
         );
@@ -726,7 +743,7 @@ export class Ui extends BaseUi<Params> {
       this.#viewItems = this.#viewItems.reverse();
     }
 
-    if (!initialized || cursorPos > 0 || checkRefreshed) {
+    if (!initialized || initializeCursor || isResume || isAsyncUpdate) {
       // Update current cursor.
       await this.updateCursor({ denops: args.denops, context: args.context });
     }
@@ -743,6 +760,13 @@ export class Ui extends BaseUi<Params> {
     }
 
     this.#prevDone = args.context.done;
+    // Update async session state: start tracking when done===false, clear
+    // after the final completion update has been rendered.
+    if (!args.context.done) {
+      this.#asyncSession = true;
+    } else {
+      this.#asyncSession = false;
+    }
   }
 
   override async clearSelectedItems(args: {
