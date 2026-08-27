@@ -100,7 +100,7 @@ endfunction
 
 function ddu#ui#ff#_apply_updates(
       \ params, bufnr, winid, lines, items, selected_items,
-      \ refreshed, pos, saved_line) abort
+      \ initialize, pos, saved_line) abort
   " Batch update: combines _update_buffer and _process_items into one RPC call.
   if !bufexists(a:bufnr)
     return
@@ -145,8 +145,8 @@ function ddu#ui#ff#_apply_updates(
   endtry
 
   let restored = 0
-  if a:refreshed
-    " Init the cursor after a refresh (items changed/filtered).
+  if a:initialize
+    " Init the cursor on first display.
     call s:init_cursor(a:winid,
           \   a:params.reversed
           \ ? a:lines->len() - a:pos + 1
