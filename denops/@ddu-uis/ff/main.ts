@@ -685,7 +685,7 @@ export class Ui extends BaseUi<Params> {
     const isResume = !!initialized && !existsUI;
     const isAsyncUpdate = this.#asyncSession || !args.context.done;
     const initializeCursor = !initialized && !isResume && !isAsyncUpdate;
-    const cursorPos = initializeCursor && Number(args.uiParams.cursorPos) > 0
+    const cursorPos = Number(args.uiParams.cursorPos) > 0
       ? Number(args.uiParams.cursorPos)
       : 0;
 
@@ -743,7 +743,14 @@ export class Ui extends BaseUi<Params> {
       this.#viewItems = this.#viewItems.reverse();
     }
 
-    if (!initialized || initializeCursor || isResume || isAsyncUpdate) {
+    if (
+      !initialized || initializeCursor || isResume || isAsyncUpdate ||
+      cursorPos > 0
+    ) {
+      if (cursorPos > 0) {
+        await this.#cursor(args.denops, args.context, [cursorPos, 0]);
+      }
+
       // Update current cursor.
       await this.updateCursor({ denops: args.denops, context: args.context });
     }
