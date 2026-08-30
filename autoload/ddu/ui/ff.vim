@@ -679,7 +679,7 @@ function ddu#ui#ff#_check_popup(winid) abort
   endif
 
   if has('nvim')
-    return a:winid->nvim_win_is_valid()
+    return nvim_win_is_valid(a:winid)
   elseif a:winid->win_id2win() > 0
     return v:true
   else
