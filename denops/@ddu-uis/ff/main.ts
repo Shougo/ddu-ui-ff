@@ -676,16 +676,18 @@ export class Ui extends BaseUi<Params> {
     // Restore when:
     //   - UI is being resumed (!existsUI && initialized): the window was
     //     closed but the buffer still exists; keep the previous position.
-    //   - An async search session is active (#asyncSession || !done): keep
-    //     the cursor stable during incremental updates, including the final
-    //     completion update.
+    //   - An async search session is still updating (!done): keep the cursor
+    //     stable during incremental updates.
     //
-    // Initialize (move to cursorPos or top) only on the very first display
-    // of this buffer (!initialized).
+    // Initialize (move to cursorPos or top) on the very first display of this
+    // buffer (!initialized), or move to the top when an async session
+    // completes so newly inserted head candidates are selected.
     const isResume = !!initialized && !existsUI;
-    const isAsyncUpdate = this.#asyncSession || !args.context.done;
-    const initializeCursor = !initialized && !isResume && !isAsyncUpdate;
-    const cursorPos = Number(args.uiParams.cursorPos) > 0
+    const isAsyncCompletion = this.#asyncSession && args.context.done;
+    const isAsyncUpdate = !args.context.done;
+    const initializeCursor = isAsyncCompletion ||
+      (!initialized && !isResume && !isAsyncUpdate);
+    const cursorPos = !isAsyncCompletion && Number(args.uiParams.cursorPos) > 0
       ? Number(args.uiParams.cursorPos)
       : 0;
 
