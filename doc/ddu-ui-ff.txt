@@ -524,8 +524,7 @@ previewFloatingTitlePos	(string)
 
                                        *ddu-ui-ff-param-previewFloatingZindex*
 previewFloatingZindex		(number)
-		Specify the style of the preview window zindex if
-		|ddu-ui-ff-param-split| is "floating".
+		Specify the z-index of the preview floating window.
 
 		Default: 100
 
@@ -564,9 +563,11 @@ previewRow	(number)
                               *ddu-ui-ff-param-previewSkipSyntaxForLargeFiles*
 previewSkipSyntaxForLargeFiles	(boolean)
 		When v:true (the default), syntax highlighting and filetype
-		detection are skipped for preview buffers whose content
-		exceeds the syntaxLimitChars threshold (default 400000
-		characters).  Disabling syntax processing for large files
+		detection are skipped for preview buffers  whose content
+		exceeds the {syntaxLimitChars} parameter of the
+		|ddu-ui-ff-action-preview| action.(default 400000 characters).
+		Disabling syntax processing for large files
+
 		prevents noticeable UI lag during preview.
 		Set to v:false to always apply syntax regardless of file size.
 
