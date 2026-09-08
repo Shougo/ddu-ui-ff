@@ -110,7 +110,7 @@ expandItem
 				If it is less than 0, infinite recursive.
 
 			{isGrouped}:
-				If it is only one item tree, it will be
+				If there is only one item tree, it will be
 				concatenated.
 
 			{isInTree}:
@@ -315,8 +315,8 @@ exprParams	(string[])
                                                *ddu-ui-ff-param-floatingBlend*
 floatingBlend	(number)
 		Specify popup window transparency.
-		The valid values are in the range of 0 for fully opaque
-		popupmenu (disabled) to 100.
+		The valid values range from 0 for a fully opaque floating
+		window to 100 for a fully transparent floating window.
 
 		NOTE: It is neovim only.
 
@@ -886,7 +886,7 @@ must force this behaviour.
 	autocmd User Ddu:uiOpenFilterWindow
 	      \ call s:ddu_filter_my_settings()
 	function s:ddu_filter_my_settings() abort
-	  set cursorline
+	  setlocal cursorline
 
 	  call ddu#ui#save_cmaps(['<C-j>', '<C-k>'])
 
@@ -899,7 +899,7 @@ must force this behaviour.
 	autocmd User Ddu:uiCloseFilterWindow
 	      \ call s:ddu_filter_cleanup()
 	function s:ddu_filter_cleanup() abort
-	  set nocursorline
+	  setlocal nocursorline
 
 	  call ddu#ui#restore_cmaps()
 	endfunction
