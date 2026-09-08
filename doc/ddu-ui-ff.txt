@@ -337,7 +337,7 @@ floatingBorder		(string | list)
 		"rounded": Neovim only.
 		"solid": Neovim only.
 		"shadow": Neovim only.
-		array: Specifify the eight chars building up the border.
+		array: Specify the eight chars building up the border.
 
 		Default: "none"
 
@@ -377,11 +377,11 @@ highlights	(dictionary)
 		Default: "NormalFloat"
 
 		floatingBorder			(string)
-		Specify border highlight of flowing window
+		Specify border highlight of floating window.
 		Default: "FloatBorder"
 
 		floatingCursorLine		(string)
-		Specify cursor line highlight of floating window
+		Specify cursor line highlight of floating window.
 		Default: "CursorLine"
 
 		preview				(string)
@@ -757,7 +757,7 @@ EXAMPLES                                                  *ddu-ui-ff-examples*
 FREQUENTLY ASKED QUESTIONS (FAQ)                               *ddu-ui-ff-faq*
 
 FAQ 1:                                                       |ddu-ui-ff-faq-1|
-	I want to toggle hidden files by mappings.
+	I want to start filtering immediately.
 
 FAQ 2:                                                       |ddu-ui-ff-faq-2|
 	I want to call default action in the filter window.
@@ -845,7 +845,7 @@ FAQ 27:                                                     |ddu-ui-ff-faq-27|
 
 ------------------------------------------------------------------------------
                                                              *ddu-ui-ff-faq-1*
-Q: I want to start narrowing in the first.
+Q: I want to start filtering immediately.
 
 A: You can use |input()| like this.
 >
@@ -978,8 +978,9 @@ If you want to use |treesitter|, you need to stop it manually after quit. >vim
                                                              *ddu-ui-ff-faq-8*
 Q: I want to custom the statusline.
 
-A: You can disable the original statusline by |ddu-ui-ff-param-statusline|.
-And you can get the status line information by "w:ddu_ui_ff_status" variable.
+A: You can disable the original statusline by
+|ddu-ui-ff-param-overwriteStatusline|. And you can get the status line
+information by "w:ddu_ui_ff_status" variable.
 
                                                              *ddu-ui-ff-faq-9*
 Q: I want to move to line quickly like denite.nvim's "quick-move" feature.
