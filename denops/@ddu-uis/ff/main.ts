@@ -1888,7 +1888,7 @@ export class Ui extends BaseUi<Params> {
         await fn.setwinvar(denops, winid, "&statuscolumn", "");
       }
       if (existsWinpinned) {
-        await fn.setwinvar(denops, winid, "&winpinned", 0);
+        await fn.setwinvar(denops, winid, "&winpinned", 1);
       }
 
       await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");
