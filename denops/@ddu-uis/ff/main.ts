@@ -1868,6 +1868,7 @@ export class Ui extends BaseUi<Params> {
     });
     const tabNr = await fn.tabpagenr(denops);
     const existsStatusColumn = await fn.exists(denops, "+statuscolumn");
+    const existsWinpinned = await fn.exists(denops, "+winpinned");
 
     await batch(denops, async (denops: Denops) => {
       await fn.setbufvar(denops, bufnr, "ddu_ui_name", options.name);
@@ -1885,6 +1886,9 @@ export class Ui extends BaseUi<Params> {
       await fn.setwinvar(denops, winid, "&signcolumn", "no");
       if (existsStatusColumn) {
         await fn.setwinvar(denops, winid, "&statuscolumn", "");
+      }
+      if (existsWinpinned) {
+        await fn.setwinvar(denops, winid, "&winpinned", 0);
       }
 
       await fn.setbufvar(denops, bufnr, "&bufhidden", "hide");
